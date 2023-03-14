@@ -1,20 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"strconv"
 	"time"
 )
-
-type graphqlQuery struct {
-	Query     string            `json:"query"`
-	Variables map[string]string `json:"variables"`
-}
 
 type QueryAll struct {
 	Data struct {
@@ -54,13 +46,17 @@ func queryAllIssues(config *GitlabConfig, projectPath string) {
 	variables := map[string]string{
 		"projectPath": projectPath,
 	}
-	response := makeRequest(graphqlQuery{
+	response, err := makeRequest(&graphqlQuery{
 		Query:     query,
 		Variables: variables,
 	}, config)
 
+	if err != nil {
+		log.Fatalf("query all issues: %s\n", err)
+	}
+
 	rs := QueryAll{}
-	err := json.Unmarshal([]byte(response), &rs)
+	err = json.Unmarshal(response, &rs)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -106,39 +102,14 @@ func querySingleIssue(config *GitlabConfig, projectPath string, issueID int) {
 		"issueIID":    strconv.Itoa(issueID),
 	}
 
-	response := makeRequest(graphqlQuery{
+	response, err := makeRequest(&graphqlQuery{
 		Query:     query,
 		Variables: variables,
 	}, config)
 
+	if err != nil {
+		log.Fatalf("query single: %s\n", err)
+	}
+
 	fmt.Printf("Single issue:\n%s\n", response)
-}
-
-func makeRequest(requestInterface interface{}, config *GitlabConfig) string {
-	requestBody, err := json.Marshal(requestInterface)
-	if err != nil {
-		log.Fatal("Error marshaling JSON:", err)
-	}
-
-	req, err := http.NewRequest("POST", config.Url, bytes.NewBuffer(requestBody))
-	if err != nil {
-		log.Fatal("Error creating HTTP request:", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.Token))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error sending HTTP request:", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading HTTP response body:", err)
-	}
-
-	return string(body)
 }
