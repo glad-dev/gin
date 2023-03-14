@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/user"
 	"path"
 
@@ -20,10 +21,14 @@ func readConfig() (*GitlabConfig, error) {
 		return nil, fmt.Errorf("could not read gitlab config: %w", err)
 	}
 
-	// Get config
+	// Load config
 	config := GitlabConfig{}
 	_, err = toml.DecodeFile(path.Join(usr.HomeDir, ".gn.toml"), &config)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("the config file at \"~/.gn.toml\" does not exist")
+		}
+
 		return nil, fmt.Errorf("could not decode config: %w", err)
 	}
 
