@@ -34,13 +34,17 @@ func makeRequest(query *graphqlQuery, config *GitlabConfig) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("request returned invalid status code: %d", resp.StatusCode)
-	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
+	}
+
+	if resp.StatusCode == 401 {
+		return nil, fmt.Errorf("token is invalid")
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
 	}
 
 	return body, nil
