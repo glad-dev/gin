@@ -14,16 +14,25 @@ type GitlabConfig struct {
 	Token string
 }
 
-func readConfig() (*GitlabConfig, error) {
+func getConfigLocation() (string, error) {
 	// Get the user's home directory
 	usr, err := user.Current()
 	if err != nil {
-		return nil, fmt.Errorf("could not read gitlab config: %w", err)
+		return "", fmt.Errorf("could not get current user: %w", err)
+	}
+
+	return path.Join(usr.HomeDir, ".gn.toml"), nil
+}
+
+func readConfig() (*GitlabConfig, error) {
+	fileLocation, err := getConfigLocation()
+	if err != nil {
+		return nil, err
 	}
 
 	// Load config
 	config := GitlabConfig{}
-	metaData, err := toml.DecodeFile(path.Join(usr.HomeDir, ".gn.toml"), &config)
+	metaData, err := toml.DecodeFile(fileLocation, &config)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("config file at \"~/.gn.toml\" does not exist")
