@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"golang.org/x/term"
 	"net/url"
 	"os"
 	"os/user"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"golang.org/x/term"
 )
 
 type GitlabConfig struct {
