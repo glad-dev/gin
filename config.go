@@ -193,6 +193,7 @@ func readConfigFromStdin() (*GitlabConfig, error) {
 
 	fmt.Printf("Enter the API token (input is hidden): ")
 	token, err := term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Printf("\n")
 	if err != nil {
 		return nil, err
 	}
