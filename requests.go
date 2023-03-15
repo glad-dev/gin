@@ -39,7 +39,7 @@ func makeRequest(query *graphqlQuery, config *GitlabConfig) ([]byte, error) {
 		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}
 
-	if resp.StatusCode == 401 {
+	if resp.StatusCode == http.StatusUnauthorized {
 		return nil, fmt.Errorf("token is invalid")
 	}
 
