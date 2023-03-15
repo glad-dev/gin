@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
+	"golang.org/x/term"
 	"net/url"
 	"os"
 	"os/user"
 	"path"
 	"reflect"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -20,15 +24,16 @@ type GitlabConfig struct {
 
 const currentMajorVersion = 1
 
+var (
+	ErrConfigDoesNotExist = errors.New("config does not exist")
+	ErrDontCreateConfig   = errors.New("user does not want to create the configuration")
+)
+
 func (config *GitlabConfig) CheckValidity() error {
 	// Check URL
-	u, err := url.ParseRequestURI(config.Url)
+	_, err := checkURLStr(config.Url)
 	if err != nil {
-		return fmt.Errorf("config contains invalid URL: %w", err)
-	}
-
-	if !u.IsAbs() {
-		return fmt.Errorf("config contains URL that is not absolute: %s", config.Url)
+		return err
 	}
 
 	// Check if token is semantically correct. The tokens validity is not checked
@@ -36,11 +41,38 @@ func (config *GitlabConfig) CheckValidity() error {
 		return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(config.Token))
 	}
 
+	// Check version
 	if config.MajorVersion > currentMajorVersion {
 		return fmt.Errorf("config was written by a newer version of the tool")
 	}
 
 	return nil
+}
+
+func handleConfig() (*GitlabConfig, error) {
+	config, err := loadConfig()
+	if err != nil {
+		if !errors.Is(err, ErrConfigDoesNotExist) {
+			// Error is NOT about the config not existing
+			return nil, err
+		}
+
+		config, err = readConfigFromStdin()
+		if err != nil {
+			if errors.Is(err, ErrDontCreateConfig) {
+				os.Exit(0)
+			}
+
+			return nil, err
+		}
+
+		err = writeConfig(config)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return config, nil
 }
 
 func writeConfig(config *GitlabConfig) error {
@@ -75,7 +107,7 @@ func writeConfig(config *GitlabConfig) error {
 	return nil
 }
 
-func readConfig() (*GitlabConfig, error) {
+func loadConfig() (*GitlabConfig, error) {
 	fileLocation, err := getConfigLocation()
 	if err != nil {
 		return nil, err
@@ -86,7 +118,7 @@ func readConfig() (*GitlabConfig, error) {
 	metaData, err := toml.DecodeFile(fileLocation, &config)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("config file at '~/.gn.toml' does not exist")
+			return nil, ErrConfigDoesNotExist
 		}
 
 		return nil, fmt.Errorf("could not decode config: %w", err)
@@ -109,6 +141,82 @@ func readConfig() (*GitlabConfig, error) {
 	}
 
 	return &config, nil
+}
+
+func readConfigFromStdin() (*GitlabConfig, error) {
+	path, err := getConfigLocation()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("No configuration file was found at: %s\n", path)
+	fmt.Printf("Do you want to create it (y/n)? ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	if err = scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	input := strings.ToLower(scanner.Text())
+	switch input {
+	case "n":
+		return nil, ErrDontCreateConfig
+	case "yes":
+		fallthrough
+	case "y":
+		break
+	default:
+		return nil, fmt.Errorf("invalid input. Expected 'y' or 'n', got '%s'", input)
+	}
+
+	config := GitlabConfig{
+		Url:          "",
+		Token:        "",
+		MajorVersion: currentMajorVersion,
+	}
+
+	fmt.Printf("What is the URL? ")
+	scanner.Scan()
+	if err = scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	config.Url = scanner.Text()
+	u, err := checkURLStr(config.Url)
+	if err != nil {
+		return nil, err
+	}
+
+	fullURL := u.JoinPath("-/profile/personal_access_tokens")
+	rest := "?name=git-navigator&scopes=api,read_api,read_user" // Can't be added with url.JoinPath since that escapes the '?'
+	fmt.Printf("Go to %s%s to create an API key with the permissions api, read_api and read_user\n", fullURL.String(), rest)
+
+	fmt.Printf("Enter the API token (input is hidden): ")
+	token, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		return nil, err
+	}
+
+	config.Token = string(token)
+
+	return &config, nil
+}
+
+func checkURLStr(urlStr string) (*url.URL, error) {
+	u, err := url.ParseRequestURI(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	if !u.IsAbs() {
+		return nil, errors.New("URL is not absolute")
+	}
+
+	if u.Scheme != "https" && u.Scheme != "http" {
+		return nil, errors.New("URL has invalid scheme")
+	}
+
+	return u, nil
 }
 
 func getConfigLocation() (string, error) {
