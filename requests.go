@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,8 +40,11 @@ func makeRequest(query *graphqlQuery, config *GitlabConfig) ([]byte, error) {
 		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}
 
-	if resp.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf("token is invalid")
+	switch resp.StatusCode {
+	case http.StatusUnauthorized:
+		return nil, errors.New("token is invalid")
+	case http.StatusNotFound:
+		return nil, errors.New("either project does not exist or token is invalid")
 	}
 
 	if resp.StatusCode != 200 {
