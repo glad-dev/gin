@@ -1,0 +1,18 @@
+#!/bin/bash
+# Run formater
+out=$(gofmt -w .)
+if [ $? -ne 0 ]; then
+	echo "Formater failed!"
+	echo "$out"
+	exit 1
+fi
+
+# Sort imports
+out=$(goimports -w *.go)
+if [ $? -ne 0 ]; then
+	echo "Sorting imports failed!"
+	echo "$out"
+	exit 1
+fi
+
+exit 0
