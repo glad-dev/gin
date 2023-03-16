@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 )
 
 type graphqlQuery struct {
@@ -20,7 +21,13 @@ func makeRequest(query *graphqlQuery, config *GitlabConfig) ([]byte, error) {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", config.Url, bytes.NewBuffer(requestBody))
+	u, err := url.Parse(config.Url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse url: %s", err)
+	}
+
+	u = u.JoinPath("/api/graphql")
+	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
