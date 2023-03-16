@@ -44,7 +44,7 @@ func readConfigFromStdin() (*Gitlab, error) {
 		MajorVersion: currentMajorVersion,
 	}
 
-	fmt.Printf("What is the URL? ")
+	fmt.Printf("What is the base URL (e.g. https://gitlab.com)? ")
 	scanner.Scan()
 	if err = scanner.Err(); err != nil {
 		return nil, err
