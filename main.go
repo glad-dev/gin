@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"gn/config"
 )
 
 func main() {
-	config, err := handleConfig()
+	config, err := config.Get()
 	if err != nil {
 		log.Fatalln(err)
 	}

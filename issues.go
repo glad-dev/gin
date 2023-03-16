@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"gn/config"
 	"log"
 	"strconv"
 	"time"
@@ -26,7 +27,7 @@ type Issue struct {
 	WebUrl      string    `json:"webUrl"`
 }
 
-func queryAllIssues(config *GitlabConfig, projectPath string) {
+func queryAllIssues(config *config.Gitlab, projectPath string) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
@@ -70,7 +71,7 @@ func queryAllIssues(config *GitlabConfig, projectPath string) {
 	}
 }
 
-func querySingleIssue(config *GitlabConfig, projectPath string, issueID int) {
+func querySingleIssue(config *config.Gitlab, projectPath string, issueID int) {
 	query := `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gn/config"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,7 +16,7 @@ type graphqlQuery struct {
 	Variables map[string]string `json:"variables"`
 }
 
-func makeRequest(query *graphqlQuery, config *GitlabConfig) ([]byte, error) {
+func makeRequest(query *graphqlQuery, config *config.Gitlab) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
