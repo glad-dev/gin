@@ -3,13 +3,12 @@ package issues
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"gn/config"
 	"gn/requests"
 )
 
-func QuerySingle(config *config.Gitlab, projectPath string, issueID int) {
+func QuerySingle(config *config.Gitlab, projectPath string, issueID string) {
 	query := `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {
@@ -38,7 +37,7 @@ func QuerySingle(config *config.Gitlab, projectPath string, issueID int) {
 
 	variables := map[string]string{
 		"projectPath": projectPath,
-		"issueIID":    strconv.Itoa(issueID),
+		"issueIID":    issueID,
 	}
 
 	response, err := requests.MakeRequest(&requests.GraphqlQuery{
