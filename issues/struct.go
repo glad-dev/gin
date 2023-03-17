@@ -9,7 +9,8 @@ type Issue struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 	Iid         string    `json:"iid"`
 	State       string    `json:"state"`
-	Assignees   []string  `json:"assignees"`
+	Author      User      `json:"author"`
+	Assignees   []User    `json:"assignees"`
 }
 
 type IssueDetails struct {

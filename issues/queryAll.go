@@ -20,10 +20,9 @@ type queryAllResponse struct {
 					UpdatedAt   time.Time `json:"updatedAt"`
 					Iid         string    `json:"iid"`
 					State       string    `json:"state"`
+					Author      User      `json:"author"`
 					Assignees   struct {
-						Nodes []struct {
-							Name string `json:"name"`
-						} `json:"nodes"`
+						Nodes []User `json:"nodes"`
 					} `json:"assignees"`
 				} `json:"nodes"`
 			} `json:"issues"`
@@ -43,9 +42,14 @@ func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 				updatedAt
 				iid
 				state
+				author {
+				  name
+				  username
+				}
 				assignees {
 				  nodes {
 					name
+					username
 				  }
 				}
 			  }
@@ -88,8 +92,11 @@ func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 			UpdatedAt:   issue.UpdatedAt,
 			Iid:         issue.Iid,
 			State:       issue.State,
-			Assignees:   assignees,
+			Assignees:   issue.Assignees.Nodes,
+			Author:      issue.Author,
 		})
+
+		fmt.Printf("%d)\tAuthor: %#v\n\tAssignees: %#v\n", len(issues), issue.Assignees.Nodes, issue.Author)
 	}
 
 	return issues, nil
