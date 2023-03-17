@@ -1,6 +1,8 @@
 package issues
 
-import "time"
+import (
+	"time"
+)
 
 type Issue struct {
 	Title       string    `json:"title"`

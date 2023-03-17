@@ -95,8 +95,6 @@ func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 			Assignees:   issue.Assignees.Nodes,
 			Author:      issue.Author,
 		})
-
-		fmt.Printf("%d)\tAuthor: %#v\n\tAssignees: %#v\n", len(issues), issue.Assignees.Nodes, issue.Author)
 	}
 
 	return issues, nil
