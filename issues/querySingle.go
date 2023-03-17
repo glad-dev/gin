@@ -2,13 +2,17 @@ package issues
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"gn/config"
 	"gn/requests"
 )
+
+var ErrIssueDoesNotExist = errors.New("issue with the given iid does not exist")
 
 type querySingleResponse struct {
 	Data struct {
@@ -106,6 +110,10 @@ func QuerySingle(config *config.Gitlab, projectPath string, issueID string) (*Is
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
+	if issueDoesNotExist(response) {
+		return nil, ErrIssueDoesNotExist
+	}
+
 	querySingle := querySingleResponse{}
 	err = json.Unmarshal(response, &querySingle)
 	if err != nil {
@@ -182,4 +190,21 @@ func QuerySingle(config *config.Gitlab, projectPath string, issueID string) (*Is
 	}
 
 	return &issueDetails, nil
+}
+
+func issueDoesNotExist(response []byte) bool {
+	emptyResponse := struct {
+		Data struct {
+			Project struct {
+				Issue interface{} `json:"issue"`
+			} `json:"project"`
+		} `json:"data"`
+	}{}
+
+	err := json.Unmarshal(response, &emptyResponse)
+	if err != nil {
+		return false
+	}
+
+	return !reflect.ValueOf(emptyResponse.Data.Project.Issue).IsValid()
 }
