@@ -16,6 +16,14 @@ func main() {
 
 	projectPath := "bachelorarbeitP3/P3"
 	fmt.Printf("Looking for issues for '%s'\n", projectPath)
-	issues.QueryAll(conf, projectPath)
-	//querySingleIssue(config, projectPath, 2)
+	//*
+	_, err = issues.QueryAll(conf, projectPath)
+	if err != nil {
+		log.Fatalf("QueryAll failed: %s", err)
+	} //*/
+
+	_, err = issues.QuerySingle(conf, projectPath, "1")
+	if err != nil {
+		log.Fatalf("QuerySingle failed: %s", err)
+	}
 }
