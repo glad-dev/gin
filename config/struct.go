@@ -1,32 +1,43 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+
+	"gn/constants"
 )
 
-const currentMajorVersion = 1
-
 type Gitlab struct {
-	Url          string
-	Token        string
 	MajorVersion int
+	Configs      []Config
+}
+
+type Config struct {
+	Url   string
+	Token string
 }
 
 func (config *Gitlab) CheckValidity() error {
-	// Check URL
-	_, err := checkURLStr(config.Url)
-	if err != nil {
-		return err
-	}
-
-	// Check if token is semantically correct. The tokens validity is not checked
-	if len(config.Token) < 20 {
-		return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(config.Token))
+	if len(config.Configs) == 0 {
+		return errors.New("config file does not contain []Config")
 	}
 
 	// Check version
-	if config.MajorVersion > currentMajorVersion {
+	if config.MajorVersion > constants.CurrentMajorVersion {
 		return fmt.Errorf("config was written by a newer version of the tool")
+	}
+
+	for _, singleConfig := range config.Configs {
+		// Check URL
+		_, err := checkURLStr(singleConfig.Url)
+		if err != nil {
+			return err
+		}
+
+		// Check if token is semantically correct. The tokens validity is not checked
+		if len(singleConfig.Token) < 20 {
+			return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(singleConfig.Token))
+		}
 	}
 
 	return nil

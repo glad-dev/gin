@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"gn/constants"
+
 	"golang.org/x/term"
 )
 
@@ -38,10 +40,9 @@ func readConfigFromStdin() (*Gitlab, error) {
 		return nil, fmt.Errorf("invalid input. Expected 'y' or 'n', got '%s'", input)
 	}
 
-	config := Gitlab{
-		Url:          "",
-		Token:        "",
-		MajorVersion: currentMajorVersion,
+	config := Config{
+		Url:   "",
+		Token: "",
 	}
 
 	fmt.Printf("What is the base URL (e.g. https://gitlab.com)? ")
@@ -69,5 +70,11 @@ func readConfigFromStdin() (*Gitlab, error) {
 
 	config.Token = string(token)
 
-	return &config, nil
+	return &Gitlab{
+		MajorVersion: constants.CurrentMajorVersion,
+		Configs: []Config{
+			config,
+		},
+	}, nil
+
 }

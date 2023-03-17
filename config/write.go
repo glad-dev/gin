@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"gn/constants"
+
 	"github.com/BurntSushi/toml"
 )
 
 func writeConfig(config *Gitlab) error {
-	config.MajorVersion = currentMajorVersion
+	config.MajorVersion = constants.CurrentMajorVersion
 
 	err := config.CheckValidity()
 	if err != nil {
