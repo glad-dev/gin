@@ -50,7 +50,7 @@ type querySingleResponse struct {
 	} `json:"data"`
 }
 
-func QuerySingle(config *config.Gitlab, projectPath string, issueID string) (*IssueDetails, error) {
+func QuerySingle(config *config.General, projectPath string, url string, issueID string) (*IssueDetails, error) {
 	query := `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {
@@ -101,10 +101,15 @@ func QuerySingle(config *config.Gitlab, projectPath string, issueID string) (*Is
 		"issueIID":    issueID,
 	}
 
+	lab, err := config.GetMatchingConfig(url)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := requests.MakeRequest(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: variables,
-	}, config)
+	}, lab)
 
 	if err != nil {
 		return nil, fmt.Errorf("query single - request failed: %w", err)

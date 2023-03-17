@@ -11,14 +11,14 @@ import (
 
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
-func loadConfig() (*Gitlab, error) {
+func loadConfig() (*General, error) {
 	fileLocation, err := getConfigLocation()
 	if err != nil {
 		return nil, err
 	}
 
 	// Load config
-	config := Gitlab{}
+	config := General{}
 	metaData, err := toml.DecodeFile(fileLocation, &config)
 	if err != nil {
 		if os.IsNotExist(err) {

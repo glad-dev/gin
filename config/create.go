@@ -14,7 +14,7 @@ import (
 
 var ErrDontCreateConfig = errors.New("user does not want to create the config")
 
-func readConfigFromStdin() (*Gitlab, error) {
+func readConfigFromStdin() (*General, error) {
 	path, err := getConfigLocation()
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func readConfigFromStdin() (*Gitlab, error) {
 		return nil, fmt.Errorf("invalid input. Expected 'y' or 'n', got '%s'", input)
 	}
 
-	config := Config{
+	config := GitLab{
 		Url:   "",
 		Token: "",
 	}
@@ -70,9 +70,9 @@ func readConfigFromStdin() (*Gitlab, error) {
 
 	config.Token = string(token)
 
-	return &Gitlab{
+	return &General{
 		MajorVersion: constants.CurrentMajorVersion,
-		Configs: []Config{
+		Configs: []GitLab{
 			config,
 		},
 	}, nil

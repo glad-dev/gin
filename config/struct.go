@@ -3,23 +3,26 @@ package config
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"gn/constants"
 )
 
-type Gitlab struct {
+type General struct {
 	MajorVersion int
-	Configs      []Config
+	Configs      []GitLab
 }
 
-type Config struct {
+type GitLab struct {
 	Url   string
 	Token string
 }
 
-func (config *Gitlab) CheckValidity() error {
+var ErrNoMatchingConfig = errors.New("no matching config was found")
+
+func (config *General) CheckValidity() error {
 	if len(config.Configs) == 0 {
-		return errors.New("config file does not contain []Config")
+		return errors.New("config file does not contain []GitLab")
 	}
 
 	// Check version
@@ -41,4 +44,14 @@ func (config *Gitlab) CheckValidity() error {
 	}
 
 	return nil
+}
+
+func (config *General) GetMatchingConfig(url string) (*GitLab, error) {
+	for _, lab := range config.Configs {
+		if strings.HasPrefix(url, lab.Url) {
+			return &lab, nil
+		}
+	}
+
+	return nil, ErrNoMatchingConfig
 }

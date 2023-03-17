@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Get() (*Gitlab, error) {
+func Get() (*General, error) {
 	config, err := loadConfig()
 	if err != nil {
 		if !errors.Is(err, ErrConfigDoesNotExist) {

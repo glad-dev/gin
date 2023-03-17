@@ -10,7 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func writeConfig(config *Gitlab) error {
+func writeConfig(config *General) error {
 	config.MajorVersion = constants.CurrentMajorVersion
 
 	err := config.CheckValidity()

@@ -30,7 +30,7 @@ type queryAllResponse struct {
 	} `json:"data"`
 }
 
-func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
+func QueryAll(config *config.General, projectPath string, url string) ([]Issue, error) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
@@ -61,10 +61,16 @@ func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 	variables := map[string]string{
 		"projectPath": projectPath,
 	}
+
+	lab, err := config.GetMatchingConfig(url)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := requests.MakeRequest(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: variables,
-	}, config)
+	}, lab)
 
 	if err != nil {
 		return nil, fmt.Errorf("query all issues failed: %w", err)
