@@ -3,7 +3,6 @@ package issues
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"gn/config"
@@ -21,14 +20,18 @@ type queryAllResponse struct {
 					UpdatedAt   time.Time `json:"updatedAt"`
 					Iid         string    `json:"iid"`
 					State       string    `json:"state"`
+					Assignees   struct {
+						Nodes []struct {
+							Name string `json:"name"`
+						} `json:"nodes"`
+					} `json:"assignees"`
 				} `json:"nodes"`
 			} `json:"issues"`
 		} `json:"project"`
 	} `json:"data"`
 }
 
-func QueryAll(config *config.Gitlab, projectPath string) {
-	// ToDo: Get assignees
+func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
@@ -40,6 +43,11 @@ func QueryAll(config *config.Gitlab, projectPath string) {
 				updatedAt
 				iid
 				state
+				assignees {
+				  nodes {
+					name
+				  }
+				}
 			  }
 			}
 		  }
@@ -55,20 +63,34 @@ func QueryAll(config *config.Gitlab, projectPath string) {
 	}, config)
 
 	if err != nil {
-		log.Fatalf("query all issues: %s\n", err)
+		return nil, fmt.Errorf("query all issues failed: %w", err)
 	}
 
 	rs := queryAllResponse{}
 	err = json.Unmarshal(response, &rs)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, fmt.Errorf("unmarshle of issues failed: %w", err)
 	}
 
-	fmt.Printf("Raw:\n%s\n", response)
+	// Flatter the Graphql struct to an Issue struct
+	issues := make([]Issue, 0)
+	for _, issue := range rs.Data.Project.Issues.Nodes {
+		// Iterate over the issue's assignees
+		assignees := make([]string, 0)
+		for _, assignee := range issue.Assignees.Nodes {
+			assignees = append(assignees, assignee.Name)
+		}
 
-	nodes := rs.Data.Project.Issues.Nodes
-	fmt.Printf("List of all (%d) issues:\n", len(nodes))
-	for _, node := range nodes {
-		fmt.Printf("%s) %s - %s [%s]\n", node.Iid, node.Title, node.Description, node.State)
+		issues = append(issues, Issue{
+			Title:       issue.Title,
+			Description: issue.Description,
+			CreatedAt:   issue.CreatedAt,
+			UpdatedAt:   issue.UpdatedAt,
+			Iid:         issue.Iid,
+			State:       issue.State,
+			Assignees:   assignees,
+		})
 	}
+
+	return issues, nil
 }

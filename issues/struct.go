@@ -9,4 +9,5 @@ type Issue struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 	Iid         string    `json:"iid"`
 	State       string    `json:"state"`
+	Assignees   []string  `json:assignees`
 }
