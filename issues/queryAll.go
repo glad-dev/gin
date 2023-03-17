@@ -66,15 +66,15 @@ func QueryAll(config *config.Gitlab, projectPath string) ([]Issue, error) {
 		return nil, fmt.Errorf("query all issues failed: %w", err)
 	}
 
-	rs := queryAllResponse{}
-	err = json.Unmarshal(response, &rs)
+	queryAll := queryAllResponse{}
+	err = json.Unmarshal(response, &queryAll)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshle of issues failed: %w", err)
 	}
 
 	// Flatter the Graphql struct to an Issue struct
 	issues := make([]Issue, 0)
-	for _, issue := range rs.Data.Project.Issues.Nodes {
+	for _, issue := range queryAll.Data.Project.Issues.Nodes {
 		// Iterate over the issue's assignees
 		assignees := make([]string, 0)
 		for _, assignee := range issue.Assignees.Nodes {
