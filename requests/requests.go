@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"reflect"
 
 	"gn/config"
 )
@@ -55,5 +56,24 @@ func MakeRequest(query *GraphqlQuery, config *config.Gitlab) ([]byte, error) {
 		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
 	}
 
+	if responseIsNil(body) {
+		return nil, errors.New("the project does not exist")
+	}
+
 	return body, nil
+}
+
+func responseIsNil(response []byte) bool {
+	emptyResponse := struct {
+		Data struct {
+			Project interface{} `json:"project"`
+		} `json:"data"`
+	}{}
+
+	err := json.Unmarshal(response, &emptyResponse)
+	if err != nil {
+		return false
+	}
+
+	return !reflect.ValueOf(emptyResponse.Data.Project).IsValid()
 }
