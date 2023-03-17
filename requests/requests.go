@@ -13,6 +13,8 @@ import (
 	"gn/config"
 )
 
+var ErrProjectDoesNotExist = errors.New("the project does not exist")
+
 func MakeRequest(query *GraphqlQuery, config *config.Gitlab) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
@@ -56,14 +58,14 @@ func MakeRequest(query *GraphqlQuery, config *config.Gitlab) ([]byte, error) {
 		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
 	}
 
-	if responseIsNil(body) {
-		return nil, errors.New("the project does not exist")
+	if projectDoesNotExist(body) {
+		return nil, ErrProjectDoesNotExist
 	}
 
 	return body, nil
 }
 
-func responseIsNil(response []byte) bool {
+func projectDoesNotExist(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`
