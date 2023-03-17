@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"gn/constants"
 
 	"github.com/spf13/cobra"
 )
 
-func Execute() {
+func Execute() error {
 	var issues = &cobra.Command{
 		Use:   "issues [command]",
 		Short: "View issues",
@@ -47,11 +48,44 @@ func Execute() {
 		},
 	}
 
+	var config = &cobra.Command{
+		Use:   "config [command]",
+		Short: "Interact with config",
+		Long:  "Long - edit config",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("config")
+		},
+	}
+
+	var editConfig = &cobra.Command{
+		Use:   "add",
+		Short: "Add remote",
+		Long:  "Long - add remote",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("config - edit")
+		},
+	}
+
+	var removeConfig = &cobra.Command{
+		Use:   "remove",
+		Short: "Remove a remote",
+		Long:  "Long - Remove a remote",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("config - remove remote")
+		},
+	}
+
 	var rootCmd = &cobra.Command{
 		Use:     "gn",
-		Version: "1",
+		Version: constants.Version,
 	}
-	rootCmd.AddCommand(issues, list)
+
+	rootCmd.AddCommand(issues, list, config)
 	issues.AddCommand(allIssues, singleIssue)
-	rootCmd.Execute()
+	config.AddCommand(editConfig, removeConfig)
+
+	return rootCmd.Execute()
 }
