@@ -39,12 +39,12 @@ linters:
         - errorlint
         - exhaustive
         - exportloopref
-        - gci
         - gochecknoinits
         - goconst
         - gocritic
         - godot
         - gofmt
+        - goimports
         - goprintffuncname
         - gosec
         - nilerr
