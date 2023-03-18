@@ -1,11 +1,14 @@
 package config
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"os/user"
 	"path"
+	"strconv"
 )
 
 func checkURLStr(urlStr string) (*url.URL, error) {
@@ -33,4 +36,30 @@ func getConfigLocation() (string, error) {
 	}
 
 	return path.Join(usr.HomeDir, ".gn.toml"), nil
+}
+
+func selectExistingConfigs(configs []GitLab) (int, error) {
+	fmt.Println("The following URLs exist:")
+	for i, config := range configs {
+		fmt.Printf("%d) %s\n", i+1, config.Url)
+	}
+
+	fmt.Print("Enter the index of the config you wish to edit: ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		return -1, err
+	}
+
+	index, err := strconv.Atoi(scanner.Text())
+	if err != nil {
+		return -1, err
+	}
+
+	index -= 1 // Since we add one when displaying the list
+	if index < 0 || index >= len(configs) {
+		return -1, errors.New("invalid index passed")
+	}
+
+	return index, nil
 }
