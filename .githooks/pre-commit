@@ -1,4 +1,12 @@
 #!/bin/bash
+# Check if the code builds
+go build -o gn
+if [ $? -ne 0 ]; then
+	echo "Failed to build!"
+	exit 1
+fi
+rm gn
+
 # Run formater
 out=$(gofmt -w .)
 if [ $? -ne 0 ]; then
@@ -7,11 +15,11 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-# Sort imports
-out=$(goimports -w *.go)
+# Run golangcli-lint
+golangci-lint run
 if [ $? -ne 0 ]; then
-	echo "Sorting imports failed!"
-	echo "$out"
+	echo
+	echo "golangcli has found some issues"
 	exit 1
 fi
 

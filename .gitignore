@@ -571,4 +571,4 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,go,jetbrains+all,visualstudio,vim
 
 # Repo specific
-sources/*
+gn
