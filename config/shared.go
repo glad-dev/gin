@@ -41,7 +41,7 @@ func getConfigLocation() (string, error) {
 func selectExistingConfigs(configs []GitLab) (int, error) {
 	fmt.Println("The following URLs exist:")
 	for i, config := range configs {
-		fmt.Printf("%d) %s\n", i+1, config.Url)
+		fmt.Printf("%d) %s\n", i+1, config.Url.String())
 	}
 
 	fmt.Print("Enter the index of the config you wish to edit: ")
