@@ -21,33 +21,14 @@ func Execute() error {
 
 	rawURL := "https://gitlab.com"
 
-	var cmdIssues = &cobra.Command{
-		Use:   "issues [command]",
+	var cmdAllIssues = &cobra.Command{
+		Use:   "issues",
 		Short: "View issues",
-		Long:  "Either query all issues or a single issue with the given iid.\nIf no argument is passed, query all",
+		Long:  "Query all issues",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			projectPath := "glad.dev/testing-repo"
-			issueList, err := issues.QueryAll(conf, projectPath, rawURL)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
-
-			for _, issue := range issueList {
-				fmt.Printf("%s) %s [%s]", issue.Iid, issue.Title, issue.State)
-			}
-		},
-	}
-
-	var cmdIssuesAll = &cobra.Command{
-		Use:   "all",
-		Short: "Show all issues",
-		Long:  "Show all issues of the current directory",
-		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			projectPath := "glad.dev/testing-repo"
-			issueList, err := issues.QueryAll(conf, projectPath, rawURL)
+			issueList, err := issues.QueryAll(conf, projectPath, rawURL) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 				os.Exit(1)
@@ -60,7 +41,7 @@ func Execute() error {
 	}
 
 	var cmdSingleIssue = &cobra.Command{
-		Use:   "single [iid]",
+		Use:   "issue [iid]",
 		Short: "Show single issues",
 		Long:  "Show single issues details",
 		Args:  cobra.ExactArgs(1),
@@ -168,8 +149,7 @@ func Execute() error {
 		Version: constants.Version,
 	}
 
-	rootCmd.AddCommand(cmdIssues, cmdList, cmdConfig)
-	cmdIssues.AddCommand(cmdIssuesAll, cmdSingleIssue)
+	rootCmd.AddCommand(cmdAllIssues, cmdSingleIssue, cmdList, cmdConfig)
 	cmdConfig.AddCommand(cmdConfigEdit, cmdConfigRemove, cmdConfigList, cmdConfigUpdate)
 
 	return rootCmd.Execute()
