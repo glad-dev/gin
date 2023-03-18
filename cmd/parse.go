@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"gn/config"
 	"gn/constants"
 	"gn/issues"
+	"gn/repo"
 
 	"github.com/spf13/cobra"
 )
@@ -17,10 +17,20 @@ func Execute() error {
 	// Load config
 	conf, err := config.Get()
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
-	rawURL := "https://gitlab.com"
+	// Get the current directory
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	// Get the git repository at the current directory
+	details, err := repo.Get(dir)
+	if err != nil {
+		return err
+	}
 
 	var cmdAllIssues = &cobra.Command{
 		Use:   "issues",
@@ -28,15 +38,14 @@ func Execute() error {
 		Long:  "Query all issues",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			projectPath := "glad.dev/testing-repo"
-			issueList, err := issues.QueryAll(conf, projectPath, rawURL) //nolint:govet
+			issueList, err := issues.QueryAll(conf, details) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 				os.Exit(1)
 			}
 
 			for _, issue := range issueList {
-				fmt.Printf("%s) %s [%s]", issue.Iid, issue.Title, issue.State)
+				fmt.Printf("%s) %s [%s]\n", issue.Iid, issue.Title, issue.State)
 			}
 		},
 	}
@@ -47,8 +56,7 @@ func Execute() error {
 		Long:  "Show single issues details",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			projectPath := "glad.dev/testing-repo"
-			issue, err := issues.QuerySingle(conf, projectPath, rawURL, args[0]) //nolint:govet
+			issue, err := issues.QuerySingle(conf, details, args[0]) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 				os.Exit(1)

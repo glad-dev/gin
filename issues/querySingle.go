@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"gn/config"
+	"gn/repo"
 	"gn/requests"
 )
 
@@ -50,7 +51,7 @@ type querySingleResponse struct {
 	} `json:"data"`
 }
 
-func QuerySingle(config *config.General, projectPath string, url string, issueID string) (*IssueDetails, error) {
+func QuerySingle(config *config.General, details []repo.Details, issueID string) (*IssueDetails, error) {
 	query := `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {
@@ -96,14 +97,14 @@ func QuerySingle(config *config.General, projectPath string, url string, issueID
 		}
 	`
 
+	lab, projectPath, err := config.GetMatchingConfig(details)
+	if err != nil {
+		return nil, err
+	}
+
 	variables := map[string]string{
 		"projectPath": projectPath,
 		"issueIID":    issueID,
-	}
-
-	lab, err := config.GetMatchingConfig(url)
-	if err != nil {
-		return nil, err
 	}
 
 	response, err := requests.MakeRequest(&requests.GraphqlQuery{

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gn/config"
+	"gn/repo"
 	"gn/requests"
 )
 
@@ -30,7 +31,7 @@ type queryAllResponse struct {
 	} `json:"data"`
 }
 
-func QueryAll(config *config.General, projectPath string, url string) ([]Issue, error) {
+func QueryAll(config *config.General, details []repo.Details) ([]Issue, error) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
@@ -58,13 +59,13 @@ func QueryAll(config *config.General, projectPath string, url string) ([]Issue, 
 		}
 	`
 
-	variables := map[string]string{
-		"projectPath": projectPath,
-	}
-
-	lab, err := config.GetMatchingConfig(url)
+	lab, projectPath, err := config.GetMatchingConfig(details)
 	if err != nil {
 		return nil, err
+	}
+
+	variables := map[string]string{
+		"projectPath": projectPath,
 	}
 
 	response, err := requests.MakeRequest(&requests.GraphqlQuery{

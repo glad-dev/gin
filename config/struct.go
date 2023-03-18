@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"gn/constants"
+	"gn/repo"
 )
 
 type General struct {
@@ -46,18 +47,14 @@ func (config *General) CheckValidity() error {
 	return nil
 }
 
-func (config *General) GetMatchingConfig(rawURL string) (*GitLab, error) {
-	// Convert url string to url.Url
-	u, err := url.ParseRequestURI(rawURL)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, lab := range config.Configs {
-		if u.Host == lab.URL.Host {
-			return &lab, err
+func (config *General) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
+	for _, detail := range details {
+		for _, lab := range config.Configs {
+			if lab.URL.Host == detail.URL.Host {
+				return &lab, detail.ProjectPath, nil
+			}
 		}
 	}
 
-	return nil, ErrNoMatchingConfig
+	return nil, "", ErrNoMatchingConfig
 }
