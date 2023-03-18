@@ -1,6 +1,6 @@
 package config
 
-func RemoveConfig() error {
+func Remove() error {
 	// Load current config
 	generalConfig, err := loadConfig()
 	if err != nil {

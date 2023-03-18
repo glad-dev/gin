@@ -2,99 +2,164 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
+
+	"gn/config"
 	"gn/constants"
+	"gn/issues"
 
 	"github.com/spf13/cobra"
 )
 
 func Execute() error {
-	var issues = &cobra.Command{
+	// Load config
+	conf, err := config.Get()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	rawURL := "https://gitlab.com"
+
+	var cmdIssues = &cobra.Command{
 		Use:   "issues [command]",
 		Short: "View issues",
 		Long:  "Either query all issues or a single issue with the given iid.\nIf no argument is passed, query all",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Issues")
+			projectPath := "glad.dev/testing-repo"
+			issueList, err := issues.QueryAll(conf, projectPath, rawURL)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
+
+			for _, issue := range issueList {
+				fmt.Printf("%s) %s [%s]", issue.Iid, issue.Title, issue.State)
+			}
 		},
 	}
 
-	var allIssues = &cobra.Command{
+	var cmdIssuesAll = &cobra.Command{
 		Use:   "all",
 		Short: "Show all issues",
 		Long:  "Show all issues of the current directory",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("All issues")
+			projectPath := "glad.dev/testing-repo"
+			issueList, err := issues.QueryAll(conf, projectPath, rawURL)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
+
+			for _, issue := range issueList {
+				fmt.Printf("%s) %s [%s]", issue.Iid, issue.Title, issue.State)
+			}
 		},
 	}
 
-	var singleIssue = &cobra.Command{
+	var cmdSingleIssue = &cobra.Command{
 		Use:   "single [iid]",
-		Short: "Show all issues",
-		Long:  "Show all issues of the current directory",
+		Short: "Show single issues",
+		Long:  "Show single issues details",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Single issue: %s\n", args[0])
+			projectPath := "glad.dev/testing-repo"
+			issue, err := issues.QuerySingle(conf, projectPath, rawURL, args[0])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
+
+			fmt.Println(issue.Title)
+			fmt.Println(issue.Description)
+			fmt.Println()
+
+			for _, comment := range issue.Discussion {
+				fmt.Println(comment.Body)
+				fmt.Printf("- %s\n", comment.Author)
+				for _, subComments := range comment.Comments {
+					fmt.Printf("\t%s\n", subComments.Body)
+				}
+			}
 		},
 	}
 
-	var list = &cobra.Command{
+	var cmdList = &cobra.Command{
 		Use:   "list",
 		Short: "List all repos that you have access to",
 		Long:  "List all repos that you have access to (long description)",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Show all repos")
+			fmt.Printf("Show all repos - ToDo")
 		},
 	}
 
-	var config = &cobra.Command{
+	var cmdConfig = &cobra.Command{
 		Use:   "config [command]",
 		Short: "Interact with config",
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config")
+			fmt.Fprintln(os.Stderr, "Use commands like add|list|remove|update")
+			fmt.Printf("config - Remove this?")
 		},
 	}
 
-	var configEdit = &cobra.Command{
+	var cmdConfigEdit = &cobra.Command{
 		Use:   "add",
 		Short: "Add remote",
 		Long:  "Long - add remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config - add")
+			err = config.Append()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
 		},
 	}
 
-	var configRemove = &cobra.Command{
+	var cmdConfigRemove = &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
 		Long:  "Long - Remove a remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config - remove remote")
+			err = config.Remove()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
 		},
 	}
 
-	var configList = &cobra.Command{
+	var cmdConfigList = &cobra.Command{
 		Use:   "list",
 		Short: "List all remotes",
 		Long:  "View a list of all existing remotes",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config - list remote")
+			err = config.List()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
 		},
 	}
 
-	var configUpdate = &cobra.Command{
+	var cmdConfigUpdate = &cobra.Command{
 		Use:   "update",
 		Short: "Update the token of an existing remote",
 		Long:  "Long - update config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config - list remote")
+			err = config.UpdateToken()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
+				os.Exit(1)
+			}
 		},
 	}
 
@@ -103,9 +168,9 @@ func Execute() error {
 		Version: constants.Version,
 	}
 
-	rootCmd.AddCommand(issues, list, config)
-	issues.AddCommand(allIssues, singleIssue)
-	config.AddCommand(configEdit, configRemove, configList, configUpdate)
+	rootCmd.AddCommand(cmdIssues, cmdList, cmdConfig)
+	cmdIssues.AddCommand(cmdIssuesAll, cmdSingleIssue)
+	cmdConfig.AddCommand(cmdConfigEdit, cmdConfigRemove, cmdConfigList, cmdConfigUpdate)
 
 	return rootCmd.Execute()
 }
