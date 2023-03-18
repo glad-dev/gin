@@ -21,9 +21,9 @@ func MakeRequest(query *GraphqlQuery, config *config.GitLab) ([]byte, error) {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	u, err := url.Parse(config.Url.String())
+	u, err := url.Parse(config.URL.String())
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse url: %s", err)
+		return nil, fmt.Errorf("failed to parse url: %w", err)
 	}
 
 	u = u.JoinPath("/api/graphql")

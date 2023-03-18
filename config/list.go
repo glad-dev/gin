@@ -16,7 +16,7 @@ func List() error {
 
 	fmt.Printf("The configuration file at '%s' contains data for the following URLs:\n", configLocation)
 	for i, config := range generalConfig.Configs {
-		fmt.Printf("%d) %s\n", i+1, config.Url.String())
+		fmt.Printf("%d) %s\n", i+1, config.URL.String())
 	}
 
 	return nil

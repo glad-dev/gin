@@ -30,9 +30,9 @@ type Comment struct {
 	Body         string      `json:"body"`
 	CreatedAt    time.Time   `json:"createdAt"`
 	UpdatedAt    time.Time   `json:"updatedAt"`
-	Resolved     bool        `json:"resolved"`
 	LastEditedBy interface{} `json:"lastEditedBy"` // ToDo: Remove interface
 	Comments     []Comment   `json:"comments"`
+	Resolved     bool        `json:"resolved"`
 }
 
 type User struct {

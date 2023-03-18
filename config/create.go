@@ -61,13 +61,12 @@ func readConfig() (*GitLab, error) {
 		return nil, err
 	}
 
-	rawUrl := scanner.Text()
-	gitLabUrl, err := checkURLStr(rawUrl)
+	gitLabURL, err := checkURLStr(scanner.Text())
 	if err != nil {
 		return nil, err
 	}
 
-	fullURL := gitLabUrl.JoinPath("-/profile/personal_access_tokens")
+	fullURL := gitLabURL.JoinPath("-/profile/personal_access_tokens")
 	rest := "?name=git-navigator&scopes=api,read_api,read_user" // Can't be added with url.JoinPath since that escapes the '?'
 	fmt.Printf("Go to %s%s to create an API key with the permissions api, read_api and read_user\n", fullURL.String(), rest)
 
@@ -79,7 +78,7 @@ func readConfig() (*GitLab, error) {
 	}
 
 	return &GitLab{
-		Url:   *gitLabUrl,
+		URL:   *gitLabURL,
 		Token: string(token),
 	}, nil
 }

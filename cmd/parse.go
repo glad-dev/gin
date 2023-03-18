@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//nolint:goconst
 func Execute() error {
 	// Load config
 	conf, err := config.Get()
@@ -47,7 +48,7 @@ func Execute() error {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			projectPath := "glad.dev/testing-repo"
-			issue, err := issues.QuerySingle(conf, projectPath, rawURL, args[0])
+			issue, err := issues.QuerySingle(conf, projectPath, rawURL, args[0]) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 				os.Exit(1)

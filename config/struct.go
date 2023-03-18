@@ -3,17 +3,18 @@ package config
 import (
 	"errors"
 	"fmt"
-	"gn/constants"
 	"net/url"
+
+	"gn/constants"
 )
 
 type General struct {
-	MajorVersion int
 	Configs      []GitLab
+	MajorVersion int
 }
 
 type GitLab struct {
-	Url   url.URL
+	URL   url.URL
 	Token string
 }
 
@@ -31,7 +32,7 @@ func (config *General) CheckValidity() error {
 
 	for _, singleConfig := range config.Configs {
 		// Check URL
-		_, err := checkURLStr(singleConfig.Url.String())
+		_, err := checkURLStr(singleConfig.URL.String())
 		if err != nil {
 			return err
 		}
@@ -45,15 +46,15 @@ func (config *General) CheckValidity() error {
 	return nil
 }
 
-func (config *General) GetMatchingConfig(rawUrl string) (*GitLab, error) {
+func (config *General) GetMatchingConfig(rawURL string) (*GitLab, error) {
 	// Convert url string to url.Url
-	u, err := url.ParseRequestURI(rawUrl)
+	u, err := url.ParseRequestURI(rawURL)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, lab := range config.Configs {
-		if u.Host == lab.Url.Host {
+		if u.Host == lab.URL.Host {
 			return &lab, err
 		}
 	}

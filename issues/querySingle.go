@@ -34,13 +34,13 @@ type querySingleResponse struct {
 					Nodes []struct {
 						Notes struct {
 							Nodes []struct {
-								System       bool
-								User         `json:"author"`
 								Body         string      `json:"body"`
 								CreatedAt    time.Time   `json:"createdAt"`
 								UpdatedAt    time.Time   `json:"updatedAt"`
-								Resolved     bool        `json:"resolved"`
 								LastEditedBy interface{} `json:"lastEditedBy"`
+								User         `json:"author"`
+								System       bool `json:"system"`
+								Resolved     bool `json:"resolved"`
 							} `json:"nodes"`
 						} `json:"notes"`
 					} `json:"nodes"`
@@ -158,10 +158,11 @@ func QuerySingle(config *config.General, projectPath string, url string, issueID
 		inner := node.Notes.Nodes
 		if len(inner) == 0 {
 			log.Printf("query single - discussion without nodes?\n%s", response)
+
 			continue
 		}
 
-		if inner[0].System == true {
+		if inner[0].System {
 			continue
 		}
 

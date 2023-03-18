@@ -85,12 +85,6 @@ func QueryAll(config *config.General, projectPath string, url string) ([]Issue, 
 	// Flatter the Graphql struct to an Issue struct
 	issues := make([]Issue, 0)
 	for _, issue := range queryAll.Data.Project.Issues.Nodes {
-		// Iterate over the issue's assignees
-		assignees := make([]string, 0)
-		for _, assignee := range issue.Assignees.Nodes {
-			assignees = append(assignees, assignee.Name)
-		}
-
 		issues = append(issues, Issue{
 			Title:       issue.Title,
 			Description: issue.Description,
