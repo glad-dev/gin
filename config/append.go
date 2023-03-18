@@ -1,8 +1,14 @@
 package config
 
-func Append(config *GitLab) error {
+func Append() error {
 	// Load current config
 	generalConf, err := loadConfig()
+	if err != nil {
+		return err
+	}
+
+	// Read config from terminal
+	config, err := readConfig()
 	if err != nil {
 		return err
 	}
