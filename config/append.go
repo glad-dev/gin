@@ -8,7 +8,7 @@ func Append() error {
 	}
 
 	// Read config from terminal
-	config, err := readConfig()
+	config, err := readConfigFromStdIn()
 	if err != nil {
 		return err
 	}

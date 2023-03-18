@@ -9,6 +9,8 @@ import (
 	"os/user"
 	"path"
 	"strconv"
+
+	"golang.org/x/term"
 )
 
 func checkURLStr(urlStr string) (*url.URL, error) {
@@ -62,4 +64,40 @@ func selectExistingConfigs(configs []GitLab) (int, error) {
 	}
 
 	return index, nil
+}
+
+func readConfigFromStdIn() (*GitLab, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Printf("What is the base URL (e.g. https://gitlab.com)? ")
+	scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	gitLabURL, err := checkURLStr(scanner.Text())
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the hostname for the API token's name
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = ""
+	}
+
+	fullURL := gitLabURL.JoinPath("-/profile/personal_access_tokens")
+	rest := fmt.Sprintf("?name=%s-git-navigator&scopes=api,read_api,read_user", hostname) // Can't be added with url.JoinPath since that escapes the '?'
+	fmt.Printf("Go to %s%s to create an API key with the permissions api, read_api and read_user\n", fullURL.String(), rest)
+
+	fmt.Printf("Enter the API token (input is hidden): ")
+	token, err := term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Printf("\n")
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitLab{
+		URL:   *gitLabURL,
+		Token: string(token),
+	}, nil
 }
