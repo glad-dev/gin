@@ -58,23 +58,43 @@ func Execute() error {
 		},
 	}
 
-	var editConfig = &cobra.Command{
+	var configEdit = &cobra.Command{
 		Use:   "add",
 		Short: "Add remote",
 		Long:  "Long - add remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config - edit")
+			fmt.Printf("config - add")
 		},
 	}
 
-	var removeConfig = &cobra.Command{
+	var configRemove = &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
 		Long:  "Long - Remove a remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("config - remove remote")
+		},
+	}
+
+	var configList = &cobra.Command{
+		Use:   "list",
+		Short: "List all remotes",
+		Long:  "View a list of all existing remotes",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("config - list remote")
+		},
+	}
+
+	var configUpdate = &cobra.Command{
+		Use:   "update",
+		Short: "Update the token of an existing remote",
+		Long:  "Long - update config",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("config - list remote")
 		},
 	}
 
@@ -85,7 +105,7 @@ func Execute() error {
 
 	rootCmd.AddCommand(issues, list, config)
 	issues.AddCommand(allIssues, singleIssue)
-	config.AddCommand(editConfig, removeConfig)
+	config.AddCommand(configEdit, configRemove, configList, configUpdate)
 
 	return rootCmd.Execute()
 }
