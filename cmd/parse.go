@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"gn/config"
@@ -20,24 +21,17 @@ func Execute() error {
 		return err
 	}
 
-	// Get the current directory
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	// Get the git repository at the current directory
-	details, err := repo.Get(dir)
-	if err != nil {
-		return err
-	}
-
 	var cmdAllIssues = &cobra.Command{
 		Use:   "issues",
 		Short: "View issues",
-		Long:  "Query all issues",
+		Long:  "Long - Query all issues",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
+			details, err := getRepo(cmd) //nolint:govet
+			if err != nil {
+				log.Fatalln(err)
+			}
+
 			issueList, err := issues.QueryAll(conf, details) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
@@ -52,10 +46,15 @@ func Execute() error {
 
 	var cmdSingleIssue = &cobra.Command{
 		Use:   "issue [iid]",
-		Short: "Show single issues",
-		Long:  "Show single issues details",
+		Short: "Show single issue",
+		Long:  "Long - Show single issue",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			details, err := getRepo(cmd) //nolint:govet
+			if err != nil {
+				log.Fatalln(err)
+			}
+
 			issue, err := issues.QuerySingle(conf, details, args[0]) //nolint:govet
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
@@ -158,8 +157,30 @@ func Execute() error {
 		Version: constants.Version,
 	}
 
+	cmdAllIssues.PersistentFlags().String("path", "", "Path to the repo")
+	cmdSingleIssue.PersistentFlags().String("path", "", "Path to the repo")
+
 	rootCmd.AddCommand(cmdAllIssues, cmdSingleIssue, cmdList, cmdConfig)
 	cmdConfig.AddCommand(cmdConfigEdit, cmdConfigRemove, cmdConfigList, cmdConfigUpdate)
 
 	return rootCmd.Execute()
+}
+
+func getRepo(cmd *cobra.Command) ([]repo.Details, error) {
+	// Get path flag
+	dir, err := cmd.Flags().GetString("path")
+	if err != nil {
+		return nil, err
+	}
+
+	if len(dir) == 0 {
+		// Path flag was not set => Use current directory
+		dir, err = os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Get the git repository at the current directory
+	return repo.Get(dir)
 }
