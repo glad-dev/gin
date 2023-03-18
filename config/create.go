@@ -66,8 +66,14 @@ func readConfig() (*GitLab, error) {
 		return nil, err
 	}
 
+	// Get the hostname for the API token's name
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = ""
+	}
+
 	fullURL := gitLabURL.JoinPath("-/profile/personal_access_tokens")
-	rest := "?name=git-navigator&scopes=api,read_api,read_user" // Can't be added with url.JoinPath since that escapes the '?'
+	rest := fmt.Sprintf("?name=%s-git-navigator&scopes=api,read_api,read_user", hostname) // Can't be added with url.JoinPath since that escapes the '?'
 	fmt.Printf("Go to %s%s to create an API key with the permissions api, read_api and read_user\n", fullURL.String(), rest)
 
 	fmt.Printf("Enter the API token (input is hidden): ")
