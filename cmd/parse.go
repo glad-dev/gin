@@ -23,7 +23,7 @@ func Execute() error {
 
 	var cmdAllIssues = &cobra.Command{
 		Use:   "issues",
-		Short: "View issues",
+		Short: "View all issues of a repository",
 		Long:  "Long - Query all issues",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -46,7 +46,7 @@ func Execute() error {
 
 	var cmdSingleIssue = &cobra.Command{
 		Use:   "issue [iid]",
-		Short: "Show single issue",
+		Short: "View the discussion of an issue",
 		Long:  "Long - Show single issue",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
