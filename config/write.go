@@ -29,7 +29,7 @@ func writeConfig(config *General) error {
 		return err
 	}
 
-	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("could not open config file: %w", err)
 	}
