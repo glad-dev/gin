@@ -40,24 +40,34 @@ func readConfigFromStdin() (*General, error) {
 		return nil, fmt.Errorf("invalid input. Expected 'y' or 'n', got '%s'", input)
 	}
 
-	config := GitLab{
-		Url:   "",
-		Token: "",
-	}
-
-	fmt.Printf("What is the base URL (e.g. https://gitlab.com)? ")
-	scanner.Scan()
-	if err = scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	config.Url = scanner.Text()
-	u, err := checkURLStr(config.Url)
+	config, err := readConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	fullURL := u.JoinPath("-/profile/personal_access_tokens")
+	return &General{
+		MajorVersion: constants.CurrentMajorVersion,
+		Configs: []GitLab{
+			*config,
+		},
+	}, nil
+}
+
+func readConfig() (*GitLab, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Printf("What is the base URL (e.g. https://gitlab.com)? ")
+	scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	rawUrl := scanner.Text()
+	gitLabUrl, err := checkURLStr(rawUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	fullURL := gitLabUrl.JoinPath("-/profile/personal_access_tokens")
 	rest := "?name=git-navigator&scopes=api,read_api,read_user" // Can't be added with url.JoinPath since that escapes the '?'
 	fmt.Printf("Go to %s%s to create an API key with the permissions api, read_api and read_user\n", fullURL.String(), rest)
 
@@ -68,13 +78,8 @@ func readConfigFromStdin() (*General, error) {
 		return nil, err
 	}
 
-	config.Token = string(token)
-
-	return &General{
-		MajorVersion: constants.CurrentMajorVersion,
-		Configs: []GitLab{
-			config,
-		},
+	return &GitLab{
+		Url:   *gitLabUrl,
+		Token: string(token),
 	}, nil
-
 }

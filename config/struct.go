@@ -3,9 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
-	"strings"
-
 	"gn/constants"
+	"net/url"
 )
 
 type General struct {
@@ -14,7 +13,7 @@ type General struct {
 }
 
 type GitLab struct {
-	Url   string
+	Url   url.URL
 	Token string
 }
 
@@ -32,7 +31,7 @@ func (config *General) CheckValidity() error {
 
 	for _, singleConfig := range config.Configs {
 		// Check URL
-		_, err := checkURLStr(singleConfig.Url)
+		_, err := checkURLStr(singleConfig.Url.String())
 		if err != nil {
 			return err
 		}
@@ -46,10 +45,16 @@ func (config *General) CheckValidity() error {
 	return nil
 }
 
-func (config *General) GetMatchingConfig(url string) (*GitLab, error) {
+func (config *General) GetMatchingConfig(rawUrl string) (*GitLab, error) {
+	// Convert url string to url.Url
+	u, err := url.ParseRequestURI(rawUrl)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, lab := range config.Configs {
-		if strings.HasPrefix(url, lab.Url) {
-			return &lab, nil
+		if u.Host == lab.Url.Host {
+			return &lab, err
 		}
 	}
 

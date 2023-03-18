@@ -17,8 +17,8 @@ func loadConfig() (*General, error) {
 	}
 
 	// Load config
-	config := General{}
-	metaData, err := toml.DecodeFile(fileLocation, &config)
+	config := &General{}
+	metaData, err := toml.DecodeFile(fileLocation, config)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, ErrConfigDoesNotExist
@@ -37,5 +37,5 @@ func loadConfig() (*General, error) {
 		return nil, fmt.Errorf("config is invalid: %w", err)
 	}
 
-	return &config, nil
+	return config, nil
 }
