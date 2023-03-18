@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"gn/constants"
+
+	"github.com/BurntSushi/toml"
 )
 
 func writeConfig(config *General) error {
