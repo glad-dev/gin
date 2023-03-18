@@ -15,6 +15,14 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
+# Sort imports
+out=$(goimports -w *.go)
+if [ $? -ne 0 ]; then
+	echo "Sorting imports failed!"
+	echo "$out"
+	exit 1
+fi
+
 # Run golangcli-lint
 golangci-lint run
 if [ $? -ne 0 ]; then

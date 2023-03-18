@@ -45,7 +45,6 @@ linters:
         - gocritic
         - godot
         - gofmt
-        - goimports
         - goprintffuncname
         - gosec
         - nilerr
