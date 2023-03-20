@@ -1,6 +1,7 @@
 package issues
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -40,12 +41,31 @@ type User struct {
 	Username string `json:"username"`
 }
 
+func (user *User) String() string {
+	return fmt.Sprintf("%s (%s)", user.Name, user.Username)
+}
+
+// Title should only be used by bubbletea. To ge the title, use TitleOnly.
 func (i Issue) Title() string {
-	return i.title
+	status := ""
+	if i.state == "closed" {
+		status = "[closed] "
+	}
+
+	return fmt.Sprintf("#%s %s%s by %s on %s", i.iid, status, i.title, i.author.String(), i.createdAt.Format("2006-01-02 15:04"))
 }
 
 func (i Issue) Description() string {
 	return i.description
+}
+
+// FilterValue is needed to allow Issue to be a bubbletea list.Item.
+func (i Issue) FilterValue() string {
+	return i.Title() + i.description
+}
+
+func (i Issue) TitleOnly() string {
+	return i.title
 }
 
 func (i Issue) CreatedAt() time.Time {
@@ -74,9 +94,4 @@ func (i Issue) Assignees() []User {
 
 func (i Issue) HasBeenUpdated() bool {
 	return i.createdAt != i.UpdatedAt()
-}
-
-// FilterValue is needed to allow Issue to be a bubbletea list.Item.
-func (i Issue) FilterValue() string {
-	return i.title + i.description
 }

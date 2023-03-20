@@ -31,7 +31,7 @@ type queryAllResponse struct {
 	} `json:"data"`
 }
 
-func QueryAll(config *config.General, details []repo.Details) ([]Issue, error) {
+func QueryAll(config *config.General, details []repo.Details) ([]Issue, string, error) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
@@ -61,7 +61,7 @@ func QueryAll(config *config.General, details []repo.Details) ([]Issue, error) {
 
 	lab, projectPath, err := config.GetMatchingConfig(details)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	variables := map[string]string{
@@ -74,13 +74,13 @@ func QueryAll(config *config.General, details []repo.Details) ([]Issue, error) {
 	}, lab)
 
 	if err != nil {
-		return nil, fmt.Errorf("query all issues failed: %w", err)
+		return nil, "", fmt.Errorf("query all issues failed: %w", err)
 	}
 
 	queryAll := queryAllResponse{}
 	err = json.Unmarshal(response, &queryAll)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshle of issues failed: %w", err)
+		return nil, "", fmt.Errorf("unmarshle of issues failed: %w", err)
 	}
 
 	// Flatter the Graphql struct to an Issue struct
@@ -98,5 +98,5 @@ func QueryAll(config *config.General, details []repo.Details) ([]Issue, error) {
 		})
 	}
 
-	return issues, nil
+	return issues, projectPath, nil
 }

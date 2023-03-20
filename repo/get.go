@@ -9,8 +9,16 @@ import (
 )
 
 type Details struct {
-	URL         url.URL
-	ProjectPath string
+	url         url.URL
+	projectPath string
+}
+
+func (details *Details) ProjectPath() string {
+	return details.projectPath
+}
+
+func (details *Details) URL() url.URL {
+	return details.url
 }
 
 func Get(path string) ([]Details, error) {
@@ -45,10 +53,10 @@ func Get(path string) ([]Details, error) {
 			}
 
 			repos = append(repos, Details{
-				URL: url.URL{
+				url: url.URL{
 					Host: u.Scheme,
 				},
-				ProjectPath: u.Opaque,
+				projectPath: u.Opaque,
 			})
 		}
 	}

@@ -50,8 +50,8 @@ func (config *General) CheckValidity() error {
 func (config *General) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
 	for _, detail := range details {
 		for _, lab := range config.Configs {
-			if lab.URL.Host == detail.URL.Host {
-				return &lab, detail.ProjectPath, nil
+			if lab.URL.Host == detail.URL().Host {
+				return &lab, detail.ProjectPath(), nil
 			}
 		}
 	}

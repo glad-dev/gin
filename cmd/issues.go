@@ -8,6 +8,7 @@ import (
 	"gn/config"
 	"gn/issues"
 	"gn/repo"
+	allIssues "gn/tui/issues/all"
 
 	"github.com/spf13/cobra"
 )
@@ -52,15 +53,13 @@ func runAllIssues(cmd *cobra.Command, _ []string) {
 		log.Fatalln(err)
 	}
 
-	issueList, err := issues.QueryAll(conf, details)
+	issueList, projectPath, err := issues.QueryAll(conf, details)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 		os.Exit(1)
 	}
 
-	for _, issue := range issueList {
-		fmt.Printf("%s) %s [%s]\n", issue.Iid(), issue.Title(), issue.State())
-	}
+	allIssues.Show(issueList, projectPath)
 }
 
 func runSingleIssue(cmd *cobra.Command, args []string) {
