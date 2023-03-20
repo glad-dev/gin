@@ -59,7 +59,7 @@ func runAllIssues(cmd *cobra.Command, _ []string) {
 	}
 
 	for _, issue := range issueList {
-		fmt.Printf("%s) %s [%s]\n", issue.Iid, issue.Title, issue.State)
+		fmt.Printf("%s) %s [%s]\n", issue.Iid(), issue.Title(), issue.State())
 	}
 }
 
