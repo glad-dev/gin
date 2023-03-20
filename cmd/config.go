@@ -20,7 +20,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	list := &cobra.Command{
+	cmdList := &cobra.Command{
 		Use:   "list",
 		Short: "List all remotes",
 		Long:  "View a list of all existing remotes",
@@ -34,7 +34,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	edit := &cobra.Command{
+	cmdEdit := &cobra.Command{
 		Use:   "add",
 		Short: "Add remote",
 		Long:  "Long - add remote",
@@ -48,7 +48,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	remove := &cobra.Command{
+	cmdRemove := &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
 		Long:  "Long - Remove a remote",
@@ -62,7 +62,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	update := &cobra.Command{
+	cmdUpdate := &cobra.Command{
 		Use:   "update",
 		Short: "Update the token of an existing remote",
 		Long:  "Long - update config",
@@ -76,7 +76,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	root.AddCommand(edit, remove, list, update)
+	root.AddCommand(cmdList, cmdEdit, cmdRemove, cmdUpdate)
 
 	return root
 }

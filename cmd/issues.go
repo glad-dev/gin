@@ -14,7 +14,7 @@ import (
 )
 
 func newCmdAllIssues() *cobra.Command {
-	allIssues := &cobra.Command{
+	cmdAllIssues := &cobra.Command{
 		Use:   "issues",
 		Short: "View all issues of a repository",
 		Long:  "Long - Query all issues",
@@ -22,13 +22,13 @@ func newCmdAllIssues() *cobra.Command {
 		Run:   runAllIssues,
 	}
 
-	allIssues.PersistentFlags().String("path", "", "Path to the repo")
+	cmdAllIssues.PersistentFlags().String("path", "", "Path to the repo")
 
-	return allIssues
+	return cmdAllIssues
 }
 
 func newCmdSingleIssue() *cobra.Command {
-	singleIssue := &cobra.Command{
+	cmdSingleIssue := &cobra.Command{
 		Use:   "issue [iid]",
 		Short: "View the discussion of an issue",
 		Long:  "Long - Show single issue",
@@ -36,9 +36,9 @@ func newCmdSingleIssue() *cobra.Command {
 		Run:   runSingleIssue,
 	}
 
-	singleIssue.PersistentFlags().String("path", "", "Path to the repo")
+	cmdSingleIssue.PersistentFlags().String("path", "", "Path to the repo")
 
-	return singleIssue
+	return cmdSingleIssue
 }
 
 func runAllIssues(cmd *cobra.Command, _ []string) {
