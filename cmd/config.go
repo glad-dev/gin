@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"gn/config"
+	tui "gn/tui/config"
 
 	"github.com/spf13/cobra"
 )
@@ -54,11 +55,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - Remove a remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.Remove()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
+			tui.Remove()
 		},
 	}
 
