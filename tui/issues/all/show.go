@@ -7,6 +7,7 @@ import (
 	"gn/issues"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -16,9 +17,13 @@ func Show(allIssues []issues.Issue, projectPath string) {
 		issueList[i] = issue
 	}
 
-	delegate := newItemDelegate()
-	m := model{list: list.New(issueList, delegate, 0, 0)}
-	m.list.Title = fmt.Sprintf("Issues of %s", projectPath)
+	lst := list.New(issueList, newItemDelegate(), 0, 0)
+	lst.Title = fmt.Sprintf("Issues of %s", projectPath)
+	lst.SetSpinner(spinner.Points)
+
+	m := model{
+		list: lst,
+	}
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 
