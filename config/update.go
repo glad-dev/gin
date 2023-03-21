@@ -9,7 +9,7 @@ import (
 
 func UpdateToken() error {
 	// Load the current config
-	generalConfig, err := loadConfig()
+	generalConfig, err := Load()
 	if err != nil {
 		return err
 	}

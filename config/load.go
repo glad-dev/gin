@@ -10,7 +10,7 @@ import (
 
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
-func loadConfig() (*General, error) {
+func Load() (*General, error) {
 	fileLocation, err := getConfigLocation()
 	if err != nil {
 		return nil, err

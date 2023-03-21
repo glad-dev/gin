@@ -2,7 +2,7 @@ package config
 
 func Append() error {
 	// Load current config
-	generalConf, err := loadConfig()
+	generalConf, err := Load()
 	if err != nil {
 		return err
 	}

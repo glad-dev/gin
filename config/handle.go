@@ -6,7 +6,7 @@ import (
 )
 
 func Get() (*General, error) {
-	config, err := loadConfig()
+	config, err := Load()
 	if err != nil {
 		if !errors.Is(err, ErrConfigDoesNotExist) {
 			// Error is NOT about the config not existing
