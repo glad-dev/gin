@@ -44,7 +44,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 }
 
 type model struct {
-	view      func(m model) string
+	view      func(m *model) string
 	list      list.Model
 	oldConfig config.General
 	quitting  bool
@@ -84,5 +84,5 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.view(m)
+	return m.view(&m)
 }

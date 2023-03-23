@@ -11,14 +11,14 @@ import (
 )
 
 func Remove() {
-	m := setUp("Which remote do you want to delete?")
+	m := setUp("Which remote do you want to delete?", removeView)
 	if _, err := tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
 }
 
-func removeView(m model) string {
+func removeView(m *model) string {
 	if m.quitting {
 		return style.QuitTextStyle.Render("No changes were made.")
 	}
