@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"gn/tui/config/add"
 	"os"
 
 	"gn/config"
@@ -41,11 +42,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - add remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.Append()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
+			add.Add()
 		},
 	}
 
