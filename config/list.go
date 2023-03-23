@@ -19,9 +19,9 @@ func List() error {
 	}
 
 	fmt.Println()
-	fmt.Print(style.TitleStyle.Render(fmt.Sprintf("The configuration file at '%s' contains data for the following URLs:", configLocation)))
+	fmt.Print(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
 	for i, config := range generalConfig.Configs {
-		fmt.Print(style.ListStyle.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
+		fmt.Print(style.List.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
 	}
 	fmt.Print("\n\n")
 
