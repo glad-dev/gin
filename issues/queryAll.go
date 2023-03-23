@@ -68,7 +68,7 @@ func QueryAll(config *config.General, details []repo.Details) ([]Issue, string, 
 		"projectPath": projectPath,
 	}
 
-	response, err := requests.MakeRequest(&requests.GraphqlQuery{
+	response, err := requests.Do(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: variables,
 	}, lab)

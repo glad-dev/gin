@@ -15,7 +15,7 @@ import (
 
 var ErrProjectDoesNotExist = errors.New("the project does not exist")
 
-func MakeRequest(query *GraphqlQuery, config *config.GitLab) ([]byte, error) {
+func Do(query *GraphqlQuery, config *config.GitLab) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
