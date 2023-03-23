@@ -11,5 +11,6 @@ var (
 	SelectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
 	PaginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
 	HelpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
+	ListStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4)
 	QuitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 )

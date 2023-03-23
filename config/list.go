@@ -1,6 +1,10 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+
+	style "gn/tui/style/config"
+)
 
 func List() error {
 	// Load config
@@ -14,10 +18,12 @@ func List() error {
 		return err
 	}
 
-	fmt.Printf("The configuration file at '%s' contains data for the following URLs:\n", configLocation)
+	fmt.Println()
+	fmt.Print(style.TitleStyle.Render(fmt.Sprintf("The configuration file at '%s' contains data for the following URLs:", configLocation)))
 	for i, config := range generalConfig.Configs {
-		fmt.Printf("%d) %s\n", i+1, config.URL.String())
+		fmt.Print(style.ListStyle.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
 	}
+	fmt.Print("\n\n")
 
 	return nil
 }
