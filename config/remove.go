@@ -5,15 +5,13 @@ import (
 	"os"
 )
 
-var removeOnceAlreadyCalled = false
-
 func RemoveOnce(generalConfig *General, index int) error {
-	if removeOnceAlreadyCalled {
-		return nil
+	if firstCall {
+		firstCall = false
+		errPrevious = Remove(generalConfig, index)
 	}
-	removeOnceAlreadyCalled = true
 
-	return Remove(generalConfig, index)
+	return errPrevious
 }
 
 func Remove(generalConfig *General, index int) error {
