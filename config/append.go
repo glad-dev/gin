@@ -1,5 +1,9 @@
 package config
 
+import (
+	"errors"
+)
+
 func AppendOnce(urlStr string, token string) error {
 	if firstCall {
 		firstCall = false
@@ -11,8 +15,9 @@ func AppendOnce(urlStr string, token string) error {
 
 func Append(urlStr string, token string) error {
 	// Load current config
-	generalConf, err := Load() // ToDo: Deal with adding entry to empty config
-	if err != nil {
+	generalConf, err := Load()
+	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
+		// Config exists, but there was some other error
 		return err
 	}
 
