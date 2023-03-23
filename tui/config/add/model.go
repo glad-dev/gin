@@ -23,8 +23,8 @@ var (
 )
 
 type model struct {
-	focusIndex int
 	inputs     []textinput.Model
+	focusIndex int
 	submit     bool
 	quit       bool
 }
@@ -36,7 +36,7 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "esc":
@@ -75,6 +75,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					cmds[i] = m.inputs[i].Focus()
 					m.inputs[i].PromptStyle = focusedStyle
 					m.inputs[i].TextStyle = focusedStyle
+
 					continue
 				}
 				// Remove focused state

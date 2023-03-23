@@ -33,10 +33,10 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 
 	str := fmt.Sprintf("%d. %s", index+1, i.lab.URL.String())
 
-	fn := style.ItemStyle.Render
+	fn := style.Item.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Render("> " + s[0])
+			return style.SelectedItem.Render("> " + s[0])
 		}
 	}
 

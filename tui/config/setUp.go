@@ -14,12 +14,12 @@ func setUp(title string, viewFunction func(*model) string) model {
 	// Load current config
 	generalConfig, err := config.Load()
 	if err != nil {
-		fmt.Fprint(os.Stderr, style.QuitTextStyle.Render(fmt.Sprintf("Failed to load config: %s", err)))
+		fmt.Fprint(os.Stderr, style.QuitText.Render(fmt.Sprintf("Failed to load config: %s", err)))
 		os.Exit(1)
 	}
 
 	if len(generalConfig.Configs) == 0 {
-		fmt.Fprint(os.Stderr, style.QuitTextStyle.Render("The config file contains no remotes."))
+		fmt.Fprint(os.Stderr, style.QuitText.Render("The config file contains no remotes."))
 		os.Exit(1)
 	}
 
@@ -38,9 +38,9 @@ func setUp(title string, viewFunction func(*model) string) model {
 	lst.Title = title
 	lst.SetShowStatusBar(false)
 	lst.SetFilteringEnabled(false)
-	lst.Styles.Title = style.TitleStyle
-	lst.Styles.PaginationStyle = style.PaginationStyle
-	lst.Styles.HelpStyle = style.HelpStyle
+	lst.Styles.Title = style.Title
+	lst.Styles.PaginationStyle = style.Pagination
+	lst.Styles.HelpStyle = style.Help
 
 	return model{
 		list:      lst,
