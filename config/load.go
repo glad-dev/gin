@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"gn/constants"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -10,6 +11,8 @@ import (
 
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
+// Load returns the config located at '~/.gn.toml' if it exists. If it does not exist, function returns a
+// ErrConfigDoesNotExist error and an initialized General config.
 func Load() (*General, error) {
 	fileLocation, err := getConfigLocation()
 	if err != nil {
@@ -21,7 +24,10 @@ func Load() (*General, error) {
 	metaData, err := toml.DecodeFile(fileLocation, config)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, ErrConfigDoesNotExist
+			return &General{
+				Configs:      []GitLab{},
+				MajorVersion: constants.CurrentMajorVersion,
+			}, ErrConfigDoesNotExist
 		}
 
 		return nil, fmt.Errorf("could not decode config: %w", err)
