@@ -23,7 +23,7 @@ func removeView(m *model) string {
 		return style.QuitTextStyle.Render("No changes were made.")
 	}
 
-	if m.delete {
+	if m.action {
 		index := m.list.Index()
 
 		selected, ok := m.list.Items()[index].(item)

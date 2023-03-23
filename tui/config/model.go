@@ -48,7 +48,7 @@ type model struct {
 	list      list.Model
 	oldConfig config.General
 	quitting  bool
-	delete    bool
+	action    bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -71,7 +71,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.delete = true
+			m.action = true
 
 			return m, tea.Quit
 		}
