@@ -1,4 +1,10 @@
 package constants
 
-const CurrentMajorVersion = 1
-const Version = "1.0.0"
+const (
+	Version             = "1.0.0"
+	CurrentMajorVersion = 1
+)
+
+var (
+	RequiredScopes = []string{"read_user", "read_repository"}
+)
