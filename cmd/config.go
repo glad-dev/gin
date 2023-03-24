@@ -49,7 +49,7 @@ func newCmdConfig() *cobra.Command {
 	cmdRemove := &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
-		Long:  "Long - Remove a remote",
+		Long:  "Long - Remove a remote and its API token",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			tui.Remove()
@@ -57,9 +57,9 @@ func newCmdConfig() *cobra.Command {
 	}
 
 	cmdUpdate := &cobra.Command{
-		Use:   "update",
-		Short: "Update the token of an existing remote",
-		Long:  "Long - update config",
+		Use:   "edit",
+		Short: "Edit the configuration of an existing remote",
+		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			err := config.UpdateToken()
