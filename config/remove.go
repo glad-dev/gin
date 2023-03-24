@@ -5,15 +5,6 @@ import (
 	"os"
 )
 
-func RemoveOnce(generalConfig *General, index int) error {
-	if firstCall {
-		firstCall = false
-		errPrevious = Remove(generalConfig, index)
-	}
-
-	return errPrevious
-}
-
 func Remove(generalConfig *General, index int) error {
 	// Check if index is valid
 	if index < 0 || index >= len(generalConfig.Configs) {

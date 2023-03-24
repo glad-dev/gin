@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 )
 
-func setUp(title string, viewFunction func(*model) string) model {
+func setUp(title string, onSubmitFunction func(*model) string) model {
 	// Load current config
 	generalConfig, err := config.Load()
 	if err != nil {
@@ -45,6 +45,6 @@ func setUp(title string, viewFunction func(*model) string) model {
 	return model{
 		list:      lst,
 		oldConfig: *generalConfig,
-		view:      viewFunction,
+		onSubmit:  onSubmitFunction,
 	}
 }

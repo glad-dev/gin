@@ -4,15 +4,6 @@ import (
 	"errors"
 )
 
-func AppendOnce(urlStr string, token string) error {
-	if firstCall {
-		firstCall = false
-		errPrevious = Append(urlStr, token)
-	}
-
-	return errPrevious
-}
-
 func Append(urlStr string, token string) error {
 	// Load current config
 	generalConf, err := Load()

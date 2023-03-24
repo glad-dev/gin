@@ -44,11 +44,12 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 }
 
 type model struct {
-	view      func(m *model) string
+	onSubmit  func(m *model) string
+	exitText  string
 	list      list.Model
 	oldConfig config.General
 	quitting  bool
-	action    bool
+	finished  bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -71,7 +72,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.action = true
+			m.exitText = m.onSubmit(&m)
+			m.finished = true
 
 			return m, tea.Quit
 		}
@@ -84,5 +86,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.view(&m)
+	if m.quitting {
+		return style.QuitText.Render("No changes were made.")
+	}
+
+	if m.finished {
+		return m.exitText
+	}
+
+	return "\n" + m.list.View()
 }

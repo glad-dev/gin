@@ -23,6 +23,7 @@ var (
 )
 
 type model struct {
+	exitText   string
 	inputs     []textinput.Model
 	focusIndex int
 	submit     bool
@@ -52,6 +53,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
 				m.submit = true
+				m.exitText = onSubmit(&m)
 
 				return m, tea.Quit
 			}
@@ -99,29 +101,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.quit {
+		return style.QuitText.Render("No changes were made")
+	}
+
 	if m.submit {
-		return submitView(&m)
-	} else if m.quit {
-		return quitView()
+		return m.exitText
 	}
 
-	return normalView(&m)
-}
-
-func quitView() string {
-	return style.QuitText.Render("No changes were made")
-}
-
-func submitView(m *model) string {
-	err := config.AppendOnce(m.inputs[0].Value(), m.inputs[1].Value())
-	if err != nil {
-		return style.QuitText.Render(fmt.Sprintf("Could not add config: %s", err))
-	}
-
-	return style.QuitText.Render(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()))
-}
-
-func normalView(m *model) string {
 	var b strings.Builder
 
 	fmt.Fprint(&b, "Enter the details:\n")
@@ -140,4 +127,13 @@ func normalView(m *model) string {
 	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
 	return b.String()
+}
+
+func onSubmit(m *model) string {
+	err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
+	if err != nil {
+		return style.QuitText.Render(fmt.Sprintf("Could not add config: %s", err))
+	}
+
+	return style.QuitText.Render(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()))
 }
