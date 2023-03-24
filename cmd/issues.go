@@ -42,7 +42,7 @@ func newCmdSingleIssue() *cobra.Command {
 }
 
 func runAllIssues(cmd *cobra.Command, _ []string) {
-	conf, err := config.Get()
+	conf, err := config.Load()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 		os.Exit(1)
@@ -63,7 +63,7 @@ func runAllIssues(cmd *cobra.Command, _ []string) {
 }
 
 func runSingleIssue(cmd *cobra.Command, args []string) {
-	conf, err := config.Get()
+	conf, err := config.Load()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
 		os.Exit(1)

@@ -1,34 +1,23 @@
 package config
 
 import (
-	"fmt"
-	"os"
-
-	"golang.org/x/term"
+	"errors"
 )
 
-func UpdateToken() error {
-	// Load the current config
-	wrapper, err := Load()
+func Update(wrapper *Wrapper, index int, url string, token string) error {
+	if index < 0 || index >= len(wrapper.Configs) {
+		return errors.New("update: invalid index")
+	}
+
+	u, err := checkURLStr(url)
 	if err != nil {
 		return err
 	}
 
-	index, err := selectExistingConfigs(wrapper.Configs)
-	if err != nil {
-		return err
+	wrapper.Configs[index] = GitLab{
+		URL:   *u,
+		Token: token,
 	}
 
-	// Read token
-	fmt.Printf("Enter the API token (input is hidden): ")
-	token, err := term.ReadPassword(int(os.Stdin.Fd()))
-	fmt.Printf("\n")
-	if err != nil {
-		return err
-	}
-
-	wrapper.Configs[index].Token = string(token)
-
-	// Write back updated config
 	return writeConfig(wrapper)
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type item struct {
@@ -63,9 +64,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
-		case "q":
-			fallthrough
-		case "ctrl+c":
+		case "q", "ctrl+c", "esc":
 			m.quitting = true
 
 			return m, tea.Quit
@@ -86,14 +85,25 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.quitting {
-		return style.QuitText.Render("No changes were made.")
+		return style.FormatQuitText("No changes were made.")
 	}
 
 	if m.finished {
 		return m.exitText
 	}
 
-	return "\n" + m.list.View()
+	return lipgloss.Place(
+		m.list.Width(),
+		m.list.Height(),
+		lipgloss.Center,
+		lipgloss.Center,
+
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			"",
+			style.InputField.Render(m.list.View()),
+		),
+	)
 }
 
 func onSubmit(m *model) string {
@@ -101,13 +111,13 @@ func onSubmit(m *model) string {
 
 	selected, ok := m.list.Items()[index].(item)
 	if !ok {
-		return style.QuitText.Render("Failed to convert list.Item to item")
+		return style.FormatQuitText("Failed to convert list.Item to item")
 	}
 
 	err := config.Remove(&m.oldConfig, index)
 	if err != nil {
-		return style.QuitText.Render(fmt.Sprintf("Failed to remove remote: %s", err))
+		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err))
 	}
 
-	return style.QuitText.Render(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.lab.URL.String()))
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.lab.URL.String()))
 }

@@ -15,12 +15,12 @@ func Config() {
 	// Load current config
 	wrapper, err := config.Load()
 	if err != nil {
-		fmt.Fprint(os.Stderr, style.QuitText.Render(fmt.Sprintf("Failed to load config: %s", err)))
+		fmt.Fprint(os.Stderr, style.FormatQuitText(fmt.Sprintf("Failed to load config: %s", err)))
 		os.Exit(1)
 	}
 
 	if len(wrapper.Configs) == 0 {
-		fmt.Fprint(os.Stderr, style.QuitText.Render("The config file contains no remotes."))
+		fmt.Fprint(os.Stderr, style.FormatQuitText("The config file contains no remotes."))
 		os.Exit(1)
 	}
 
@@ -49,7 +49,7 @@ func Config() {
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
+		fmt.Print(style.FormatQuitText(fmt.Sprintf("Error running program: %s", err)))
 		os.Exit(1)
 	}
 }

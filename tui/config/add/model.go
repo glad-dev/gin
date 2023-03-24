@@ -4,22 +4,11 @@ import (
 	"fmt"
 
 	"gn/config"
+	tui "gn/tui/config"
 	"gn/tui/style"
-	"gn/tui/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-)
-
-var (
-	focusedStyle = lipgloss.NewStyle().Foreground(color.Focused)
-	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-	cursorStyle  = focusedStyle.Copy()
-	noStyle      = lipgloss.NewStyle()
-
-	focusedButton = focusedStyle.Copy().Render("[ Submit ]")
-	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
 )
 
 type model struct {
@@ -76,19 +65,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.focusIndex = len(m.inputs)
 			}
 
-			for i := 0; i <= len(m.inputs)-1; i++ {
+			for i := 0; i < len(m.inputs); i++ {
 				if i == m.focusIndex {
 					// Set focused state
 					cmds[i] = m.inputs[i].Focus()
-					m.inputs[i].PromptStyle = focusedStyle
-					m.inputs[i].TextStyle = focusedStyle
+					m.inputs[i].PromptStyle = style.Focused
+					m.inputs[i].TextStyle = style.Focused
 
 					continue
 				}
 				// Remove focused state
 				m.inputs[i].Blur()
-				m.inputs[i].PromptStyle = noStyle
-				m.inputs[i].TextStyle = noStyle
+				m.inputs[i].PromptStyle = style.None
+				m.inputs[i].TextStyle = style.None
 			}
 
 			return m, tea.Batch(cmds...)
@@ -107,51 +96,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.quit {
-		return style.QuitText.Render("No changes were made")
+		return style.FormatQuitText("No changes were made")
 	}
 
 	if m.submit {
 		return m.exitText
 	}
 
-	button := &blurredButton
-	if m.focusIndex == len(m.inputs) {
-		button = &focusedButton
-	}
-
-	return lipgloss.Place(
-		m.width,
-		m.height,
-		lipgloss.Center,
-		lipgloss.Center,
-
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				"Gitlab URL",
-				style.InputField.Render(m.inputs[0].View()),
-			),
-			"\n",
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				"API Key",
-				style.InputField.Render(m.inputs[1].View()),
-			),
-			"\n",
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				*button,
-			),
-		),
-	)
+	return tui.RenderInputFields(m.inputs, m.focusIndex, m.width, m.height)
 }
 
 func onSubmit(m *model) string {
 	err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
-		return style.QuitText.Render(fmt.Sprintf("Could not add config: %s", err))
+		return style.FormatQuitText(fmt.Sprintf("Could not add config: %s", err))
 	}
 
-	return style.QuitText.Render(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()))
+	return style.FormatQuitText(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()))
 }
