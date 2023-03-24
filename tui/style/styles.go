@@ -1,4 +1,4 @@
-package config
+package style
 
 import (
 	"gn/tui/style/color"
@@ -15,4 +15,5 @@ var (
 	Help         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
 	List         = list.DefaultStyles().HelpStyle.PaddingLeft(4)
 	QuitText     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
+	InputField   = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80)
 )

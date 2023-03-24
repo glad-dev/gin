@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"gn/config"
-	style "gn/tui/style/config"
+	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

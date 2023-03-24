@@ -2,9 +2,10 @@ package add
 
 import (
 	"fmt"
+
 	"gn/config"
+	"gn/tui/style"
 	"gn/tui/style/color"
-	style "gn/tui/style/config"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -22,14 +23,13 @@ var (
 )
 
 type model struct {
-	exitText        string
-	inputFieldStyle lipgloss.Style
-	inputs          []textinput.Model
-	focusIndex      int
-	width           int
-	height          int
-	submit          bool
-	quit            bool
+	exitText   string
+	inputs     []textinput.Model
+	focusIndex int
+	width      int
+	height     int
+	submit     bool
+	quit       bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -130,13 +130,13 @@ func (m model) View() string {
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				"Gitlab URL",
-				m.inputFieldStyle.Render(m.inputs[0].View()),
+				style.InputField.Render(m.inputs[0].View()),
 			),
 			"\n",
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				"API Key",
-				m.inputFieldStyle.Render(m.inputs[1].View()),
+				style.InputField.Render(m.inputs[1].View()),
 			),
 			"\n",
 			lipgloss.JoinVertical(

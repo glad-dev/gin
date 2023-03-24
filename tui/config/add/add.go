@@ -6,17 +6,14 @@ import (
 	"strings"
 
 	"gn/constants"
-	"gn/tui/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func Config() {
 	m := model{
-		inputs:          make([]textinput.Model, 2),
-		inputFieldStyle: lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80),
+		inputs: make([]textinput.Model, 2),
 	}
 
 	var t textinput.Model
