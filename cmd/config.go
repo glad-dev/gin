@@ -6,6 +6,7 @@ import (
 
 	"gn/config"
 	"gn/tui/config/add"
+	"gn/tui/config/edit"
 	"gn/tui/config/remove"
 
 	"github.com/spf13/cobra"
@@ -62,11 +63,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.UpdateToken()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
+			edit.Config()
 		},
 	}
 
