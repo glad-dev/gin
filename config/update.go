@@ -9,12 +9,12 @@ import (
 
 func UpdateToken() error {
 	// Load the current config
-	generalConfig, err := Load()
+	wrapper, err := Load()
 	if err != nil {
 		return err
 	}
 
-	index, err := selectExistingConfigs(generalConfig.Configs)
+	index, err := selectExistingConfigs(wrapper.Configs)
 	if err != nil {
 		return err
 	}
@@ -27,8 +27,8 @@ func UpdateToken() error {
 		return err
 	}
 
-	generalConfig.Configs[index].Token = string(token)
+	wrapper.Configs[index].Token = string(token)
 
 	// Write back updated config
-	return writeConfig(generalConfig)
+	return writeConfig(wrapper)
 }

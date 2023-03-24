@@ -12,19 +12,19 @@ import (
 
 func setUp(title string, onSubmitFunction func(*model) string) model {
 	// Load current config
-	generalConfig, err := config.Load()
+	wrapper, err := config.Load()
 	if err != nil {
 		fmt.Fprint(os.Stderr, style.QuitText.Render(fmt.Sprintf("Failed to load config: %s", err)))
 		os.Exit(1)
 	}
 
-	if len(generalConfig.Configs) == 0 {
+	if len(wrapper.Configs) == 0 {
 		fmt.Fprint(os.Stderr, style.QuitText.Render("The config file contains no remotes."))
 		os.Exit(1)
 	}
 
-	items := make([]list.Item, len(generalConfig.Configs))
-	for i, conf := range generalConfig.Configs {
+	items := make([]list.Item, len(wrapper.Configs))
+	for i, conf := range wrapper.Configs {
 		items[i] = item{
 			lab: conf,
 		}
@@ -44,7 +44,7 @@ func setUp(title string, onSubmitFunction func(*model) string) model {
 
 	return model{
 		list:      lst,
-		oldConfig: *generalConfig,
+		oldConfig: *wrapper,
 		onSubmit:  onSubmitFunction,
 	}
 }

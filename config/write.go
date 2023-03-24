@@ -10,7 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func writeConfig(config *General) error {
+func writeConfig(config *Wrapper) error {
 	config.MajorVersion = constants.CurrentMajorVersion
 
 	err := config.CheckValidity()

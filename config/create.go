@@ -12,7 +12,7 @@ import (
 
 var ErrDontCreateConfig = errors.New("user does not want to create the config")
 
-func readConfigFromStdin() (*General, error) {
+func readConfigFromStdin() (*Wrapper, error) {
 	path, err := getConfigLocation()
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func readConfigFromStdin() (*General, error) {
 		return nil, err
 	}
 
-	return &General{
+	return &Wrapper{
 		MajorVersion: constants.CurrentMajorVersion,
 		Configs: []GitLab{
 			*config,

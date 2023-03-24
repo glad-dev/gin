@@ -9,7 +9,7 @@ import (
 	"gn/repo"
 )
 
-type General struct {
+type Wrapper struct {
 	Configs      []GitLab
 	MajorVersion int
 }
@@ -21,7 +21,7 @@ type GitLab struct {
 
 var ErrNoMatchingConfig = errors.New("no matching config was found")
 
-func (config *General) CheckValidity() error {
+func (config *Wrapper) CheckValidity() error {
 	if len(config.Configs) == 0 {
 		return errors.New("config file does not contain []GitLab")
 	}
@@ -47,7 +47,7 @@ func (config *General) CheckValidity() error {
 	return nil
 }
 
-func (config *General) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
+func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
 	for _, detail := range details {
 		for _, lab := range config.Configs {
 			if lab.URL.Host == detail.URL().Host {

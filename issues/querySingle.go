@@ -51,7 +51,7 @@ type querySingleResponse struct {
 	} `json:"data"`
 }
 
-func QuerySingle(config *config.General, details []repo.Details, issueID string) (*IssueDetails, error) {
+func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string) (*IssueDetails, error) {
 	query := `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {

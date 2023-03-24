@@ -47,7 +47,7 @@ type model struct {
 	onSubmit  func(m *model) string
 	exitText  string
 	list      list.Model
-	oldConfig config.General
+	oldConfig config.Wrapper
 	quitting  bool
 	finished  bool
 }

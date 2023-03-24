@@ -8,7 +8,7 @@ import (
 
 func List() error {
 	// Load config
-	generalConfig, err := Load()
+	wrapper, err := Load()
 	if err != nil {
 		return err
 	}
@@ -20,7 +20,7 @@ func List() error {
 
 	fmt.Println()
 	fmt.Print(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
-	for i, config := range generalConfig.Configs {
+	for i, config := range wrapper.Configs {
 		fmt.Print(style.List.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
 	}
 	fmt.Print("\n\n")

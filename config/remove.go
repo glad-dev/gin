@@ -5,17 +5,17 @@ import (
 	"os"
 )
 
-func Remove(generalConfig *General, index int) error {
+func Remove(wrapper *Wrapper, index int) error {
 	// Check if index is valid
-	if index < 0 || index >= len(generalConfig.Configs) {
+	if index < 0 || index >= len(wrapper.Configs) {
 		return errors.New("invalid index")
 	}
 
 	// Remove the selected config
-	generalConfig.Configs = append(generalConfig.Configs[:index], generalConfig.Configs[index+1:]...)
+	wrapper.Configs = append(wrapper.Configs[:index], wrapper.Configs[index+1:]...)
 
 	// If there are no GitLab configs, delete the config file
-	if len(generalConfig.Configs) == 0 {
+	if len(wrapper.Configs) == 0 {
 		location, err := getConfigLocation()
 		if err != nil {
 			return err
@@ -25,5 +25,5 @@ func Remove(generalConfig *General, index int) error {
 	}
 
 	// Write back the updated config
-	return writeConfig(generalConfig)
+	return writeConfig(wrapper)
 }

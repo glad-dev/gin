@@ -31,7 +31,7 @@ type queryAllResponse struct {
 	} `json:"data"`
 }
 
-func QueryAll(config *config.General, details []repo.Details) ([]Issue, string, error) {
+func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, error) {
 	query := `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {

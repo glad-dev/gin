@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Get() (*General, error) {
+func Get() (*Wrapper, error) {
 	config, err := Load()
 	if err != nil {
 		if !errors.Is(err, ErrConfigDoesNotExist) {

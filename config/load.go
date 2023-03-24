@@ -12,19 +12,19 @@ import (
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
 // Load returns the config located at '~/.gn.toml' if it exists. If it does not exist, function returns a
-// ErrConfigDoesNotExist error and an initialized General config.
-func Load() (*General, error) {
+// ErrConfigDoesNotExist error and an initialized Wrapper config.
+func Load() (*Wrapper, error) {
 	fileLocation, err := getConfigLocation()
 	if err != nil {
 		return nil, err
 	}
 
 	// Load config
-	config := &General{}
+	config := &Wrapper{}
 	metaData, err := toml.DecodeFile(fileLocation, config)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return &General{
+			return &Wrapper{
 				Configs:      []GitLab{},
 				MajorVersion: constants.CurrentMajorVersion,
 			}, ErrConfigDoesNotExist
