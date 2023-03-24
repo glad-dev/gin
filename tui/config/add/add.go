@@ -13,7 +13,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func Add() {
+func Config() {
 	m := model{
 		inputs:          make([]textinput.Model, 2),
 		inputFieldStyle: lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80),

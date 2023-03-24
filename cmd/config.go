@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"gn/tui/config/add"
 	"os"
 
 	"gn/config"
-	tui "gn/tui/config"
+	"gn/tui/config/add"
+	"gn/tui/config/remove"
 
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - add remote",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			add.Add()
+			add.Config()
 		},
 	}
 
@@ -52,7 +52,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - Remove a remote and its API token",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			tui.Remove()
+			remove.Config()
 		},
 	}
 

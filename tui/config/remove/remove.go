@@ -1,4 +1,4 @@
-package config
+package remove
 
 import (
 	"fmt"
@@ -8,9 +8,10 @@ import (
 	style "gn/tui/style/config"
 
 	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-func setUp(title string, onSubmitFunction func(*model) string) model {
+func Config() {
 	// Load current config
 	wrapper, err := config.Load()
 	if err != nil {
@@ -35,16 +36,20 @@ func setUp(title string, onSubmitFunction func(*model) string) model {
 	const listHeight = 14
 
 	lst := list.New(items, itemDelegate{}, defaultWidth, listHeight)
-	lst.Title = title
+	lst.Title = "Which remote do you want to delete?"
 	lst.SetShowStatusBar(false)
 	lst.SetFilteringEnabled(false)
 	lst.Styles.Title = style.Title
 	lst.Styles.PaginationStyle = style.Pagination
 	lst.Styles.HelpStyle = style.Help
 
-	return model{
+	m := model{
 		list:      lst,
 		oldConfig: *wrapper,
-		onSubmit:  onSubmitFunction,
+	}
+
+	if _, err := tea.NewProgram(m).Run(); err != nil {
+		fmt.Println("Error running program:", err)
+		os.Exit(1)
 	}
 }

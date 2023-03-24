@@ -1,4 +1,4 @@
-package config
+package remove
 
 import (
 	"fmt"
@@ -44,7 +44,6 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 }
 
 type model struct {
-	onSubmit  func(m *model) string
 	exitText  string
 	list      list.Model
 	oldConfig config.Wrapper
@@ -72,7 +71,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.exitText = m.onSubmit(&m)
+			m.exitText = onSubmit(&m)
 			m.finished = true
 
 			return m, tea.Quit
@@ -95,4 +94,20 @@ func (m model) View() string {
 	}
 
 	return "\n" + m.list.View()
+}
+
+func onSubmit(m *model) string {
+	index := m.list.Index()
+
+	selected, ok := m.list.Items()[index].(item)
+	if !ok {
+		return style.QuitText.Render("Failed to convert list.Item to item")
+	}
+
+	err := config.Remove(&m.oldConfig, index)
+	if err != nil {
+		return style.QuitText.Render(fmt.Sprintf("Failed to remove remote: %s", err))
+	}
+
+	return style.QuitText.Render(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.lab.URL.String()))
 }
