@@ -3,14 +3,20 @@ package add
 import (
 	"fmt"
 	"os"
+	"strings"
+
+	"gn/constants"
+	"gn/tui/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func Add() {
 	m := model{
-		inputs: make([]textinput.Model, 2),
+		inputs:          make([]textinput.Model, 2),
+		inputFieldStyle: lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80),
 	}
 
 	var t textinput.Model
@@ -21,12 +27,12 @@ func Add() {
 
 		switch i {
 		case 0:
-			t.Placeholder = "Gitlab Base URL, e.g. https://gitlab.com"
+			t.Placeholder = "E.g. https://gitlab.com"
 			t.Focus()
 			t.PromptStyle = focusedStyle
 			t.TextStyle = focusedStyle
 		case 1:
-			t.Placeholder = "API Key"
+			t.Placeholder = "Requires the following scopes: " + strings.Join(constants.RequiredScopes, ", ")
 		}
 
 		m.inputs[i] = t

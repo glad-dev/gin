@@ -5,7 +5,6 @@ import (
 	"gn/config"
 	"gn/tui/style/color"
 	style "gn/tui/style/config"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,11 +22,14 @@ var (
 )
 
 type model struct {
-	exitText   string
-	inputs     []textinput.Model
-	focusIndex int
-	submit     bool
-	quit       bool
+	exitText        string
+	inputFieldStyle lipgloss.Style
+	inputs          []textinput.Model
+	focusIndex      int
+	width           int
+	height          int
+	submit          bool
+	quit            bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -37,7 +39,10 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
-	switch msg := msg.(type) { //nolint:gocritic
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "esc":
@@ -109,24 +114,37 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	var b strings.Builder
-
-	fmt.Fprint(&b, "Enter the details:\n")
-
-	for i := range m.inputs {
-		b.WriteString(m.inputs[i].View())
-		if i < len(m.inputs)-1 {
-			b.WriteRune('\n')
-		}
-	}
-
 	button := &blurredButton
 	if m.focusIndex == len(m.inputs) {
 		button = &focusedButton
 	}
-	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
-	return b.String()
+	return lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Center,
+
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				"Gitlab URL",
+				m.inputFieldStyle.Render(m.inputs[0].View()),
+			),
+			"\n",
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				"API Key",
+				m.inputFieldStyle.Render(m.inputs[1].View()),
+			),
+			"\n",
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				*button,
+			),
+		),
+	)
 }
 
 func onSubmit(m *model) string {
