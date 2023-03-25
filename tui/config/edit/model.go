@@ -140,16 +140,19 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	if m.selectedConfig != nil {
-		if m.inputs[0].Value() == "" && m.inputs[1].Value() == "" {
-			m.inputs[0].SetValue(m.selectedConfig.URL.String())
-			m.inputs[1].SetValue(m.selectedConfig.Token)
-		}
-
-		return shared.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
+	if m.selectedConfig == nil {
+		// No config is selected => We must be in list view
+		return shared.RenderList(m.list)
 	}
 
-	return shared.RenderList(m.list)
+	// There is a selected config => We must be in edit view
+	if m.inputs[0].Value() == "" && m.inputs[1].Value() == "" {
+		// Write the selected config's values in the input fields
+		m.inputs[0].SetValue(m.selectedConfig.URL.String())
+		m.inputs[1].SetValue(m.selectedConfig.Token)
+	}
+
+	return shared.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
 }
 
 func updateFocus(m *model) (tea.Model, tea.Cmd) {
