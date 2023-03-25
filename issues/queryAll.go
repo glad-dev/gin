@@ -87,14 +87,14 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 	issues := make([]Issue, 0)
 	for _, issue := range queryAll.Data.Project.Issues.Nodes {
 		issues = append(issues, Issue{
-			title:       issue.Title,
-			description: issue.Description,
-			createdAt:   issue.CreatedAt,
-			updatedAt:   issue.UpdatedAt,
-			iid:         issue.Iid,
-			state:       issue.State,
-			assignees:   issue.Assignees.Nodes,
-			author:      issue.Author,
+			Title:       issue.Title,
+			Description: issue.Description,
+			CreatedAt:   issue.CreatedAt,
+			UpdatedAt:   issue.UpdatedAt,
+			Iid:         issue.Iid,
+			State:       issue.State,
+			Assignees:   issue.Assignees.Nodes,
+			Author:      issue.Author,
 		})
 	}
 

@@ -2,6 +2,7 @@ package all
 
 import (
 	"fmt"
+
 	"gn/issues"
 	"gn/tui/style"
 
@@ -13,7 +14,7 @@ import (
 func Show(allIssues []issues.Issue, projectPath string) {
 	issueList := make([]list.Item, len(allIssues))
 	for i, issue := range allIssues {
-		issueList[i] = issue
+		issueList[i] = item{issue: issue}
 	}
 
 	lst := list.New(issueList, newItemDelegate(), 0, 0)

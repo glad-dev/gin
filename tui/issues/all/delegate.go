@@ -1,8 +1,6 @@
 package all
 
 import (
-	"gn/issues"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,8 +12,8 @@ func newItemDelegate() list.DefaultDelegate {
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
 		var iid string
 
-		if i, ok := m.SelectedItem().(issues.Issue); ok {
-			iid = i.Iid()
+		if i, ok := m.SelectedItem().(item); ok {
+			iid = i.issue.Iid
 		} else {
 			return nil
 		}
