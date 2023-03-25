@@ -11,6 +11,8 @@ import (
 
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
+const ErrConfigDoesNotExistMsg = "No configuration exists.\nRun `go config add` to add remotes"
+
 // Load returns the config located at '~/.gn.toml' if it exists. If it does not exist, function returns a
 // ErrConfigDoesNotExist error and an initialized Wrapper config.
 func Load() (*Wrapper, error) {

@@ -1,6 +1,7 @@
 package edit
 
 import (
+	"errors"
 	"fmt"
 
 	"gn/config"
@@ -186,6 +187,10 @@ func updateFocus(m *model) (tea.Model, tea.Cmd) {
 func onSubmit(m *model) string {
 	err := config.Update(&m.oldConfig, m.list.Index(), m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
+		if errors.Is(err, config.ErrConfigDoesNotExist) {
+			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg)
+		}
+
 		return style.FormatQuitText(fmt.Sprintf("Failed to update remote: %s", err))
 	}
 

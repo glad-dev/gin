@@ -2,9 +2,8 @@ package all
 
 import (
 	"fmt"
-	"os"
-
 	"gn/issues"
+	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -28,7 +27,6 @@ func Show(allIssues []issues.Issue, projectPath string) {
 	p := tea.NewProgram(m, tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 }

@@ -1,6 +1,7 @@
 package add
 
 import (
+	"errors"
 	"fmt"
 
 	"gn/config"
@@ -114,6 +115,10 @@ func (m model) View() string {
 func onSubmit(m *model) string {
 	err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
+		if errors.Is(err, config.ErrConfigDoesNotExist) {
+			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg)
+		}
+
 		return style.FormatQuitText(fmt.Sprintf("Could not add config: %s", err))
 	}
 

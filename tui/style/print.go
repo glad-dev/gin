@@ -1,6 +1,8 @@
 package style
 
 import (
+	"fmt"
+	"os"
 	"strings"
 )
 
@@ -34,4 +36,9 @@ func FormatQuitText(str string) string {
 	}
 
 	return "\n" + quitText.Render(out) + "\n"
+}
+
+func PrintErrAndExit(str string) {
+	fmt.Fprint(os.Stderr, FormatQuitText(str))
+	os.Exit(1)
 }

@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"errors"
 
 	"gn/config"
 	"gn/tui/config/add"
 	"gn/tui/config/edit"
 	"gn/tui/config/remove"
+	"gn/tui/style"
 
 	"github.com/spf13/cobra"
 )
@@ -19,7 +19,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(os.Stderr, "Use commands like add|list|remove|update")
+			style.PrintErrAndExit("Use commands like add|list|remove|update")
 		},
 	}
 
@@ -31,8 +31,11 @@ func newCmdConfig() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := config.List()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
+				if errors.Is(err, config.ErrConfigDoesNotExist) {
+					style.PrintErrAndExit(config.ErrConfigDoesNotExistMsg)
+				}
+
+				style.PrintErrAndExit("An error occurred while attempting to list the configuration: " + err.Error())
 			}
 		},
 	}

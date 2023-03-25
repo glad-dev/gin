@@ -1,9 +1,7 @@
 package remove
 
 import (
-	"fmt"
-	"os"
-
+	"errors"
 	"gn/config"
 	"gn/tui/config/shared"
 	"gn/tui/style"
@@ -16,8 +14,11 @@ func Config() {
 	// Load current config
 	wrapper, err := config.Load()
 	if err != nil {
-		fmt.Fprint(os.Stderr, style.FormatQuitText(fmt.Sprintf("Failed to load config: %s", err)))
-		os.Exit(1)
+		if errors.Is(err, config.ErrConfigDoesNotExist) {
+			style.PrintErrAndExit(config.ErrConfigDoesNotExistMsg)
+		}
+
+		style.PrintErrAndExit("Failed to load the configuration: " + err.Error())
 	}
 
 	items := make([]list.Item, len(wrapper.Configs))
@@ -45,7 +46,6 @@ func Config() {
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Fprint(os.Stderr, style.FormatQuitText(fmt.Sprintf("Error running program: %s", err)))
-		os.Exit(1)
+		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 }
