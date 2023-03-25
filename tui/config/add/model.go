@@ -103,7 +103,12 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	return shared.RenderInputFields(m.inputs, m.focusIndex, m.width, m.height)
+	return shared.RenderInputFields(
+		m.inputs,
+		m.focusIndex,
+		m.width,
+		m.height,
+	)
 }
 
 func onSubmit(m *model) string {
