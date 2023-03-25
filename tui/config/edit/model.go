@@ -73,6 +73,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
+		m.list.SetHeight(msg.Height)
 
 		return m, nil
 	case tea.KeyMsg:
