@@ -1,4 +1,3 @@
-// nolint: goconst
 package edit
 
 import (
@@ -11,7 +10,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -60,7 +58,7 @@ func updateList(m *model, msg tea.KeyMsg) (model, tea.Cmd) {
 		m.quit = true
 
 		return *m, tea.Quit
-	case "enter":
+	case "enter": //nolint:goconst
 		selected, ok := m.list.Items()[m.list.Index()].(shared.ListItem)
 		if !ok {
 			m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
@@ -151,7 +149,7 @@ func (m model) View() string {
 		return shared.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
 	}
 
-	return "\n" + m.list.View()
+	return shared.RenderList(m.list)
 }
 
 func updateFocus(m *model) (tea.Model, tea.Cmd) {

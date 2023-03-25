@@ -7,6 +7,7 @@ import (
 	"gn/constants"
 	"gn/tui/style"
 
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -74,6 +75,21 @@ func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, heig
 				lipgloss.Left,
 				*button,
 			),
+		),
+	)
+}
+
+func RenderList(list list.Model) string {
+	return lipgloss.Place(
+		list.Width(),
+		list.Height(),
+		lipgloss.Center,
+		lipgloss.Center,
+
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			"",
+			style.InputField.Render(list.View()),
 		),
 	)
 }

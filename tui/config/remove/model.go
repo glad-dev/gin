@@ -9,7 +9,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -60,18 +59,7 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	return lipgloss.Place(
-		m.list.Width(),
-		m.list.Height(),
-		lipgloss.Center,
-		lipgloss.Center,
-
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			"",
-			style.InputField.Render(m.list.View()),
-		),
-	)
+	return shared.RenderList(m.list) + fmt.Sprintf("\nTest: %d", m.list.Height())
 }
 
 func onSubmit(m *model) string {
