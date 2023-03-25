@@ -59,7 +59,7 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	return shared.RenderList(m.list) + fmt.Sprintf("\nTest: %d", m.list.Height())
+	return shared.RenderList(m.list)
 }
 
 func onSubmit(m *model) string {
