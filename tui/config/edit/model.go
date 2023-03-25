@@ -35,7 +35,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
-		m.list.SetHeight(msg.Height)
+		if msg.Height > 2*style.InputField.GetVerticalPadding() {
+			// We have to subtract our padding
+			m.list.SetHeight(msg.Height - 2*style.InputField.GetVerticalPadding())
+		}
 
 		return m, nil
 	case tea.KeyMsg:
@@ -152,7 +155,12 @@ func (m model) View() string {
 		m.inputs[1].SetValue(m.selectedConfig.Token)
 	}
 
-	return shared.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
+	return shared.RenderInputFields(
+		m.inputs,
+		m.focusIndex,
+		m.list.Width(),
+		m.list.Height()+2*style.InputField.GetVerticalPadding(),
+	)
 }
 
 func updateFocus(m *model) (tea.Model, tea.Cmd) {
