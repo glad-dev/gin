@@ -28,20 +28,24 @@ func (i item) Title() string {
 	}
 
 	return fmt.Sprintf(
-		"#%s %s%s by %s on %s",
-		i.issue.Iid, status,
+		"#%s %s%s",
+		i.issue.Iid,
+		status,
 		i.issue.Title,
+	)
+}
+
+func (i item) Description() string {
+	// Use author and creation date as description
+	return fmt.Sprintf(
+		"Created by %s on %s",
 		i.issue.Author.String(),
 		i.issue.CreatedAt.Format("2006-01-02 15:04"),
 	)
 }
 
-func (i item) Description() string {
-	return i.issue.Description
-}
-
 func (i item) FilterValue() string {
-	return i.issue.Title + i.issue.Description
+	return i.issue.Title
 }
 
 func (m model) Init() tea.Cmd {

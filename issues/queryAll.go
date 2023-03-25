@@ -15,14 +15,13 @@ type queryAllResponse struct {
 		Project struct {
 			Issues struct {
 				Nodes []struct {
-					Title       string    `json:"title"`
-					Description string    `json:"description"`
-					CreatedAt   time.Time `json:"createdAt"`
-					UpdatedAt   time.Time `json:"updatedAt"`
-					Iid         string    `json:"iid"`
-					State       string    `json:"state"`
-					Author      User      `json:"author"`
-					Assignees   struct {
+					Title     string    `json:"title"`
+					CreatedAt time.Time `json:"createdAt"`
+					UpdatedAt time.Time `json:"updatedAt"`
+					Iid       string    `json:"iid"`
+					State     string    `json:"state"`
+					Author    User      `json:"author"`
+					Assignees struct {
 						Nodes []User `json:"nodes"`
 					} `json:"assignees"`
 				} `json:"nodes"`
@@ -38,7 +37,6 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 			issues(sort: CREATED_ASC) {
 			  nodes {
 				title
-				description
 				createdAt
 				updatedAt
 				iid
@@ -87,14 +85,13 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 	issues := make([]Issue, 0)
 	for _, issue := range queryAll.Data.Project.Issues.Nodes {
 		issues = append(issues, Issue{
-			Title:       issue.Title,
-			Description: issue.Description,
-			CreatedAt:   issue.CreatedAt,
-			UpdatedAt:   issue.UpdatedAt,
-			Iid:         issue.Iid,
-			State:       issue.State,
-			Assignees:   issue.Assignees.Nodes,
-			Author:      issue.Author,
+			Title:     issue.Title,
+			CreatedAt: issue.CreatedAt,
+			UpdatedAt: issue.UpdatedAt,
+			Iid:       issue.Iid,
+			State:     issue.State,
+			Assignees: issue.Assignees.Nodes,
+			Author:    issue.Author,
 		})
 	}
 

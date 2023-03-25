@@ -6,14 +6,13 @@ import (
 )
 
 type Issue struct {
-	Title       string
-	Description string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Iid         string
-	State       string
-	Author      User
-	Assignees   []User
+	Title     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Iid       string
+	State     string
+	Author    User
+	Assignees []User
 }
 
 type IssueDetails struct {
