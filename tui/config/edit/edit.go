@@ -46,7 +46,7 @@ func Config() {
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
+		fmt.Fprint(os.Stderr, style.FormatQuitText(fmt.Sprintf("Error running program: %s", err)))
 		os.Exit(1)
 	}
 }

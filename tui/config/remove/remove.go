@@ -20,11 +20,6 @@ func Config() {
 		os.Exit(1)
 	}
 
-	if len(wrapper.Configs) == 0 {
-		fmt.Fprint(os.Stderr, style.FormatQuitText("The config file contains no remotes."))
-		os.Exit(1)
-	}
-
 	items := make([]list.Item, len(wrapper.Configs))
 	for i, conf := range wrapper.Configs {
 		items[i] = shared.ListItem{
@@ -50,7 +45,7 @@ func Config() {
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Print(style.FormatQuitText(fmt.Sprintf("Error running program: %s", err)))
+		fmt.Fprint(os.Stderr, style.FormatQuitText(fmt.Sprintf("Error running program: %s", err)))
 		os.Exit(1)
 	}
 }
