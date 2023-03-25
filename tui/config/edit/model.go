@@ -8,7 +8,6 @@ import (
 	"gn/config"
 	tui "gn/tui/config"
 	"gn/tui/style"
-	"gn/tui/style/color"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -68,7 +67,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	tmp := msg
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -80,7 +78,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return updateList(&m, msg)
 		}
 
-		return updateSelection(&m, msg, tmp)
+		return updateSelection(&m, msg)
 	}
 
 	var cmd tea.Cmd
@@ -112,14 +110,7 @@ func updateList(m *model, msg tea.KeyMsg) (model, tea.Cmd) {
 	return *m, cmd
 }
 
-var (
-	focusedStyle = lipgloss.NewStyle().Foreground(color.Focused)
-	noStyle      = lipgloss.NewStyle()
-)
-
-func updateSelection(m *model, msg tea.KeyMsg, orgMsg tea.Msg) (tea.Model, tea.Cmd) {
-	cmds := make([]tea.Cmd, len(m.inputs))
-
+func updateSelection(m *model, msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
 		m.quit = true
@@ -164,11 +155,12 @@ func updateSelection(m *model, msg tea.KeyMsg, orgMsg tea.Msg) (tea.Model, tea.C
 		return updateFocus(m)
 	}
 
+	cmds := make([]tea.Cmd, len(m.inputs))
 	// Handle character input and blinking
 	// Only text inputs with Focus() set will respond, so it's safe to simply
 	// update all of them here without any further logic.
 	for i := range m.inputs {
-		m.inputs[i], cmds[i] = m.inputs[i].Update(orgMsg)
+		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
 	}
 
 	return *m, tea.Batch(cmds...)
@@ -201,15 +193,15 @@ func updateFocus(m *model) (tea.Model, tea.Cmd) {
 		if i == m.focusIndex {
 			// Set focused state
 			cmds[i] = m.inputs[i].Focus()
-			m.inputs[i].PromptStyle = focusedStyle
-			m.inputs[i].TextStyle = focusedStyle
+			m.inputs[i].PromptStyle = style.Focused
+			m.inputs[i].TextStyle = style.Focused
 
 			continue
 		}
 		// Remove focused state
 		m.inputs[i].Blur()
-		m.inputs[i].PromptStyle = noStyle
-		m.inputs[i].TextStyle = noStyle
+		m.inputs[i].PromptStyle = style.None
+		m.inputs[i].TextStyle = style.None
 	}
 
 	return *m, tea.Batch(cmds...)
