@@ -33,5 +33,5 @@ func FormatQuitText(str string) string {
 		out += line + "\n"
 	}
 
-	return quitText.Render(out) + "\n"
+	return "\n" + quitText.Render(out) + "\n"
 }

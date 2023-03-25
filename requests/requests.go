@@ -14,6 +14,7 @@ import (
 )
 
 var ErrProjectDoesNotExist = errors.New("the project does not exist")
+var ErrNotFound = errors.New("received a 404 - not found when contacting API")
 
 func Do(query *GraphqlQuery, config *config.GitLab) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
@@ -51,7 +52,7 @@ func Do(query *GraphqlQuery, config *config.GitLab) ([]byte, error) {
 	case http.StatusUnauthorized:
 		return nil, errors.New("token is invalid")
 	case http.StatusNotFound:
-		return nil, errors.New("either project does not exist or token is invalid")
+		return nil, ErrNotFound
 	}
 
 	if resp.StatusCode != 200 {
