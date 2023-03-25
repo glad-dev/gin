@@ -14,10 +14,17 @@ func Update(wrapper *Wrapper, index int, url string, token string) error {
 		return err
 	}
 
-	wrapper.Configs[index] = GitLab{
+	lab := GitLab{
 		URL:   *u,
 		Token: token,
 	}
+
+	err = lab.GetUsername()
+	if err != nil {
+		return err
+	}
+
+	wrapper.Configs[index] = lab
 
 	return writeConfig(wrapper)
 }

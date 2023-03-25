@@ -22,6 +22,11 @@ func Append(urlStr string, token string) error {
 		Token: token,
 	}
 
+	err = config.GetUsername()
+	if err != nil {
+		return err
+	}
+
 	// Add new config
 	generalConf.Configs = append(generalConf.Configs, config)
 
