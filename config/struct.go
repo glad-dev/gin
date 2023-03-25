@@ -58,3 +58,11 @@ func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*GitLab, strin
 
 	return nil, "", ErrNoMatchingConfig
 }
+
+func (l *GitLab) GetURL() string {
+	return l.URL.String()
+}
+
+func (l *GitLab) GetToken() string {
+	return l.Token
+}

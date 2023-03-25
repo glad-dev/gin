@@ -107,7 +107,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 		"issueIID":    issueID,
 	}
 
-	response, err := requests.Do(&requests.GraphqlQuery{
+	response, err := requests.Project(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: variables,
 	}, lab)

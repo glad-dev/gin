@@ -5,10 +5,7 @@ type GraphqlQuery struct {
 	Query     string            `json:"query"`
 }
 
-type scopes struct {
-	Data struct {
-		Viewer struct {
-			Scopes []string `json:"scopes"`
-		} `json:"viewer"`
-	} `json:"data"`
+type ConfigInterface interface {
+	GetURL() string
+	GetToken() string
 }
