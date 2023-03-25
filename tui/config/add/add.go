@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	tui "gn/tui/config"
+	"gn/tui/config/shared"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func Config() {
 	m := model{
-		inputs: tui.GetTextInputs(),
+		inputs: shared.GetTextInputs(),
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {

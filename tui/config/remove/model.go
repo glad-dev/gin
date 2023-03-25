@@ -2,47 +2,15 @@ package remove
 
 import (
 	"fmt"
-	"io"
 
 	"gn/config"
+	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
-
-type item struct {
-	lab config.GitLab
-}
-
-func (i item) FilterValue() string { return "" }
-func (i item) Title() string {
-	return i.lab.URL.String()
-}
-
-type itemDelegate struct{}
-
-func (d itemDelegate) Height() int                             { return 1 }
-func (d itemDelegate) Spacing() int                            { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf("%d. %s", index+1, i.lab.URL.String())
-
-	fn := style.Item.Render
-	if index == m.Index() {
-		fn = func(s ...string) string {
-			return style.SelectedItem.Render("> " + s[0])
-		}
-	}
-
-	fmt.Fprint(w, fn(str))
-}
 
 type model struct {
 	exitText  string
@@ -109,7 +77,7 @@ func (m model) View() string {
 func onSubmit(m *model) string {
 	index := m.list.Index()
 
-	selected, ok := m.list.Items()[index].(item)
+	selected, ok := m.list.Items()[index].(shared.ListItem)
 	if !ok {
 		return style.FormatQuitText("Failed to convert list.Item to item")
 	}
@@ -119,5 +87,5 @@ func onSubmit(m *model) string {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err))
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.lab.URL.String()))
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Lab.URL.String()))
 }

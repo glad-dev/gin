@@ -3,10 +3,9 @@ package edit
 
 import (
 	"fmt"
-	"io"
 
 	"gn/config"
-	tui "gn/tui/config"
+	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -14,38 +13,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
-
-type item struct {
-	lab config.GitLab
-}
-
-func (i item) FilterValue() string { return "" }
-func (i item) Title() string {
-	return i.lab.URL.String()
-}
-
-type itemDelegate struct{}
-
-func (d itemDelegate) Height() int                             { return 1 }
-func (d itemDelegate) Spacing() int                            { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf("%d. %s", index+1, i.lab.URL.String())
-
-	fn := style.Item.Render
-	if index == m.Index() {
-		fn = func(s ...string) string {
-			return style.SelectedItem.Render("> " + s[0])
-		}
-	}
-
-	fmt.Fprint(w, fn(str))
-}
 
 type model struct {
 	exitText       string
@@ -94,14 +61,14 @@ func updateList(m *model, msg tea.KeyMsg) (model, tea.Cmd) {
 
 		return *m, tea.Quit
 	case "enter":
-		selected, ok := m.list.Items()[m.list.Index()].(item)
+		selected, ok := m.list.Items()[m.list.Index()].(shared.ListItem)
 		if !ok {
 			m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
 
 			return *m, tea.Quit
 		}
 
-		m.selectedConfig = &selected.lab
+		m.selectedConfig = &selected.Lab
 	}
 
 	var cmd tea.Cmd
@@ -181,7 +148,7 @@ func (m model) View() string {
 			m.inputs[1].SetValue(m.selectedConfig.Token)
 		}
 
-		return tui.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
+		return shared.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
 	}
 
 	return "\n" + m.list.View()

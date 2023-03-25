@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"gn/config"
-	tui "gn/tui/config"
+	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -22,8 +22,8 @@ func Config() {
 
 	items := make([]list.Item, len(wrapper.Configs))
 	for i, conf := range wrapper.Configs {
-		items[i] = item{
-			lab: conf,
+		items[i] = shared.ListItem{
+			Lab: conf,
 		}
 	}
 
@@ -31,7 +31,7 @@ func Config() {
 	const defaultWidth = 20
 	const listHeight = 14
 
-	lst := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+	lst := list.New(items, shared.ItemDelegate{}, defaultWidth, listHeight)
 	lst.Title = "Which remote do you want to edit?"
 	lst.SetShowStatusBar(false)
 	lst.SetFilteringEnabled(false)
@@ -42,7 +42,7 @@ func Config() {
 	m := model{
 		list:      lst,
 		oldConfig: *wrapper,
-		inputs:    tui.GetTextInputs(),
+		inputs:    shared.GetTextInputs(),
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {

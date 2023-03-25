@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"gn/config"
-	tui "gn/tui/config"
+	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -103,7 +103,7 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	return tui.RenderInputFields(m.inputs, m.focusIndex, m.width, m.height)
+	return shared.RenderInputFields(m.inputs, m.focusIndex, m.width, m.height)
 }
 
 func onSubmit(m *model) string {
