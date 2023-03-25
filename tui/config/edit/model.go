@@ -56,7 +56,6 @@ type model struct {
 	oldConfig      config.Wrapper
 	focusIndex     int
 	quit           bool
-	finished       bool
 	submit         bool
 }
 
@@ -77,31 +76,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m, nil
 	case tea.KeyMsg:
-		/*
-			switch keypress := msg.String(); keypress {
-			case "q":
-				fallthrough
-			case "ctrl+c":
-				m.quit = true
-
-				return m, tea.Quit
-
-			case "enter":
-				if m.displayingList() {
-					selected, ok := m.list.Items()[m.list.Index()].(item)
-					if !ok {
-						m.finished = true
-						m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
-
-						return m, tea.Quit
-					}
-
-					m.selectedConfig = &selected.lab
-				} else {
-
-				}
-			}*/
-
 		if m.displayingList() {
 			return updateList(&m, msg)
 		}
@@ -124,7 +98,6 @@ func updateList(m *model, msg tea.KeyMsg) (model, tea.Cmd) {
 	case "enter":
 		selected, ok := m.list.Items()[m.list.Index()].(item)
 		if !ok {
-			m.finished = true
 			m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
 
 			return *m, tea.Quit
@@ -144,14 +117,23 @@ var (
 	noStyle      = lipgloss.NewStyle()
 )
 
-func updateSelection(m *model, msg tea.KeyMsg, orgMsg tea.Msg) (model, tea.Cmd) {
+func updateSelection(m *model, msg tea.KeyMsg, orgMsg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
 	switch msg.String() {
-	case "ctrl+c", "esc":
+	case "ctrl+c":
 		m.quit = true
 
 		return *m, tea.Quit
+
+	case "esc":
+		m.focusIndex = 0
+		m.selectedConfig = nil
+		// Delete entered values
+		m.inputs[0].SetValue("")
+		m.inputs[1].SetValue("")
+
+		return updateFocus(m)
 
 	// Set focus to next input
 	case "tab", "shift+tab", "enter", "up", "down":
@@ -179,23 +161,7 @@ func updateSelection(m *model, msg tea.KeyMsg, orgMsg tea.Msg) (model, tea.Cmd) 
 			m.focusIndex = len(m.inputs)
 		}
 
-		for i := 0; i < len(m.inputs); i++ {
-			if i == m.focusIndex {
-				// Set focused state
-				cmds[i] = m.inputs[i].Focus()
-				m.inputs[i].SetValue("What?")
-				m.inputs[i].PromptStyle = focusedStyle
-				m.inputs[i].TextStyle = focusedStyle
-
-				continue
-			}
-			// Remove focused state
-			m.inputs[i].Blur()
-			m.inputs[i].PromptStyle = noStyle
-			m.inputs[i].TextStyle = noStyle
-		}
-
-		return *m, tea.Batch(cmds...)
+		return updateFocus(m)
 	}
 
 	// Handle character input and blinking
@@ -213,18 +179,40 @@ func (m model) View() string {
 		return style.FormatQuitText("No changes were made.")
 	}
 
-	if m.finished {
+	if m.submit {
 		return m.exitText
 	}
 
 	if m.selectedConfig != nil {
-		m.inputs[0].SetValue(m.selectedConfig.URL.String())
-		m.inputs[1].SetValue(m.selectedConfig.Token)
+		if m.inputs[0].Value() == "" && m.inputs[1].Value() == "" {
+			m.inputs[0].SetValue(m.selectedConfig.URL.String())
+			m.inputs[1].SetValue(m.selectedConfig.Token)
+		}
 
 		return tui.RenderInputFields(m.inputs, m.focusIndex, m.list.Width(), m.list.Height())
 	}
 
 	return "\n" + m.list.View()
+}
+
+func updateFocus(m *model) (tea.Model, tea.Cmd) {
+	var cmds = make([]tea.Cmd, len(m.inputs))
+	for i := 0; i < len(m.inputs); i++ {
+		if i == m.focusIndex {
+			// Set focused state
+			cmds[i] = m.inputs[i].Focus()
+			m.inputs[i].PromptStyle = focusedStyle
+			m.inputs[i].TextStyle = focusedStyle
+
+			continue
+		}
+		// Remove focused state
+		m.inputs[i].Blur()
+		m.inputs[i].PromptStyle = noStyle
+		m.inputs[i].TextStyle = noStyle
+	}
+
+	return *m, tea.Batch(cmds...)
 }
 
 func onSubmit(m *model) string {
