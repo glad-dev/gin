@@ -1,33 +1,23 @@
 package all
 
 import (
-	"fmt"
-
-	"gn/issues"
+	"gn/repo"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func Show(allIssues []issues.Issue, projectPath string) {
-	issueList := make([]list.Item, len(allIssues))
-	for i, issue := range allIssues {
-		issueList[i] = item{issue: issue}
-	}
-
-	lst := list.New(issueList, newItemDelegate(), 0, 0)
-	lst.Title = fmt.Sprintf("Issues of %s", projectPath)
-	lst.SetSpinner(spinner.Points)
+func Show(details []repo.Details) {
+	lst := list.New([]list.Item{}, newItemDelegate(), 0, 0)
+	lst.Title = ""
 
 	m := model{
-		list: lst,
+		list:    lst,
+		details: details,
 	}
 
-	p := tea.NewProgram(m, tea.WithAltScreen())
-
-	if _, err := p.Run(); err != nil {
+	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
 		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 }

@@ -42,24 +42,12 @@ func newCmdSingleIssue() *cobra.Command {
 }
 
 func runAllIssues(cmd *cobra.Command, _ []string) {
-	conf, err := config.Load()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
 	details, err := getRepo(cmd)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	issueList, projectPath, err := issues.QueryAll(conf, details)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
-	allIssues.Show(issueList, projectPath)
+	allIssues.Show(details)
 }
 
 func runSingleIssue(cmd *cobra.Command, args []string) {

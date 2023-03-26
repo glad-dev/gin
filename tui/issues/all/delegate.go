@@ -12,7 +12,7 @@ func newItemDelegate() list.DefaultDelegate {
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
 		var iid string
 
-		if i, ok := m.SelectedItem().(item); ok {
+		if i, ok := m.SelectedItem().(itemWrapper); ok {
 			iid = i.issue.Iid
 		} else {
 			return nil
