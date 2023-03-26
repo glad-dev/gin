@@ -51,3 +51,25 @@ func (u *User) String() string {
 func (i *Issue) HasBeenUpdated() bool {
 	return i.CreatedAt != i.UpdatedAt
 }
+
+func (i *Issue) UpdateUsername(ownUsername string) {
+	if len(ownUsername) == 0 {
+		return
+	}
+
+	// Update author
+	if i.Author.Username == ownUsername {
+		i.Author.Name = "you"
+		i.Author.Username = ""
+	}
+
+	// Update assignees
+	for k, assignee := range i.Assignees {
+		if assignee.Username == ownUsername {
+			i.Assignees[k] = User{
+				Name:     "you",
+				Username: "",
+			}
+		}
+	}
+}

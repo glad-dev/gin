@@ -83,8 +83,9 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 
 	// Flatter the Graphql struct to an Issue struct
 	issues := make([]Issue, 0)
+	var tmp Issue
 	for _, issue := range queryAll.Data.Project.Issues.Nodes {
-		issues = append(issues, Issue{
+		tmp = Issue{
 			Title:     issue.Title,
 			CreatedAt: issue.CreatedAt,
 			UpdatedAt: issue.UpdatedAt,
@@ -92,7 +93,11 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 			State:     issue.State,
 			Assignees: issue.Assignees.Nodes,
 			Author:    issue.Author,
-		})
+		}
+
+		tmp.UpdateUsername(lab.Username)
+
+		issues = append(issues, tmp)
 	}
 
 	return issues, projectPath, nil
