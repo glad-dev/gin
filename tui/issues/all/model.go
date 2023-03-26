@@ -9,6 +9,7 @@ import (
 	"gn/repo"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -19,6 +20,8 @@ type model struct {
 	selectedIid string
 	list        list.Model
 	details     []repo.Details
+	spinner     spinner.Model // ToDo: Spinner is not spinning
+	isLoading   bool
 }
 
 type updateMsg struct {
@@ -69,6 +72,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "enter":
+			if m.isLoading {
+				return m, nil
+			}
+
 			selected, ok := m.list.Items()[m.list.Index()].(itemWrapper)
 			if !ok {
 				return m, tea.Quit
@@ -87,6 +94,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.list.SetItems(val.items)
 		m.list.Title = "Issues of " + val.projectPath
+		m.isLoading = false
 	}
 
 	var cmd tea.Cmd
@@ -96,8 +104,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if len(m.list.Title) == 0 {
-		return "Loading..."
+	if m.isLoading {
+		return lipgloss.Place(
+			m.list.Width(),
+			m.list.Height(),
+			lipgloss.Center,
+			lipgloss.Center,
+
+			fmt.Sprintf("Loading %s", m.spinner.View()),
+		)
 	}
 
 	if m.selectedIid != "" {
