@@ -196,6 +196,8 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 		issueDetails.Discussion = append(issueDetails.Discussion, comment)
 	}
 
+	issueDetails.UpdateUsername(lab.Username)
+
 	return &issueDetails, nil
 }
 

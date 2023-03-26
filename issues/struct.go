@@ -16,6 +16,7 @@ type Issue struct {
 }
 
 type IssueDetails struct {
+	// ToDo: Get issue creator
 	Title       string
 	Description string
 	CreatedAt   time.Time
@@ -67,6 +68,32 @@ func (i *Issue) UpdateUsername(ownUsername string) {
 	for k, assignee := range i.Assignees {
 		if assignee.Username == ownUsername {
 			i.Assignees[k] = User{
+				Name:     "you",
+				Username: "",
+			}
+		}
+	}
+}
+
+func (id *IssueDetails) UpdateUsername(ownUsername string) {
+	if len(ownUsername) == 0 {
+		return
+	}
+
+	// Update assignees
+	for k, assignee := range id.Assignees {
+		if assignee.Username == ownUsername {
+			id.Assignees[k] = User{
+				Name:     "you",
+				Username: "",
+			}
+		}
+	}
+
+	// Update comments
+	for k, comment := range id.Discussion {
+		if comment.Author.Username == ownUsername {
+			id.Discussion[k].Author = User{
 				Name:     "you",
 				Username: "",
 			}
