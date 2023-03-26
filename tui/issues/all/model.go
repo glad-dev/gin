@@ -17,11 +17,12 @@ import (
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type model struct {
-	selectedIid string
-	list        list.Model
-	details     []repo.Details
-	spinner     spinner.Model // ToDo: Spinner is not spinning
-	isLoading   bool
+	selectedIid  string
+	list         list.Model
+	details      []repo.Details
+	viewedIssues map[string]issues.IssueDetails
+	spinner      spinner.Model // ToDo: Spinner is not spinning
+	isLoading    bool
 }
 
 type updateMsg struct {
@@ -71,6 +72,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() { //nolint:gocritic
 		case "ctrl+c":
 			return m, tea.Quit
+
 		case "enter":
 			if m.isLoading {
 				return m, nil
@@ -82,10 +84,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			m.selectedIid = selected.issue.Iid
+
+		case "esc", "backspace":
+			if len(m.selectedIid) != 0 {
+				m.selectedIid = ""
+			}
+
+			return m, nil
 		}
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
+
 	case tea.Msg:
 		val, ok := msg.(updateMsg)
 		if !ok {
@@ -115,8 +125,16 @@ func (m model) View() string {
 		)
 	}
 
-	if m.selectedIid != "" {
-		return docStyle.Render("I want: ", m.selectedIid)
+	if len(m.selectedIid) > 0 {
+		// Pull logic should be in update, not view but leaving it here for now until everything is connected.
+
+		// Check if issue was requested in this session
+		_, ok := m.viewedIssues[m.selectedIid]
+		if ok {
+			return docStyle.Render("I have already requested issue " + m.selectedIid)
+		}
+
+		return docStyle.Render("I want to request: ", m.selectedIid)
 	}
 
 	return docStyle.Render(m.list.View())

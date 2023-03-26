@@ -10,7 +10,7 @@ import (
 )
 
 func Show(details []repo.Details) {
-	lst := list.New([]list.Item{}, newItemDelegate(), 0, 0)
+	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	lst.Title = ""
 
 	s := spinner.New()
