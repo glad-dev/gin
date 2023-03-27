@@ -63,10 +63,12 @@ func (i itemWrapper) FilterValue() string {
 }
 
 func (m model) Init() tea.Cmd {
-	return getIssues(m.details)
+	return tea.Batch(getIssues(m.details), m.spinner.Tick)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() { //nolint:gocritic
@@ -92,22 +94,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, nil
 		}
+
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 
-	case tea.Msg:
-		val, ok := msg.(updateMsg)
-		if !ok {
-			return m, nil
-		}
-
-		m.list.SetItems(val.items)
-		m.list.Title = "Issues of " + val.projectPath
+	case updateMsg:
+		m.list.SetItems(msg.items)
+		m.list.Title = "Issues of " + msg.projectPath
 		m.isLoading = false
+
+	default:
+		m.spinner, cmd = m.spinner.Update(msg)
+
+		return m, cmd
 	}
 
-	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
 
 	return m, cmd
