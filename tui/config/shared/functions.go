@@ -59,22 +59,14 @@ func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, heig
 
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				"Gitlab URL",
-				style.InputField.Render(inputs[0].View()),
-			),
+
+			"Gitlab URL",
+			style.InputField.Render(inputs[0].View()),
 			"\n",
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				"API Key",
-				style.InputField.Render(inputs[1].View()),
-			),
+			"API Key",
+			style.InputField.Render(inputs[1].View()),
 			"\n",
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				*button,
-			),
+			*button,
 		),
 	)
 }
