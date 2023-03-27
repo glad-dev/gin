@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 
-	"gn/config"
-	"gn/issues"
 	"gn/repo"
 	allIssues "gn/tui/issues/all"
+	singleIssue "gn/tui/issues/single"
 
 	"github.com/spf13/cobra"
 )
@@ -51,34 +49,12 @@ func runAllIssues(cmd *cobra.Command, _ []string) {
 }
 
 func runSingleIssue(cmd *cobra.Command, args []string) {
-	conf, err := config.Load()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
 	details, err := getRepo(cmd)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	issue, err := issues.QuerySingle(conf, details, args[0])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println(issue.Title)
-	fmt.Println(issue.Description)
-	fmt.Println()
-
-	for _, comment := range issue.Discussion {
-		fmt.Println(comment.Body)
-		fmt.Printf("- %s\n", comment.Author)
-		for _, subComments := range comment.Comments {
-			fmt.Printf("\t%s\n", subComments.Body)
-		}
-	}
+	singleIssue.Show(details, args[0])
 }
 
 func getRepo(cmd *cobra.Command) ([]repo.Details, error) {

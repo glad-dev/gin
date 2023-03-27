@@ -56,10 +56,14 @@ func (config *Wrapper) CheckValidity() error {
 }
 
 func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
+	if len(details) == 0 {
+		return nil, "", errors.New("no details passed")
+	}
+
 	for _, detail := range details {
 		for _, lab := range config.Configs {
-			if lab.URL.Host == detail.URL().Host {
-				return &lab, detail.ProjectPath(), nil
+			if lab.URL.Host == detail.URL.Host {
+				return &lab, detail.ProjectPath, nil
 			}
 		}
 	}
@@ -76,6 +80,10 @@ func (l *GitLab) GetToken() string {
 }
 
 func (l *GitLab) GetUsername() error {
+	// ToDo: Is this a good idea?
+	l.Username = "Fake username"
+	return nil
+
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {

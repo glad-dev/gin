@@ -2,11 +2,10 @@ package all
 
 import (
 	"fmt"
-	"os"
-
 	"gn/config"
 	"gn/issues"
 	"gn/repo"
+	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -150,14 +149,12 @@ func getIssues(details []repo.Details) func() tea.Msg {
 	return func() tea.Msg {
 		conf, err := config.Load()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-			os.Exit(1)
+			style.PrintErrAndExit("Failed to load config: " + err.Error())
 		}
 
 		allIssues, projectPath, err := issues.QueryAll(conf, details)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-			os.Exit(1)
+			style.PrintErrAndExit("Failed to query issues: " + err.Error())
 		}
 
 		issueList := make([]list.Item, len(allIssues))
