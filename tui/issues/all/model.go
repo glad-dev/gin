@@ -88,11 +88,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectedIid = selected.issue.Iid
 
 		case "esc", "backspace":
+			// If an issue is selected, deselect it.
 			if len(m.selectedIid) != 0 {
 				m.selectedIid = ""
+
+				return m, nil
 			}
 
-			return m, nil
+			// Otherwise exit program.
+			return m, tea.Quit
 		}
 
 	case tea.WindowSizeMsg:
