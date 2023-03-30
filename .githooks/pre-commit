@@ -23,6 +23,14 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
+# Check struct alignment
+out=$(betteralign ./...)
+if [ $? -ne 0 ]; then
+	echo "There are misaligned structs!"
+	echo "$out"
+	exit 1
+fi
+
 # Run golangcli-lint
 golangci-lint run
 if [ $? -ne 0 ]; then

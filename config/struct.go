@@ -79,10 +79,14 @@ func (l *GitLab) GetToken() string {
 	return l.Token
 }
 
-func (l *GitLab) GetUsername() error {
-	// ToDo: Is this a good idea?
-	l.Username = "Fake username"
-	return nil
+var debug = true
+
+func (l *GitLab) GetUsername() error { // ToDo: Is this a good idea?
+	if debug {
+		l.Username = "Fake username"
+
+		return nil
+	}
 
 	type returnType struct {
 		Data struct {
