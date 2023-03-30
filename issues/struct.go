@@ -85,30 +85,32 @@ func (id *IssueDetails) UpdateUsername(ownUsername string) {
 		return
 	}
 
+	you := User{
+		Name:     "you",
+		Username: "",
+	}
+
 	// Update author
 	if id.Author.Username == ownUsername {
-		id.Author = User{
-			Name:     "you",
-			Username: "",
-		}
+		id.Author = you
 	}
 
 	// Update assignees
 	for k, assignee := range id.Assignees {
 		if assignee.Username == ownUsername {
-			id.Assignees[k] = User{
-				Name:     "you",
-				Username: "",
-			}
+			id.Assignees[k] = you
 		}
 	}
 
 	// Update comments
 	for k, comment := range id.Discussion {
 		if comment.Author.Username == ownUsername {
-			id.Discussion[k].Author = User{
-				Name:     "you",
-				Username: "",
+			id.Discussion[k].Author = you
+		}
+
+		for m, inner := range comment.Comments {
+			if inner.Author.Username == ownUsername {
+				id.Discussion[k].Comments[m].Author = you
 			}
 		}
 	}
