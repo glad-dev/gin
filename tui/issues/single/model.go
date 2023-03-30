@@ -38,10 +38,10 @@ var (
 )
 
 type model struct {
+	issue    *issues.IssueDetails
 	content  string
 	viewport viewport.Model
 	shared   Shared
-	issue    *issues.IssueDetails
 	ready    bool
 }
 
