@@ -29,11 +29,7 @@ func Config() {
 		}
 	}
 
-	// Not sure what these numbers do, but the TUI looks better with them
-	const defaultWidth = 20
-	const listHeight = 14
-
-	lst := list.New(items, shared.ItemDelegate{}, defaultWidth, listHeight)
+	lst := list.New(items, shared.ItemDelegate{}, 0, 0)
 	lst.Title = "Which remote do you want to edit?"
 	lst.SetShowStatusBar(false)
 	lst.SetFilteringEnabled(false)

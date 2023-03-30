@@ -3,6 +3,7 @@ package shared
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"gn/config"
 	"gn/tui/style"
@@ -36,7 +37,7 @@ func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	fn := style.Item.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItem.Render("> " + s[0])
+			return style.SelectedItem.Render("> " + strings.Join(s, ""))
 		}
 	}
 
