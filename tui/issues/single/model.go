@@ -6,7 +6,6 @@ import (
 	"gn/issues"
 	"gn/repo"
 	"gn/tui/style"
-	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -165,71 +164,4 @@ func getIssue(m *model) func() tea.Msg {
 
 		return issue
 	}
-}
-
-var issueTitleStyle = lipgloss.NewStyle().Bold(true)
-
-func prettyPrintIssue(m *model) string {
-	_, w := style.InputField.GetFrameSize()
-
-	style.InputField.Width(m.viewport.Width - w)
-
-	// Assignees
-	assignees := make([]string, len(m.issue.Assignees))
-	for i, assignee := range m.issue.Assignees {
-		assignees[i] = assignee.String()
-	}
-
-	assigneeStr := ""
-	if len(assignees) > 0 {
-		assigneeStr = fmt.Sprintf("Assigned to: %s\n", strings.Join(assignees, ", "))
-	}
-
-	labels := make([]string, len(m.issue.Labels))
-	for i, label := range m.issue.Labels {
-		labels[i] = lipgloss.NewStyle().
-			Background(lipgloss.Color(label.Color)).
-			Foreground(getInverseColor(label.Color)).
-			Render(label.Title)
-	}
-
-	labelStr := ""
-	if len(labels) > 0 {
-		labelStr = fmt.Sprintf("Labels: %s\n", strings.Join(labels, ", "))
-	}
-
-	// Header card
-	out := style.InputField.Render(fmt.Sprintf(
-		"%s\nCreated by %s\n%s%s\n%s",
-		lipgloss.PlaceHorizontal(m.viewport.Width-style.InputField.GetHorizontalFrameSize(), lipgloss.Center, issueTitleStyle.Render(m.issue.Title)),
-		m.issue.Author.String(),
-		assigneeStr,
-		labelStr,
-		m.issue.Description,
-	)) + "\n"
-
-	// Comments
-	for _, comment := range m.issue.Discussion {
-		out += style.InputField.Render(comment.Body) + "\n"
-	}
-
-	style.InputField.Width(80)
-
-	return lipgloss.Place(
-		m.viewport.Width,
-		m.viewport.Height,
-		lipgloss.Center,
-		lipgloss.Center,
-
-		out,
-	)
-}
-
-func getInverseColor(hexStr string) lipgloss.Color {
-	hexInt64, err := strconv.ParseInt(strings.Replace(hexStr, "#", "", 1), 16, 0)
-	if err != nil {
-		return ""
-	}
-
-	return lipgloss.Color(fmt.Sprintf("#%x", int(hexInt64)^0xffffff))
 }

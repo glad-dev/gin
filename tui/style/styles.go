@@ -20,3 +20,8 @@ var (
 
 	quitText = lipgloss.NewStyle().MarginLeft(4)
 )
+
+var (
+	Comment    = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.RoundedBorder()).Padding(1)
+	Discussion = Comment.Copy()
+)
