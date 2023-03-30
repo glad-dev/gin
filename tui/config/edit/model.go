@@ -186,6 +186,8 @@ func onSubmit(m *model) string {
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
 			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg)
+		} else if errors.Is(err, config.ErrUpdateSameValues) {
+			return style.FormatQuitText("No need to update the config: No changes were made.")
 		}
 
 		return style.FormatQuitText(fmt.Sprintf("Failed to update remote: %s", err))
