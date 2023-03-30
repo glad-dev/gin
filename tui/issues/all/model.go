@@ -66,7 +66,10 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -108,14 +111,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.isLoading = false
 
 	default:
-		m.spinner, cmd = m.spinner.Update(msg)
-
-		return m, cmd
+		m.shared.Spinner, cmd = m.shared.Spinner.Update(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	m.list, cmd = m.list.Update(msg)
+	cmds = append(cmds, cmd)
 
-	return m, cmd
+	return m, tea.Batch(cmds...)
 }
 
 func (m model) View() string {
