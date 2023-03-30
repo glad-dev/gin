@@ -23,13 +23,12 @@ type querySingleResponse struct {
 				Description string    `json:"description"`
 				CreatedAt   time.Time `json:"createdAt"`
 				UpdatedAt   time.Time `json:"updatedAt"`
+				Author      User      `json:"author"`
 				Assignees   struct {
 					Nodes []User `json:"nodes"`
 				} `json:"assignees"`
 				Labels struct {
-					Nodes []struct {
-						Title string `json:"title"`
-					} `json:"nodes"`
+					Nodes []Label `json:"nodes"`
 				} `json:"labels"`
 				Discussions struct {
 					Nodes []struct {
@@ -60,6 +59,10 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 			  description
 			  createdAt
 			  updatedAt
+			  author {
+			    name
+			    username
+			  }
 			  assignees {
 				nodes {
 				  name
@@ -69,6 +72,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 			  labels {
 				nodes {
 				  title
+				  color	
 				}
 			  }
 			  discussions {
@@ -131,9 +135,11 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 		Description: querySingle.Data.Project.Issue.Description,
 		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,
 		UpdatedAt:   querySingle.Data.Project.Issue.UpdatedAt,
-		Assignees:   nil,
-		Labels:      nil,
-		Discussion:  nil,
+		Author:      querySingle.Data.Project.Issue.Author,
+
+		Assignees:  nil,
+		Labels:     nil,
+		Discussion: nil,
 	}
 
 	// Flatten response
@@ -148,9 +154,12 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 	issueDetails.Assignees = assignees
 
 	// Labels
-	labels := make([]string, 0)
+	labels := make([]Label, 0)
 	for _, label := range querySingle.Data.Project.Issue.Labels.Nodes {
-		labels = append(labels, label.Title)
+		labels = append(labels, Label{
+			Title: label.Title,
+			Color: label.Color,
+		})
 	}
 	issueDetails.Labels = labels
 

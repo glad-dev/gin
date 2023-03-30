@@ -16,13 +16,13 @@ type Issue struct {
 }
 
 type IssueDetails struct {
-	// ToDo: Get issue creator
 	Title       string
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	Author      User
 	Assignees   []User
-	Labels      []string
+	Labels      []Label
 	Discussion  []Comment
 }
 
@@ -39,6 +39,11 @@ type Comment struct {
 type User struct {
 	Name     string
 	Username string
+}
+
+type Label struct {
+	Title string
+	Color string
 }
 
 func (u *User) String() string {
@@ -78,6 +83,14 @@ func (i *Issue) UpdateUsername(ownUsername string) {
 func (id *IssueDetails) UpdateUsername(ownUsername string) {
 	if len(ownUsername) == 0 {
 		return
+	}
+
+	// Update author
+	if id.Author.Username == ownUsername {
+		id.Author = User{
+			Name:     "you",
+			Username: "",
+		}
 	}
 
 	// Update assignees
