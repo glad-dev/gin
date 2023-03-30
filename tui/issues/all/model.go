@@ -20,7 +20,7 @@ type model struct {
 	list         list.Model
 	details      []repo.Details
 	viewedIssues map[string]issues.IssueDetails
-	spinner      spinner.Model // ToDo: Spinner is not spinning
+	spinner      spinner.Model
 	isLoading    bool
 }
 

@@ -8,6 +8,7 @@ import (
 	"gn/tui/style"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -48,10 +49,11 @@ type model struct {
 type Shared struct {
 	issueID string
 	details []repo.Details
+	spinner spinner.Model
 }
 
 func (m model) Init() tea.Cmd {
-	return getIssue(&m)
+	return tea.Batch(getIssue(&m), m.shared.spinner.Tick)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -107,6 +109,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.content = prettyPrintIssue(&m)
 
 		m.viewport.SetContent(m.content)
+
+	default:
+		m.shared.spinner, cmd = m.shared.spinner.Update(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	// Handle keyboard and mouse events in the viewport
@@ -122,7 +128,14 @@ func (m model) View() string {
 	}
 
 	if m.issue == nil {
-		return "Issue is loading"
+		return lipgloss.Place(
+			m.viewport.Width,
+			m.viewport.Height,
+			lipgloss.Center,
+			lipgloss.Center,
+
+			"Issue is loading "+m.shared.spinner.View(),
+		)
 	}
 
 	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
