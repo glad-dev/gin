@@ -35,12 +35,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h, v := style.InputField.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 		m.edit.width = msg.Width - h
-		m.edit.height = msg.Height - h
+		m.edit.height = msg.Height - v
 
 		return m, nil
 	case tea.KeyMsg:
-		// q should only quit the program if we're in list view. Otherwise, the user would be unable to enter an URL
-		// or token that contains q
+		// q should only quit the program if we're in list view. Otherwise, the user would be unable to enter a URL
+		// or token that contains the letter q
 		if m.currentlyDisplaying == displayingList && msg.String() == "q" {
 			m.quit = true
 
