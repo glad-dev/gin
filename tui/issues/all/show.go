@@ -1,6 +1,7 @@
 package all
 
 import (
+	"gn/issues"
 	"gn/repo"
 	shared "gn/tui/issues"
 	"gn/tui/style"
@@ -11,15 +12,21 @@ import (
 )
 
 func Show(details []repo.Details) {
-	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
-	lst.Title = ""
+	lsts := []list.Model{
+		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+	}
 
 	s := spinner.New()
 	s.Spinner = spinner.Points
 
+	viewed := make(map[string]issues.IssueDetails)
+
 	m := model{
-		list:      lst,
-		isLoading: true,
+		lists:        [3]list.Model(lsts),
+		viewedIssues: viewed,
+		isLoading:    true,
 		shared: &shared.Shared{
 			IssueID: "",
 			Details: details,

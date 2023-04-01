@@ -17,15 +17,16 @@ import (
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type model struct {
-	list         list.Model
+	lists        [3]list.Model
 	shared       *shared.Shared
+	activeTab    int
 	viewedIssues map[string]issues.IssueDetails
 	isLoading    bool
 }
 
 type updateMsg struct {
 	projectPath string
-	items       []list.Item
+	items       []itemWrapper
 }
 
 // itemWrapper is a wrapper for issues.Issue that implements all functions required by the list.Item interface.
@@ -34,15 +35,9 @@ type itemWrapper struct {
 }
 
 func (i itemWrapper) Title() string {
-	status := ""
-	if i.issue.State == "closed" {
-		status = "[closed] "
-	}
-
 	return fmt.Sprintf(
-		"#%s %s%s",
+		"#%s %s",
 		i.issue.Iid,
-		status,
 		i.issue.Title,
 	)
 }
@@ -81,7 +76,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			selected, ok := m.list.Items()[m.list.Index()].(itemWrapper)
+			selected, ok := m.lists[m.activeTab].Items()[m.lists[m.activeTab].Index()].(itemWrapper)
 			if !ok {
 				return m, tea.Quit
 			}
@@ -98,15 +93,52 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Otherwise exit program.
 			return m, tea.Quit
+
+		case "right", "tab":
+			m.activeTab = min(m.activeTab+1, len(m.lists)-1)
+			return m, nil
+		case "left", "shift+tab":
+			m.activeTab = max(m.activeTab-1, 0)
+			return m, nil
+
 		}
 
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+
+		for i, _ := range m.lists {
+			m.lists[i].SetSize(msg.Width-h, msg.Height-v)
+		}
 
 	case updateMsg:
-		m.list.SetItems(msg.items)
-		m.list.Title = "Issues of " + msg.projectPath
+		open := make([]list.Item, 0)
+		closed := make([]list.Item, 0)
+		all := make([]list.Item, 0)
+		for _, item := range msg.items {
+			switch item.issue.State {
+			case "open", "opened":
+				open = append(open, item)
+				all = append(all, item)
+			case "closed":
+				closed = append(closed, item)
+
+				item.issue.Title = "[closed] " + item.issue.Title
+				all = append(all, item)
+			}
+		}
+
+		// 0 => Open
+		m.lists[0].SetItems(open)
+		m.lists[0].Title = "Open issues"
+
+		// 1 => Closed issues
+		m.lists[1].SetItems(closed)
+		m.lists[1].Title = "Closed issues"
+
+		// 2 => All issues
+		m.lists[2].SetItems(all)
+		m.lists[2].Title = "All issues"
+
 		m.isLoading = false
 
 	default:
@@ -114,7 +146,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 
-	m.list, cmd = m.list.Update(msg)
+	m.lists[m.activeTab], cmd = m.lists[m.activeTab].Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
@@ -123,8 +155,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	if m.isLoading {
 		return lipgloss.Place(
-			m.list.Width(),
-			m.list.Height(),
+			m.lists[m.activeTab].Width(),
+			m.lists[m.activeTab].Height(),
 			lipgloss.Center,
 			lipgloss.Center,
 
@@ -138,13 +170,16 @@ func (m model) View() string {
 		// Check if issue was requested in this session
 		_, ok := m.viewedIssues[m.shared.IssueID]
 		if ok {
-			return docStyle.Render("I have already requested issue " + m.shared.IssueID)
+			return docStyle.Render("I have already requested issue " + m.viewedIssues[m.shared.IssueID].Title)
 		}
 
-		return docStyle.Render("I want to request: ", m.shared.IssueID)
+		m.viewedIssues[m.shared.IssueID] = issues.IssueDetails{
+			Title: "Title: " + m.shared.IssueID,
+		}
+		return docStyle.Render("I want to request: ", m.viewedIssues[m.shared.IssueID].Title)
 	}
 
-	return docStyle.Render(m.list.View())
+	return docStyle.Render(m.lists[m.activeTab].View())
 }
 
 func getIssues(details []repo.Details) func() tea.Msg {
@@ -159,7 +194,7 @@ func getIssues(details []repo.Details) func() tea.Msg {
 			style.PrintErrAndExit("Failed to query issues: " + err.Error())
 		}
 
-		issueList := make([]list.Item, len(allIssues))
+		issueList := make([]itemWrapper, len(allIssues))
 		for i, issue := range allIssues {
 			issueList[i] = itemWrapper{
 				issue: issue,
@@ -171,4 +206,18 @@ func getIssues(details []repo.Details) func() tea.Msg {
 			items:       issueList,
 		}
 	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
