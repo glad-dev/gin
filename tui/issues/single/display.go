@@ -62,7 +62,7 @@ func prettyPrintIssue(m *model) string {
 	for _, comment := range m.issue.Discussion {
 		commentBody, err = markdownOuter.Render(comment.Body)
 		if err != nil {
-			return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
+			return style.FormatQuitText("Failed to render markdown: " + err.Error())
 		}
 
 		discussion := fmt.Sprintf(
@@ -76,7 +76,7 @@ func prettyPrintIssue(m *model) string {
 		for i, innerComment := range comment.Comments {
 			commentBody, err = markdownInner.Render(innerComment.Body)
 			if err != nil {
-				return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
+				return style.FormatQuitText("Failed to render markdown: " + err.Error())
 			}
 
 			discussion += style.Discussion.Render(fmt.Sprintf(
