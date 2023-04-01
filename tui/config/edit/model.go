@@ -34,8 +34,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		h, v := style.InputField.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
-		m.edit.width = msg.Width - h
-		m.edit.height = msg.Height - v
+		m.edit.width = msg.Width
+		m.edit.height = msg.Height
 
 		return m, nil
 	case tea.KeyMsg:
