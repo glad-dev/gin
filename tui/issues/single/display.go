@@ -38,6 +38,7 @@ func prettyPrintIssue(m *model) string {
 	}
 	defer markdownOuter.Close()
 
+	// Update the word wrap length
 	markdownOptions[0] = glamour.WithWordWrap(innerSpace)
 	markdownInner, err := glamour.NewTermRenderer(
 		markdownOptions...,
