@@ -2,6 +2,7 @@ package all
 
 import (
 	"gn/repo"
+	shared "gn/tui/issues"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -18,9 +19,12 @@ func Show(details []repo.Details) {
 
 	m := model{
 		list:      lst,
-		details:   details,
 		isLoading: true,
-		spinner:   s,
+		shared: &shared.Shared{
+			IssueID: "",
+			Details: details,
+			Spinner: s,
+		},
 	}
 
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {

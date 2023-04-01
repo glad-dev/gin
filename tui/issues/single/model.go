@@ -2,13 +2,13 @@ package single
 
 import (
 	"fmt"
-	"gn/config"
-	"gn/issues"
-	"gn/repo"
-	"gn/tui/style"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/spinner"
+	"gn/config"
+	"gn/issues"
+	shared "gn/tui/issues"
+	"gn/tui/style"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -40,20 +40,14 @@ var (
 
 type model struct {
 	issue    *issues.IssueDetails
+	shared   *shared.Shared
 	content  string
 	viewport viewport.Model
-	shared   Shared
 	ready    bool
 }
 
-type Shared struct {
-	issueID string
-	details []repo.Details
-	spinner spinner.Model
-}
-
 func (m model) Init() tea.Cmd {
-	return tea.Batch(getIssue(&m), m.shared.spinner.Tick)
+	return tea.Batch(getIssue(&m), m.shared.Spinner.Tick)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -111,7 +105,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport.SetContent(m.content)
 
 	default:
-		m.shared.spinner, cmd = m.shared.spinner.Update(msg)
+		m.shared.Spinner, cmd = m.shared.Spinner.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
@@ -134,7 +128,7 @@ func (m model) View() string {
 			lipgloss.Center,
 			lipgloss.Center,
 
-			"Issue is loading "+m.shared.spinner.View(),
+			"Issue is loading "+m.shared.Spinner.View(),
 		)
 	}
 
@@ -142,7 +136,7 @@ func (m model) View() string {
 }
 
 func (m model) headerView() string {
-	title := titleStyle.Render("Details of issue #" + m.shared.issueID)
+	title := titleStyle.Render("Details of issue #" + m.shared.IssueID)
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
 
 	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
@@ -170,7 +164,7 @@ func getIssue(m *model) func() tea.Msg {
 			style.PrintErrAndExit("Failed to load config: " + err.Error())
 		}
 
-		issue, err := issues.QuerySingle(conf, m.shared.details, m.shared.issueID)
+		issue, err := issues.QuerySingle(conf, m.shared.Details, m.shared.IssueID)
 		if err != nil {
 			style.PrintErrAndExit("Failed to query issue: " + err.Error())
 		}

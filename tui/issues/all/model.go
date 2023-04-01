@@ -2,13 +2,14 @@ package all
 
 import (
 	"fmt"
+
 	"gn/config"
 	"gn/issues"
 	"gn/repo"
+	shared "gn/tui/issues"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -16,11 +17,9 @@ import (
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type model struct {
-	selectedIid  string
 	list         list.Model
-	details      []repo.Details
+	shared       *shared.Shared
 	viewedIssues map[string]issues.IssueDetails
-	spinner      spinner.Model
 	isLoading    bool
 }
 
@@ -62,7 +61,7 @@ func (i itemWrapper) FilterValue() string {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(getIssues(m.details), m.spinner.Tick)
+	return tea.Batch(getIssues(m.shared.Details), m.shared.Spinner.Tick)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -87,12 +86,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
-			m.selectedIid = selected.issue.Iid
+			m.shared.IssueID = selected.issue.Iid
 
 		case "esc", "backspace":
 			// If an issue is selected, deselect it.
-			if len(m.selectedIid) != 0 {
-				m.selectedIid = ""
+			if len(m.shared.IssueID) != 0 {
+				m.shared.IssueID = ""
 
 				return m, nil
 			}
@@ -111,7 +110,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.isLoading = false
 
 	default:
-		m.spinner, cmd = m.spinner.Update(msg)
+		m.shared.Spinner, cmd = m.shared.Spinner.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
@@ -129,20 +128,20 @@ func (m model) View() string {
 			lipgloss.Center,
 			lipgloss.Center,
 
-			fmt.Sprintf("Loading %s", m.spinner.View()),
+			fmt.Sprintf("Loading %s", m.shared.Spinner.View()),
 		)
 	}
 
-	if len(m.selectedIid) > 0 {
+	if len(m.shared.IssueID) > 0 {
 		// Pull logic should be in update, not view but leaving it here for now until everything is connected.
 
 		// Check if issue was requested in this session
-		_, ok := m.viewedIssues[m.selectedIid]
+		_, ok := m.viewedIssues[m.shared.IssueID]
 		if ok {
-			return docStyle.Render("I have already requested issue " + m.selectedIid)
+			return docStyle.Render("I have already requested issue " + m.shared.IssueID)
 		}
 
-		return docStyle.Render("I want to request: ", m.selectedIid)
+		return docStyle.Render("I want to request: ", m.shared.IssueID)
 	}
 
 	return docStyle.Render(m.list.View())
