@@ -33,7 +33,7 @@ type Comment struct {
 	Body         string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
-	LastEditedBy interface{} // ToDo: Remove interface
+	LastEditedBy User
 	Comments     []Comment
 	Resolved     bool
 }
@@ -110,9 +110,17 @@ func (id *IssueDetails) UpdateUsername(ownUsername string) {
 			id.Discussion[k].Author = you
 		}
 
+		if comment.LastEditedBy.Username == ownUsername {
+			id.Discussion[k].LastEditedBy = you
+		}
+
 		for m, inner := range comment.Comments {
 			if inner.Author.Username == ownUsername {
 				id.Discussion[k].Comments[m].Author = you
+			}
+
+			if inner.LastEditedBy.Username == ownUsername {
+				id.Discussion[k].Comments[m].LastEditedBy = you
 			}
 		}
 	}

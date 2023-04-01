@@ -34,10 +34,10 @@ type querySingleResponse struct {
 					Nodes []struct {
 						Notes struct {
 							Nodes []struct {
-								Body         string      `json:"body"`
-								CreatedAt    time.Time   `json:"createdAt"`
-								UpdatedAt    time.Time   `json:"updatedAt"`
-								LastEditedBy interface{} `json:"lastEditedBy"`
+								Body         string    `json:"body"`
+								CreatedAt    time.Time `json:"createdAt"`
+								UpdatedAt    time.Time `json:"updatedAt"`
+								LastEditedBy User      `json:"lastEditedBy"`
 								User         `json:"author"`
 								System       bool `json:"system"`
 								Resolved     bool `json:"resolved"`

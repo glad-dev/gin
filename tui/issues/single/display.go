@@ -52,12 +52,18 @@ func prettyPrintIssue(m *model) string {
 		return style.FormatQuitText("Failed to render markdown: " + err.Error())
 	}
 
+	updatedAt := ""
+	if m.issue.CreatedAt != m.issue.UpdatedAt {
+		updatedAt = fmt.Sprintf("Updated on %s\n", m.issue.UpdatedAt.Format("2006-01-02 15:04"))
+	}
+
 	// Issue details
 	out := style.Comment.Render(fmt.Sprintf(
-		"%s\nCreated by %s\nCreated on %s\n%s%s\n%s",
+		"%s\nCreated by %s\nCreated on %s\n%s%s%s\n%s",
 		getTitle(m),
 		m.issue.Author.String(),
 		m.issue.CreatedAt.Format("2006-01-02 15:04"),
+		updatedAt,
 		getAssignees(m),
 		getLabels(m),
 		desc,
@@ -89,10 +95,20 @@ func prettyPrintIssue(m *model) string {
 				return style.FormatQuitText("Failed to render markdown: " + err.Error())
 			}
 
+			editedBy := ""
+			if innerComment.LastEditedBy.Username != "" || innerComment.LastEditedBy.Name != "" {
+				editedBy = fmt.Sprintf(
+					"Last edit by: %s\nEdited on%s\n",
+					innerComment.LastEditedBy.String(),
+					innerComment.UpdatedAt.Format("2006-01-02 15:04"),
+				)
+			}
+
 			discussion += style.Discussion.Render(fmt.Sprintf(
-				"Created by %s\nCreated on %s\n\n%s",
+				"Created by %s\nCreated on %s\n%s\n%s",
 				innerComment.Author.String(),
 				innerComment.CreatedAt.Format("2006-01-02 15:04"),
+				editedBy,
 				strings.TrimSpace(commentBody),
 			))
 
