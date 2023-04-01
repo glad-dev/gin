@@ -136,6 +136,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,
 		UpdatedAt:   querySingle.Data.Project.Issue.UpdatedAt,
 		Author:      querySingle.Data.Project.Issue.Author,
+		BaseURL:     lab.URL,
 
 		Assignees:  nil,
 		Labels:     nil,

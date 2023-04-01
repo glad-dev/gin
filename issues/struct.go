@@ -2,6 +2,7 @@ package issues
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type IssueDetails struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Author      User
+	BaseURL     url.URL
 	Assignees   []User
 	Labels      []Label
 	Discussion  []Comment

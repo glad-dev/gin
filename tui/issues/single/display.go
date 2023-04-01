@@ -23,18 +23,24 @@ func prettyPrintIssue(m *model) string {
 	outerSpace := style.Comment.GetWidth() - style.Comment.GetHorizontalFrameSize()
 	innerSpace := style.Discussion.GetWidth() - style.Discussion.GetHorizontalFrameSize()
 
-	markdownOuter, err := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
+	markdownOptions := []glamour.TermRendererOption{
 		glamour.WithWordWrap(outerSpace),
+		glamour.WithAutoStyle(),
+		glamour.WithEmoji(),
+		glamour.WithBaseURL(m.issue.BaseURL.String()),
+	}
+
+	markdownOuter, err := glamour.NewTermRenderer(
+		markdownOptions...,
 	)
 	if err != nil {
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
 	defer markdownOuter.Close()
 
+	markdownOptions[0] = glamour.WithWordWrap(innerSpace)
 	markdownInner, err := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		glamour.WithWordWrap(innerSpace),
+		markdownOptions...,
 	)
 	if err != nil {
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
@@ -66,11 +72,15 @@ func prettyPrintIssue(m *model) string {
 		}
 
 		discussion := fmt.Sprintf(
-			"Created by %s\nCreated on %s\n%s\n",
+			"Created by %s\nCreated on %s\n\n%s\n",
 			comment.Author.String(),
 			comment.CreatedAt.Format("2006-01-02 15:04"),
-			commentBody,
+			strings.TrimSpace(commentBody),
 		)
+
+		if len(comment.Comments) > 0 {
+			discussion += "\n"
+		}
 
 		// comments on the comments
 		for i, innerComment := range comment.Comments {
@@ -80,10 +90,10 @@ func prettyPrintIssue(m *model) string {
 			}
 
 			discussion += style.Discussion.Render(fmt.Sprintf(
-				"Created by %s\nCreated on %s\n%s\n",
+				"Created by %s\nCreated on %s\n\n%s",
 				innerComment.Author.String(),
 				innerComment.CreatedAt.Format("2006-01-02 15:04"),
-				commentBody,
+				strings.TrimSpace(commentBody),
 			))
 
 			if i < len(comment.Comments)-1 {
