@@ -1,21 +1,26 @@
 package add
 
 import (
-	"fmt"
 	"os"
 
 	"gn/tui/config/shared"
+	"gn/tui/style"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func Config() {
-	m := model{
-		inputs: shared.GetTextInputs(),
+	p := tea.NewProgram(model{
+		inputs:  shared.GetTextInputs(),
+		failure: false,
+	})
+
+	m, err := p.Run()
+	if err != nil {
+		style.PrintErrAndExit("Failed to start program: " + err.Error())
 	}
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Printf("could not start program: %s\n", err)
+	if m, ok := m.(model); ok && m.failure {
 		os.Exit(1)
 	}
 }

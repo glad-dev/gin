@@ -14,6 +14,7 @@ type model struct {
 	edit                editModel
 	currentlyDisplaying displaying
 	quit                bool
+	failure             bool
 }
 
 type displaying int
@@ -81,6 +82,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			tmp = m.edit.Update(msg)
 			m.exitText = tmp.str
+			m.failure = tmp.failure
 
 			return m, tmp.cmd
 		}

@@ -2,6 +2,7 @@ package edit
 
 import (
 	"errors"
+	"os"
 
 	"gn/config"
 	"gn/tui/config/shared"
@@ -37,17 +38,23 @@ func Config() {
 	lst.Styles.PaginationStyle = style.Pagination
 	lst.Styles.HelpStyle = style.Help
 
-	m := model{
-		list: lst,
+	p := tea.NewProgram(model{
+		list:    lst,
+		failure: false,
 		edit: editModel{
 			inputs:    shared.GetTextInputs(),
 			oldConfig: wrapper,
 			width:     0,
 			height:    0,
 		},
+	})
+
+	m, err := p.Run()
+	if err != nil {
+		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		style.PrintErrAndExit("Error running program: " + err.Error())
+	if m, ok := m.(model); ok && m.failure {
+		os.Exit(1)
 	}
 }

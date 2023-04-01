@@ -17,6 +17,7 @@ type model struct {
 	oldConfig config.Wrapper
 	quitting  bool
 	finished  bool
+	failure   bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -38,7 +39,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.exitText = onSubmit(&m)
+			m.exitText, m.failure = onSubmit(&m)
 			m.finished = true
 
 			return m, tea.Quit
@@ -63,18 +64,18 @@ func (m model) View() string {
 	return shared.RenderList(m.list)
 }
 
-func onSubmit(m *model) string {
+func onSubmit(m *model) (string, bool) {
 	index := m.list.Index()
 
 	selected, ok := m.list.Items()[index].(shared.ListItem)
 	if !ok {
-		return style.FormatQuitText("Failed to convert list.Item to item")
+		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}
 
 	err := config.Remove(&m.oldConfig, index)
 	if err != nil {
-		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err))
+		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Lab.URL.String()))
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Lab.URL.String())), false
 }

@@ -20,6 +20,7 @@ type model struct {
 	height     int
 	submit     bool
 	quit       bool
+	failure    bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -48,7 +49,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
 				m.submit = true
-				m.exitText = onSubmit(&m)
+				m.exitText, m.failure = onSubmit(&m)
 
 				return m, tea.Quit
 			}
@@ -112,15 +113,15 @@ func (m model) View() string {
 	)
 }
 
-func onSubmit(m *model) string {
+func onSubmit(m *model) (string, bool) {
 	err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
-			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg)
+			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg), true
 		}
 
-		return style.FormatQuitText(fmt.Sprintf("Could not add config: %s", err))
+		return style.FormatQuitText(fmt.Sprintf("Could not add config: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()))
+	return style.FormatQuitText(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value())), false
 }

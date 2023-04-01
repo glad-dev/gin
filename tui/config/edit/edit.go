@@ -22,8 +22,9 @@ type editModel struct {
 }
 
 type ret struct {
-	cmd tea.Cmd
-	str string
+	cmd     tea.Cmd
+	str     string
+	failure bool
 }
 
 func (m *editModel) Update(msg tea.Msg) *ret {
@@ -35,9 +36,12 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
+				str, failure := m.submit()
+
 				return &ret{
-					str: m.submit(),
-					cmd: tea.Quit,
+					str:     str,
+					cmd:     tea.Quit,
+					failure: failure,
 				}
 			}
 
@@ -55,8 +59,9 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 			}
 
 			return &ret{
-				str: "",
-				cmd: m.updateFocus(),
+				str:     "",
+				cmd:     m.updateFocus(),
+				failure: false,
 			}
 		}
 	}
@@ -70,8 +75,9 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 	}
 
 	return &ret{
-		str: "",
-		cmd: tea.Batch(cmds...),
+		str:     "",
+		cmd:     tea.Batch(cmds...),
+		failure: false,
 	}
 }
 
@@ -115,18 +121,18 @@ func (m *editModel) updateFocus() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *editModel) submit() string {
+func (m *editModel) submit() (string, bool) {
 	oldURL := m.oldConfig.Configs[m.listIndex].URL.String()
 	err := config.Update(m.oldConfig, m.listIndex, m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
-			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg)
+			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg), true
 		} else if errors.Is(err, config.ErrUpdateSameValues) {
-			return style.FormatQuitText("No need to update the config: No changes were made.")
+			return style.FormatQuitText("No need to update the config: No changes were made."), false
 		}
 
-		return style.FormatQuitText(fmt.Sprintf("Failed to update remote: %s", err))
+		return style.FormatQuitText(fmt.Sprintf("Failed to update remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully updated the remote %s", oldURL))
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully updated the remote %s", oldURL)), false
 }
