@@ -14,13 +14,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
-
 type model struct {
-	lists        [3]list.Model
 	shared       *shared.Shared
-	activeTab    int
+	lists        [3]list.Model
 	viewedIssues map[string]issues.IssueDetails
+	activeTab    int
 	isLoading    bool
 }
 
@@ -66,8 +64,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		h, v := docStyle.GetFrameSize()
+
+		for i := range m.lists {
+			m.lists[i].SetSize(msg.Width-h, msg.Height-v-8)
+		}
+
 	case tea.KeyMsg:
-		switch msg.String() { //nolint:gocritic
+		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
 
@@ -96,18 +101,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "right", "tab":
 			m.activeTab = min(m.activeTab+1, len(m.lists)-1)
+
 			return m, nil
 		case "left", "shift+tab":
 			m.activeTab = max(m.activeTab-1, 0)
+
 			return m, nil
-
-		}
-
-	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
-
-		for i, _ := range m.lists {
-			m.lists[i].SetSize(msg.Width-h, msg.Height-v)
 		}
 
 	case updateMsg:
@@ -121,7 +120,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				all = append(all, item)
 			case "closed":
 				closed = append(closed, item)
-
 				item.issue.Title = "[closed] " + item.issue.Title
 				all = append(all, item)
 			}
@@ -176,10 +174,11 @@ func (m model) View() string {
 		m.viewedIssues[m.shared.IssueID] = issues.IssueDetails{
 			Title: "Title: " + m.shared.IssueID,
 		}
+
 		return docStyle.Render("I want to request: ", m.viewedIssues[m.shared.IssueID].Title)
 	}
 
-	return docStyle.Render(m.lists[m.activeTab].View())
+	return renderTab(&m)
 }
 
 func getIssues(details []repo.Details) func() tea.Msg {
@@ -206,18 +205,4 @@ func getIssues(details []repo.Details) func() tea.Msg {
 			items:       issueList,
 		}
 	}
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
