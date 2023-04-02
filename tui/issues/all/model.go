@@ -2,6 +2,7 @@ package all
 
 import (
 	"fmt"
+	"log"
 
 	"gn/config"
 	"gn/issues"
@@ -17,9 +18,10 @@ import (
 
 type model struct {
 	shared       *shared.Shared
+	conf         *config.Wrapper
+	vp           *viewport.Model
 	viewedIssues map[string]issues.IssueDetails
 	tabs         tabs
-	view         view
 	isLoading    bool
 	viewingList  bool
 }
@@ -29,12 +31,8 @@ type tabs struct {
 	activeTab int
 }
 
-type view struct {
-	content string
-	view    viewport.Model
-}
-
 type updateMsg struct {
+	conf        *config.Wrapper
 	projectPath string
 	items       []itemWrapper
 }
@@ -83,6 +81,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.tabs.lists[i].SetSize(msg.Width-h, msg.Height-v-8)
 		}
 
+		if m.vp == nil {
+			tmp := viewport.New(msg.Width-h, msg.Height-v)
+			m.vp = &tmp
+
+			break
+		}
+
+		m.vp.Width = msg.Width - h
+		m.vp.Height = msg.Height - v
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -100,12 +108,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.shared.IssueID = selected.issue.Iid
 
-			_, ok = m.viewedIssues[m.shared.IssueID]
+			is, ok := m.viewedIssues[m.shared.IssueID]
 			if !ok {
-				m.viewedIssues[m.shared.IssueID] = issues.IssueDetails{
-					Title: "Title: " + m.shared.IssueID,
+				// Request issue
+				tmp, err := issues.QuerySingle(m.conf, m.shared.Details, selected.issue.Iid)
+				if err != nil {
+					// TODO: Remove log.Fatal
+					log.Fatalln(err)
 				}
+
+				// Store issue
+				m.viewedIssues[m.shared.IssueID] = *tmp
+
+				// Copy tmp to is
+				is = *tmp
 			}
+
+			m.vp.SetContent(shared.PrettyPrintIssue(&is, m.vp.Width, m.vp.Height))
+			m.viewingList = false
 
 		case "esc", "backspace":
 			// If an issue is selected, deselect it.
@@ -129,6 +149,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case updateMsg:
+		// Set config
+		m.conf = msg.conf
+
+		// Set lists
 		open := make([]list.Item, 0)
 		closed := make([]list.Item, 0)
 		all := make([]list.Item, 0)
@@ -181,15 +205,11 @@ func (m model) View() string {
 		)
 	}
 
-	if len(m.shared.IssueID) > 0 {
-		return docStyle.Render("I want to request: ", m.viewedIssues[m.shared.IssueID].Title)
-	}
-
 	if m.viewingList {
 		return renderTab(&m.tabs)
 	}
 
-	return renderViewport(&m)
+	return m.vp.View()
 }
 
 func getIssues(details []repo.Details) func() tea.Msg {
@@ -214,6 +234,7 @@ func getIssues(details []repo.Details) func() tea.Msg {
 		return updateMsg{
 			projectPath: projectPath,
 			items:       issueList,
+			conf:        conf,
 		}
 	}
 }

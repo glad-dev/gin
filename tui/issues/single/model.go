@@ -100,7 +100,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case *issues.IssueDetails:
 		// We got the issue loaded
 		m.issue = msg
-		m.content = prettyPrintIssue(&m)
+		m.content = shared.PrettyPrintIssue(m.issue, m.viewport.Width, m.viewport.Height)
 
 		m.viewport.SetContent(m.content)
 
