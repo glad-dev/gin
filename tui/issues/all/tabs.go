@@ -13,12 +13,12 @@ var tabTitles = []string{
 	"All",
 }
 
-func renderTab(m *model) string {
+func renderTab(m *tabs) string {
 	doc := strings.Builder{}
 
 	renderedTabs := make([]string, len(tabTitles))
 
-	activeList := m.tabs.lists[m.tabs.activeTab]
+	activeList := m.lists[m.activeTab]
 
 	// width per item
 	itemWidth := (activeList.Width() - len(tabTitles[0]) - len(tabTitles[1]) - len(tabTitles[2])) / 3
@@ -26,7 +26,7 @@ func renderTab(m *model) string {
 	contentWidth := 0
 	for i, t := range tabTitles {
 		var style lipgloss.Style
-		isFirst, isLast, isActive := i == 0, i == len(tabTitles)-1, i == m.tabs.activeTab
+		isFirst, isLast, isActive := i == 0, i == len(tabTitles)-1, i == m.activeTab
 		if isActive {
 			style = activeTabStyle.Copy()
 		} else {

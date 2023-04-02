@@ -10,6 +10,7 @@ import (
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -18,12 +19,19 @@ type model struct {
 	shared       *shared.Shared
 	viewedIssues map[string]issues.IssueDetails
 	tabs         tabs
+	view         view
 	isLoading    bool
+	viewingList  bool
 }
 
 type tabs struct {
 	lists     [3]list.Model
 	activeTab int
+}
+
+type view struct {
+	content string
+	view    viewport.Model
 }
 
 type updateMsg struct {
@@ -177,7 +185,11 @@ func (m model) View() string {
 		return docStyle.Render("I want to request: ", m.viewedIssues[m.shared.IssueID].Title)
 	}
 
-	return renderTab(&m)
+	if m.viewingList {
+		return renderTab(&m.tabs)
+	}
+
+	return renderViewport(&m)
 }
 
 func getIssues(details []repo.Details) func() tea.Msg {

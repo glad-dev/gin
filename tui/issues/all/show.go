@@ -33,6 +33,7 @@ func Show(details []repo.Details) {
 		},
 		viewedIssues: make(map[string]issues.IssueDetails),
 		isLoading:    true,
+		viewingList:  true,
 	}
 
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
