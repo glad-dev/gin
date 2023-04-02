@@ -21,17 +21,18 @@ func Show(details []repo.Details) {
 	s := spinner.New()
 	s.Spinner = spinner.Points
 
-	viewed := make(map[string]issues.IssueDetails)
-
 	m := model{
-		lists:        [3]list.Model(lsts),
-		viewedIssues: viewed,
-		isLoading:    true,
+		tabs: tabs{
+			lists:     [3]list.Model(lsts),
+			activeTab: 0,
+		},
 		shared: &shared.Shared{
 			IssueID: "",
 			Details: details,
 			Spinner: s,
 		},
+		viewedIssues: make(map[string]issues.IssueDetails),
+		isLoading:    true,
 	}
 
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {

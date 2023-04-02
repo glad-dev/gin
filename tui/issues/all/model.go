@@ -16,10 +16,14 @@ import (
 
 type model struct {
 	shared       *shared.Shared
-	lists        [3]list.Model
 	viewedIssues map[string]issues.IssueDetails
-	activeTab    int
+	tabs         tabs
 	isLoading    bool
+}
+
+type tabs struct {
+	lists     [3]list.Model
+	activeTab int
 }
 
 type updateMsg struct {
@@ -67,8 +71,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 
-		for i := range m.lists {
-			m.lists[i].SetSize(msg.Width-h, msg.Height-v-8)
+		for i := range m.tabs.lists {
+			m.tabs.lists[i].SetSize(msg.Width-h, msg.Height-v-8)
 		}
 
 	case tea.KeyMsg:
@@ -81,12 +85,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			selected, ok := m.lists[m.activeTab].Items()[m.lists[m.activeTab].Index()].(itemWrapper)
+			selected, ok := m.tabs.lists[m.tabs.activeTab].Items()[m.tabs.lists[m.tabs.activeTab].Index()].(itemWrapper)
 			if !ok {
 				return m, tea.Quit
 			}
 
 			m.shared.IssueID = selected.issue.Iid
+
+			_, ok = m.viewedIssues[m.shared.IssueID]
+			if !ok {
+				m.viewedIssues[m.shared.IssueID] = issues.IssueDetails{
+					Title: "Title: " + m.shared.IssueID,
+				}
+			}
 
 		case "esc", "backspace":
 			// If an issue is selected, deselect it.
@@ -100,11 +111,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "right", "tab":
-			m.activeTab = min(m.activeTab+1, len(m.lists)-1)
+			m.tabs.activeTab = min(m.tabs.activeTab+1, len(m.tabs.lists)-1)
 
 			return m, nil
 		case "left", "shift+tab":
-			m.activeTab = max(m.activeTab-1, 0)
+			m.tabs.activeTab = max(m.tabs.activeTab-1, 0)
 
 			return m, nil
 		}
@@ -126,16 +137,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// 0 => Open
-		m.lists[0].SetItems(open)
-		m.lists[0].Title = "Open issues"
+		m.tabs.lists[0].SetItems(open)
+		m.tabs.lists[0].Title = "Open issues"
 
 		// 1 => Closed issues
-		m.lists[1].SetItems(closed)
-		m.lists[1].Title = "Closed issues"
+		m.tabs.lists[1].SetItems(closed)
+		m.tabs.lists[1].Title = "Closed issues"
 
 		// 2 => All issues
-		m.lists[2].SetItems(all)
-		m.lists[2].Title = "All issues"
+		m.tabs.lists[2].SetItems(all)
+		m.tabs.lists[2].Title = "All issues"
 
 		m.isLoading = false
 
@@ -144,7 +155,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 
-	m.lists[m.activeTab], cmd = m.lists[m.activeTab].Update(msg)
+	m.tabs.lists[m.tabs.activeTab], cmd = m.tabs.lists[m.tabs.activeTab].Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
@@ -153,8 +164,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	if m.isLoading {
 		return lipgloss.Place(
-			m.lists[m.activeTab].Width(),
-			m.lists[m.activeTab].Height(),
+			m.tabs.lists[m.tabs.activeTab].Width(),
+			m.tabs.lists[m.tabs.activeTab].Height(),
 			lipgloss.Center,
 			lipgloss.Center,
 
@@ -163,18 +174,6 @@ func (m model) View() string {
 	}
 
 	if len(m.shared.IssueID) > 0 {
-		// Pull logic should be in update, not view but leaving it here for now until everything is connected.
-
-		// Check if issue was requested in this session
-		_, ok := m.viewedIssues[m.shared.IssueID]
-		if ok {
-			return docStyle.Render("I have already requested issue " + m.viewedIssues[m.shared.IssueID].Title)
-		}
-
-		m.viewedIssues[m.shared.IssueID] = issues.IssueDetails{
-			Title: "Title: " + m.shared.IssueID,
-		}
-
 		return docStyle.Render("I want to request: ", m.viewedIssues[m.shared.IssueID].Title)
 	}
 
