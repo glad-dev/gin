@@ -1,10 +1,11 @@
-package single
+package shared
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
 
+	"gn/issues"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/glamour"
@@ -13,11 +14,11 @@ import (
 
 var issueTitleStyle = lipgloss.NewStyle().Bold(true).Underline(true)
 
-func prettyPrintIssue(m *model) string {
+func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string {
 	_, w := style.Comment.GetFrameSize()
-	availableWidth := m.viewport.Width - w
+	availableWidth := width - w
 
-	style.Comment.Width(m.viewport.Width - style.Comment.GetHorizontalFrameSize())
+	style.Comment.Width(width - style.Comment.GetHorizontalFrameSize())
 	style.Discussion.Width(availableWidth - style.Comment.GetHorizontalFrameSize() - style.Discussion.GetHorizontalFrameSize())
 
 	outerSpace := style.Comment.GetWidth() - style.Comment.GetHorizontalFrameSize()
@@ -27,7 +28,7 @@ func prettyPrintIssue(m *model) string {
 		glamour.WithWordWrap(outerSpace),
 		glamour.WithAutoStyle(),
 		glamour.WithEmoji(),
-		glamour.WithBaseURL(m.issue.BaseURL.String()),
+		glamour.WithBaseURL(issue.BaseURL.String()),
 	}
 
 	markdownOuter, err := glamour.NewTermRenderer(
@@ -48,31 +49,31 @@ func prettyPrintIssue(m *model) string {
 	}
 	defer markdownInner.Close()
 
-	desc, err := markdownOuter.Render(m.issue.Description)
+	desc, err := markdownOuter.Render(issue.Description)
 	if err != nil {
 		return style.FormatQuitText("Failed to render markdown: " + err.Error())
 	}
 
 	updatedAt := ""
-	if m.issue.CreatedAt != m.issue.UpdatedAt {
-		updatedAt = fmt.Sprintf("Updated on %s\n", m.issue.UpdatedAt.Format("2006-01-02 15:04"))
+	if issue.CreatedAt != issue.UpdatedAt {
+		updatedAt = fmt.Sprintf("Updated on %s\n", issue.UpdatedAt.Format("2006-01-02 15:04"))
 	}
 
 	// Issue details
 	out := style.Comment.Render(fmt.Sprintf(
 		"%s\nCreated by %s\nCreated on %s\n%s%s%s\n%s",
-		getTitle(m),
-		m.issue.Author.String(),
-		m.issue.CreatedAt.Format("2006-01-02 15:04"),
+		getTitle(issue, width),
+		issue.Author.String(),
+		issue.CreatedAt.Format("2006-01-02 15:04"),
 		updatedAt,
-		getAssignees(m),
-		getLabels(m),
+		getAssignees(issue),
+		getLabels(issue),
 		desc,
 	)) + "\n"
 
 	// Comments
 	var commentBody string
-	for _, comment := range m.issue.Discussion {
+	for _, comment := range issue.Discussion {
 		commentBody, err = markdownOuter.Render(comment.Body)
 		if err != nil {
 			return style.FormatQuitText("Failed to render markdown: " + err.Error())
@@ -122,8 +123,8 @@ func prettyPrintIssue(m *model) string {
 	}
 
 	return lipgloss.Place(
-		m.viewport.Width,
-		m.viewport.Height,
+		width,
+		height,
 		lipgloss.Center,
 		lipgloss.Center,
 
@@ -131,34 +132,34 @@ func prettyPrintIssue(m *model) string {
 	)
 }
 
-func getTitle(m *model) string {
+func getTitle(issue *issues.IssueDetails, width int) string {
 	return lipgloss.PlaceHorizontal(
-		m.viewport.Width-style.Comment.GetHorizontalFrameSize(),
+		width-style.Comment.GetHorizontalFrameSize(),
 		lipgloss.Center,
-		issueTitleStyle.Render(m.issue.Title),
+		issueTitleStyle.Render(issue.Title),
 	)
 }
 
-func getAssignees(m *model) string {
-	if len(m.issue.Assignees) == 0 {
+func getAssignees(issue *issues.IssueDetails) string {
+	if len(issue.Assignees) == 0 {
 		return ""
 	}
 
-	assignees := make([]string, len(m.issue.Assignees))
-	for i, assignee := range m.issue.Assignees {
+	assignees := make([]string, len(issue.Assignees))
+	for i, assignee := range issue.Assignees {
 		assignees[i] = assignee.String()
 	}
 
 	return fmt.Sprintf("Assigned to: %s\n", strings.Join(assignees, ", "))
 }
 
-func getLabels(m *model) string {
-	if len(m.issue.Labels) == 0 {
+func getLabels(issue *issues.IssueDetails) string {
+	if len(issue.Labels) == 0 {
 		return ""
 	}
 
-	labels := make([]string, len(m.issue.Labels))
-	for i, label := range m.issue.Labels {
+	labels := make([]string, len(issue.Labels))
+	for i, label := range issue.Labels {
 		labels[i] = lipgloss.NewStyle().
 			Background(lipgloss.Color(label.Color)).
 			Foreground(getInverseColor(label.Color)).

@@ -1,13 +1,16 @@
 package all
 
 import (
+	"os"
+
 	"gn/issues"
 	"gn/repo"
-	shared "gn/tui/issues"
+	"gn/tui/issues/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -21,22 +24,32 @@ func Show(details []repo.Details) {
 	s := spinner.New()
 	s.Spinner = spinner.Points
 
-	m := model{
-		tabs: tabs{
-			lists:     [3]list.Model(lsts),
-			activeTab: 0,
+	p := tea.NewProgram(
+		model{
+			tabs: tabs{
+				lists:     [3]list.Model(lsts),
+				activeTab: 0,
+			},
+			shared: &shared.Shared{
+				IssueID: "",
+				Details: details,
+				Spinner: s,
+			},
+			viewport:     viewport.New(0, 0),
+			viewedIssues: make(map[string]issues.IssueDetails),
+			isLoading:    true,
+			viewingList:  true,
 		},
-		shared: &shared.Shared{
-			IssueID: "",
-			Details: details,
-			Spinner: s,
-		},
-		viewedIssues: make(map[string]issues.IssueDetails),
-		isLoading:    true,
-		viewingList:  true,
+		tea.WithAltScreen(),
+		tea.WithMouseCellMotion(),
+	)
+
+	m, err := p.Run()
+	if err != nil {
+		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
-		style.PrintErrAndExit("Error running program: " + err.Error())
+	if m, ok := m.(model); ok && m.failure {
+		os.Exit(1)
 	}
 }

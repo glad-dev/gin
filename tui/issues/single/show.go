@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"gn/repo"
-	"gn/tui/issues"
+	"gn/tui/issues/shared"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -18,7 +18,7 @@ func Show(details []repo.Details, issueID string) {
 	p := tea.NewProgram(
 		model{
 			content: "",
-			shared: &issues.Shared{
+			shared: &shared.Shared{
 				Details: details,
 				IssueID: issueID,
 				Spinner: s,
