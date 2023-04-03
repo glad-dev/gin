@@ -1,8 +1,6 @@
 package all
 
 import (
-	"log"
-
 	"gn/issues"
 	"gn/tui/issues/shared"
 
@@ -63,34 +61,13 @@ func handleListUpdate(m *model, msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-		m.isLoading = true
+		m.isLoading = true // Does this do anything?
+		pullIssue(m)
+		m.isLoading = false
 
-		selected, ok := m.tabs.lists[m.tabs.activeTab].Items()[m.tabs.lists[m.tabs.activeTab].Index()].(itemWrapper)
-		if !ok {
+		if m.failure {
 			return m, tea.Quit
 		}
-
-		m.shared.IssueID = selected.issue.Iid
-
-		is, ok := m.viewedIssues[m.shared.IssueID]
-		if !ok {
-			// Request issue
-			tmp, err := issues.QuerySingle(m.conf, m.shared.Details, selected.issue.Iid)
-			if err != nil {
-				// TODO: Remove log.Fatal
-				log.Fatalln(err)
-			}
-
-			// Store issue
-			m.viewedIssues[m.shared.IssueID] = *tmp
-
-			// Copy tmp to is
-			is = *tmp
-		}
-
-		m.viewport.SetContent(shared.PrettyPrintIssue(&is, m.viewport.Width, m.viewport.Height))
-		m.viewingList = false
-		m.isLoading = false
 
 	case "esc", "backspace":
 		return m, tea.Quit
@@ -110,4 +87,37 @@ func handleListUpdate(m *model, msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
+}
+
+func pullIssue(m *model) {
+	selected, ok := m.tabs.lists[m.tabs.activeTab].Items()[m.tabs.lists[m.tabs.activeTab].Index()].(itemWrapper)
+	if !ok {
+		m.error = "Failed to convert selected item to itemWrapper"
+		m.failure = true
+
+		return
+	}
+
+	m.shared.IssueID = selected.issue.Iid
+
+	issue, ok := m.viewedIssues[m.shared.IssueID]
+	if !ok {
+		// Request issue
+		tmp, err := issues.QuerySingle(m.conf, m.shared.Details, selected.issue.Iid)
+		if err != nil {
+			m.error = "Failed to query issue: " + err.Error()
+			m.failure = true
+
+			return
+		}
+
+		// Store issue
+		m.viewedIssues[m.shared.IssueID] = *tmp
+
+		// Needed since issue.QuerySingle returns a pointer and map access a struct
+		issue = *tmp
+	}
+
+	m.viewport.SetContent(shared.PrettyPrintIssue(&issue, m.viewport.Width, m.viewport.Height))
+	m.viewingList = false
 }

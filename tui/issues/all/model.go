@@ -20,6 +20,7 @@ type model struct {
 	conf         *config.Wrapper
 	viewedIssues map[string]issues.IssueDetails
 	tabs         tabs
+	error        string
 	viewport     viewport.Model
 	isLoading    bool
 	viewingList  bool
@@ -32,9 +33,8 @@ type tabs struct {
 }
 
 type updateMsg struct {
-	conf        *config.Wrapper
-	projectPath string
-	items       []itemWrapper
+	conf  *config.Wrapper
+	items []itemWrapper
 }
 
 func (m model) Init() tea.Cmd {
@@ -91,6 +91,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.failure {
+		return style.FormatQuitText("An error occurred: " + m.error)
+	}
+
 	if m.isLoading {
 		return lipgloss.Place(
 			m.tabs.lists[m.tabs.activeTab].Width(),
@@ -116,7 +120,7 @@ func getIssues(details []repo.Details) func() tea.Msg {
 			style.PrintErrAndExit("Failed to load config: " + err.Error())
 		}
 
-		allIssues, projectPath, err := issues.QueryAll(conf, details)
+		allIssues, _, err := issues.QueryAll(conf, details)
 		if err != nil {
 			style.PrintErrAndExit("Failed to query issues: " + err.Error())
 		}
@@ -129,9 +133,8 @@ func getIssues(details []repo.Details) func() tea.Msg {
 		}
 
 		return updateMsg{
-			projectPath: projectPath,
-			items:       issueList,
-			conf:        conf,
+			items: issueList,
+			conf:  conf,
 		}
 	}
 }
