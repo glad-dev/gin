@@ -15,10 +15,12 @@ import (
 )
 
 func Show(details []repo.Details) {
-	lsts := []list.Model{
-		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
-		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
-		list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
+	lst.SetShowFilter(false) // TODO: Fix filtering bug
+
+	lsts := [3]list.Model{}
+	for i := range lsts {
+		lsts[i] = lst
 	}
 
 	s := spinner.New()
@@ -27,7 +29,7 @@ func Show(details []repo.Details) {
 	p := tea.NewProgram(
 		model{
 			tabs: tabs{
-				lists:     [3]list.Model(lsts),
+				lists:     lsts,
 				activeTab: 0,
 			},
 			shared: &shared.Shared{

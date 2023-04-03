@@ -50,45 +50,39 @@ func updateList(m *model, msg *updateMsg) (tea.Model, tea.Cmd) {
 }
 
 func handleListUpdate(m *model, msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	var (
-		cmd  tea.Cmd
-		cmds []tea.Cmd
-	)
+	var cmd tea.Cmd
 
-	if !m.tabs.lists[m.tabs.activeTab].FilteringEnabled() {
-		switch msg.String() {
-		case "enter":
-			if m.isLoading {
-				return m, nil
-			}
-
-			m.isLoading = true // Does this do anything?
-			pullIssue(m)
-			m.isLoading = false
-
-			if m.failure {
-				return m, tea.Quit
-			}
-
-		case "esc":
-			return m, tea.Quit
-
-		case "right", "tab":
-			m.tabs.activeTab = min(m.tabs.activeTab+1, len(m.tabs.lists)-1)
-
-			return m, nil
-
-		case "left", "shift+tab":
-			m.tabs.activeTab = max(m.tabs.activeTab-1, 0)
-
+	switch msg.String() {
+	case "enter":
+		if m.isLoading {
 			return m, nil
 		}
+
+		m.isLoading = true // Does this do anything?
+		pullIssue(m)
+		m.isLoading = false
+
+		if m.failure {
+			return m, tea.Quit
+		}
+
+	case "esc":
+		return m, tea.Quit
+
+	case "right", "tab":
+		m.tabs.activeTab = min(m.tabs.activeTab+1, len(m.tabs.lists)-1)
+
+		return m, nil
+
+	case "left", "shift+tab":
+		m.tabs.activeTab = max(m.tabs.activeTab-1, 0)
+
+		return m, nil
 	}
 
 	m.tabs.lists[m.tabs.activeTab], cmd = m.tabs.lists[m.tabs.activeTab].Update(msg)
-	cmds = append(cmds, cmd)
 
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func pullIssue(m *model) {

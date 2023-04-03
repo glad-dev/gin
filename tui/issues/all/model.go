@@ -76,9 +76,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return handleListUpdate(&m, msg)
 		}
 
+		// Not needed but added for clarity
+		break //nolint:gosimple
+
 	case tea.MouseMsg:
-		// Mouse msg are intended for the viewport => We need to break to avoid going into the "default" branch
-		break
+		// Mouse msg are only intended for the viewport
+		if m.viewingList {
+			// We don't handle MouseMsg for the list
+			return m, nil
+		}
+
+		// Not needed but added for clarity
+		break //nolint:gosimple
 
 	default:
 		m.shared.Spinner, cmd = m.shared.Spinner.Update(msg)
@@ -86,7 +95,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	}
 
-	// Viewport needs to be handled separately since it can receive key and mouse messages
+	// Can only be reached if we are displaying the viewport, and we either got a tea.MouseMsg or a tea.KeyMsg
 	return handleViewportUpdate(&m, msg)
 }
 
