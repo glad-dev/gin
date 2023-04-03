@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 
@@ -31,7 +32,21 @@ func writeConfig(config *Wrapper) error {
 
 	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("could not open config file: %w", err)
+		if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("could not open config file: %w", err)
+		}
+
+		// Create config directory
+		err = createConfigDir()
+		if err != nil {
+			return fmt.Errorf("could not create config directory: %w", err)
+		}
+
+		// Attempt to create the config file
+		f, err = os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+		if err != nil {
+			return fmt.Errorf("could not open config file: %w", err)
+		}
 	}
 
 	_, err = f.Write(buf.Bytes())
