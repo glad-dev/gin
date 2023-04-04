@@ -2,10 +2,8 @@ package all
 
 import (
 	"fmt"
-
 	"gn/config"
 	"gn/issues"
-	"gn/repo"
 	"gn/tui/issues/shared"
 	"gn/tui/style"
 
@@ -38,7 +36,10 @@ type updateMsg struct {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(getIssues(m.shared.Details), m.shared.Spinner.Tick)
+	return tea.Batch(
+		getIssues(&m),
+		m.shared.Spinner.Tick,
+	)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -122,14 +123,14 @@ func (m model) View() string {
 	return shared.ViewportView(&m.viewport, m.shared.IssueID)
 }
 
-func getIssues(details []repo.Details) func() tea.Msg {
+func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
 		conf, err := config.Load()
 		if err != nil {
 			style.PrintErrAndExit("Failed to load config: " + err.Error())
 		}
 
-		allIssues, _, err := issues.QueryAll(conf, details)
+		allIssues, err := issues.QueryAll(conf, m.shared.Details, m.shared.URL)
 		if err != nil {
 			style.PrintErrAndExit("Failed to query issues: " + err.Error())
 		}

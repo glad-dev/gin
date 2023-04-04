@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 	"reflect"
 	"time"
 
@@ -50,8 +51,7 @@ type querySingleResponse struct {
 	} `json:"data"`
 }
 
-func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string) (*IssueDetails, error) {
-	query := `
+const querySingleQuery = `
 		query($projectPath: ID!, $issueIID: String!) {
 		  project(fullPath: $projectPath) {
 			issue(iid: $issueIID) {
@@ -101,7 +101,8 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 		}
 	`
 
-	lab, projectPath, err := config.GetMatchingConfig(details)
+func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*IssueDetails, error) {
+	lab, projectPath, err := getMatchingConfig(config, details, u)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, issueID string)
 	}
 
 	response, err := requests.Project(&requests.GraphqlQuery{
-		Query:     query,
+		Query:     querySingleQuery,
 		Variables: variables,
 	}, lab)
 

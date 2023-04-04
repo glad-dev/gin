@@ -1,6 +1,7 @@
 package all
 
 import (
+	"net/url"
 	"os"
 
 	"gn/issues"
@@ -14,7 +15,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func Show(details []repo.Details) {
+func Show(details []repo.Details, u *url.URL) {
 	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	lst.SetShowFilter(false) // TODO: Fix filtering bug
 
@@ -34,6 +35,7 @@ func Show(details []repo.Details) {
 			},
 			shared: &shared.Shared{
 				IssueID: "",
+				URL:     u,
 				Details: details,
 				Spinner: s,
 			},

@@ -12,15 +12,23 @@ import (
 )
 
 type model struct {
-	issue    *issues.IssueDetails
 	shared   *shared.Shared
 	content  string
 	viewport viewport.Model
 	ready    bool
+	failure  bool
+}
+
+type updateMsg struct {
+	issue   *issues.IssueDetails
+	errText string
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(getIssue(&m), m.shared.Spinner.Tick)
+	return tea.Batch(
+		getIssue(&m),
+		m.shared.Spinner.Tick,
+	)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -40,21 +48,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport = shared.ViewportInitSize(&msg, m.shared.IssueID)
 			m.viewport.SetContent(m.content)
 			m.ready = true
-
-			// This is only necessary for high performance rendering, which in
-			// most cases you won't need.
-			//
-			// Render the viewport one line below the header.
-			// m.viewport.YPosition = headerHeight + 1
 		} else {
 			shared.ViewportSetSize(&m.viewport, &msg, m.shared.IssueID)
 		}
 
-	case *issues.IssueDetails:
-		// We got the issue loaded
-		m.issue = msg
-		m.content = shared.PrettyPrintIssue(m.issue, m.viewport.Width, m.viewport.Height)
+	case updateMsg:
+		// Check if there was an error
+		if len(msg.errText) != 0 {
+			m.content = msg.errText
+			m.failure = true
 
+			return m, tea.Quit
+		}
+
+		// We got the issue loaded
+		m.content = shared.PrettyPrintIssue(msg.issue, m.viewport.Width, m.viewport.Height)
 		m.viewport.SetContent(m.content)
 
 	default:
@@ -70,7 +78,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if !m.ready || m.issue == nil {
+	if !m.ready || len(m.content) == 0 {
 		return lipgloss.Place(
 			m.viewport.Width,
 			m.viewport.Height,
@@ -88,14 +96,23 @@ func getIssue(m *model) func() tea.Msg {
 	return func() tea.Msg {
 		conf, err := config.Load()
 		if err != nil {
-			style.PrintErrAndExit("Failed to load config: " + err.Error())
+			return updateMsg{
+				issue:   nil,
+				errText: style.FormatQuitText("Failed to load config: " + err.Error()),
+			}
 		}
 
-		issue, err := issues.QuerySingle(conf, m.shared.Details, m.shared.IssueID)
+		issue, err := issues.QuerySingle(conf, m.shared.Details, m.shared.URL, m.shared.IssueID)
 		if err != nil {
-			style.PrintErrAndExit("Failed to query issue: " + err.Error())
+			return updateMsg{
+				issue:   nil,
+				errText: style.FormatQuitText("Failed to query issue: " + err.Error()),
+			}
 		}
 
-		return issue
+		return updateMsg{
+			issue:   issue,
+			errText: "",
+		}
 	}
 }

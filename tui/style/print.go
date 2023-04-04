@@ -4,26 +4,31 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 func FormatQuitText(str string) string {
-	// Max length of 80
-	const maxLen = 80
+	// Get the terminal width
+	maxWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		maxWidth = 80
+	}
 
 	out := ""
 	for _, line := range strings.Split(str, "\n") {
-		if len(line) < maxLen {
+		if len(line) < maxWidth {
 			out += line + "\n"
 
 			continue
 		}
 
-		for len(line) >= maxLen {
+		for len(line) >= maxWidth {
 			// Get the right most space
-			index := strings.LastIndex(line[:maxLen], " ")
-			if index == -1 || index > maxLen {
-				out += line[:maxLen-2] + "-\n"
-				line = line[maxLen-2:]
+			index := strings.LastIndex(line[:maxWidth], " ")
+			if index == -1 || index > maxWidth {
+				out += line[:maxWidth-2] + "-\n"
+				line = line[maxWidth-2:]
 
 				continue
 			}

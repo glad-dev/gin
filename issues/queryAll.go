@@ -3,6 +3,7 @@ package issues
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 
 	"gn/config"
@@ -30,8 +31,7 @@ type queryAllResponse struct {
 	} `json:"data"`
 }
 
-func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, error) {
-	query := `
+const queryAllQuery = `
 		query($projectPath: ID!) {
 		  project(fullPath: $projectPath) {
 			issues(sort: CREATED_ASC) {
@@ -57,9 +57,10 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 		}
 	`
 
-	lab, projectPath, err := config.GetMatchingConfig(details)
+func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue, error) {
+	lab, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	variables := map[string]string{
@@ -67,18 +68,18 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 	}
 
 	response, err := requests.Project(&requests.GraphqlQuery{
-		Query:     query,
+		Query:     queryAllQuery,
 		Variables: variables,
 	}, lab)
 
 	if err != nil {
-		return nil, "", fmt.Errorf("query all issues failed: %w", err)
+		return nil, fmt.Errorf("query all issues failed: %w", err)
 	}
 
 	queryAll := queryAllResponse{}
 	err = json.Unmarshal(response, &queryAll)
 	if err != nil {
-		return nil, "", fmt.Errorf("unmarshle of issues failed: %w", err)
+		return nil, fmt.Errorf("unmarshle of issues failed: %w", err)
 	}
 
 	// Flatter the Graphql struct to an Issue struct
@@ -100,5 +101,5 @@ func QueryAll(config *config.Wrapper, details []repo.Details) ([]Issue, string, 
 		issues = append(issues, tmp)
 	}
 
-	return issues, projectPath, nil
+	return issues, nil
 }

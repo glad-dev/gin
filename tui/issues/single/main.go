@@ -2,6 +2,7 @@ package single
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"gn/repo"
@@ -11,7 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func Show(details []repo.Details, issueID string) {
+func Show(details []repo.Details, u *url.URL, issueID string) {
 	s := spinner.New()
 	s.Spinner = spinner.Points
 
@@ -20,6 +21,7 @@ func Show(details []repo.Details, issueID string) {
 			content: "",
 			shared: &shared.Shared{
 				Details: details,
+				URL:     u,
 				IssueID: issueID,
 				Spinner: s,
 			},
@@ -28,8 +30,14 @@ func Show(details []repo.Details, issueID string) {
 		tea.WithMouseCellMotion(), // turn on mouse support, so we can track the mouse wheel
 	)
 
-	if _, err := p.Run(); err != nil {
+	m, err := p.Run()
+	if err != nil {
 		fmt.Println("could not run program:", err)
+		os.Exit(1)
+	}
+
+	if m, ok := m.(model); ok && m.failure {
+		fmt.Fprintf(os.Stderr, m.content)
 		os.Exit(1)
 	}
 }

@@ -99,7 +99,7 @@ func pullIssue(m *model) {
 	issue, ok := m.viewedIssues[m.shared.IssueID]
 	if !ok {
 		// Request issue
-		tmp, err := issues.QuerySingle(m.conf, m.shared.Details, selected.issue.Iid)
+		tmp, err := issues.QuerySingle(m.conf, m.shared.Details, m.shared.URL, selected.issue.Iid)
 		if err != nil {
 			m.error = "Failed to query issue: " + err.Error()
 			m.failure = true
