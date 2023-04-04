@@ -58,6 +58,7 @@ const queryAllQuery = `
 	`
 
 func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue, error) {
+	// TODO: Query all issues, not just the first 100
 	lab, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
 		return nil, err

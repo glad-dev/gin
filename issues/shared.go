@@ -21,13 +21,8 @@ func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL)
 func getURLConfig(conf *config.Wrapper, u *url.URL) (*config.GitLab, string) {
 	// Get project path
 	projectPath := u.EscapedPath()
-	if strings.HasPrefix(projectPath, "/") {
-		projectPath = projectPath[1:]
-	}
-
-	if strings.HasSuffix(projectPath, "/") {
-		projectPath = projectPath[:len(projectPath)-1]
-	}
+	projectPath = strings.TrimPrefix(projectPath, "/")
+	projectPath = strings.TrimSuffix(projectPath, "/")
 
 	// Check if we have a token
 	for _, gitLab := range conf.Configs {

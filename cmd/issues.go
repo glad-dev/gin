@@ -91,7 +91,8 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 	// Due to our pre-run hook, we know that only one of the flags is set
 	if len(urlStr) > 0 {
 		// We were passed a URL flag
-		u, err := url.ParseRequestURI(urlStr)
+		var u *url.URL
+		u, err = url.ParseRequestURI(urlStr)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to parse given url: %w", err)
 		}
