@@ -8,7 +8,7 @@ fi
 rm gn
 
 # Run formater
-out=$(gofmt -w .)
+out=$(gofumpt -w .)
 if [ $? -ne 0 ]; then
 	echo "Formater failed!"
 	echo "$out"
