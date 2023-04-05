@@ -10,3 +10,6 @@
 
 ## v2
 - [ ] Add PR support
+
+# Acknowledgements
+This project would not have been possible without [bubbletea](https://github.com/charmbracelet/bubbletea/)
