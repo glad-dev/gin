@@ -8,14 +8,8 @@ import (
 	"strings"
 
 	"gn/constants"
-	"gn/repo"
 	"gn/requests"
 )
-
-type Wrapper struct {
-	Configs       []GitLab
-	ConfigVersion int
-}
 
 type GitLab struct { // TODO: Add support for Github, maybe bool field?
 	URL      url.URL
@@ -23,52 +17,13 @@ type GitLab struct { // TODO: Add support for Github, maybe bool field?
 	Username string
 }
 
-var ErrNoMatchingConfig = errors.New("no matching config was found")
-
-func (config *Wrapper) CheckValidity() error {
-	if len(config.Configs) == 0 {
-		return errors.New("config file does not contain []GitLab")
+func (l *GitLab) Init() error {
+	err := l.CheckTokenScope()
+	if err != nil {
+		return err
 	}
 
-	// Check version
-	if config.ConfigVersion > constants.ConfigVersion {
-		return fmt.Errorf("config was written by a newer version of the tool")
-	}
-
-	for _, singleConfig := range config.Configs {
-		// Check URL
-		_, err := checkURLStr(singleConfig.URL.String())
-		if err != nil {
-			return err
-		}
-
-		// Check if token is semantically correct. The tokens validity is not checked
-		if len(singleConfig.Token) < 20 { // TODO: Get actual sizes
-			return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(singleConfig.Token))
-		}
-
-		if len(singleConfig.Username) == 0 {
-			return fmt.Errorf("config contains empty username")
-		}
-	}
-
-	return nil
-}
-
-func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*GitLab, string, error) {
-	if len(details) == 0 {
-		return nil, "", errors.New("no details passed")
-	}
-
-	for _, detail := range details {
-		for _, lab := range config.Configs {
-			if lab.URL.Host == detail.URL.Host {
-				return &lab, detail.ProjectPath, nil
-			}
-		}
-	}
-
-	return nil, "", ErrNoMatchingConfig
+	return l.GetUsername()
 }
 
 func (l *GitLab) GetURL() string {
@@ -79,9 +34,28 @@ func (l *GitLab) GetToken() string {
 	return l.Token
 }
 
+func (l *GitLab) CheckValidity() error {
+	// Check URL
+	_, err := checkURLStr(l.URL.String())
+	if err != nil {
+		return err
+	}
+
+	// Check if token is semantically correct. The tokens validity is not checked
+	if len(l.Token) < 20 { // TODO: Get actual sizes
+		return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(l.Token))
+	}
+
+	if len(l.Username) == 0 {
+		return fmt.Errorf("config contains empty username")
+	}
+
+	return nil
+}
+
 var debug = true
 
-func (l *GitLab) GetUsername() error { // ToDo: Is this a good idea?
+func (l *GitLab) GetUsername() error {
 	if debug {
 		l.Username = "Fake username"
 
@@ -130,7 +104,7 @@ func (l *GitLab) GetUsername() error { // ToDo: Is this a good idea?
 	return nil
 }
 
-func (l *GitLab) CheckTokenValidity() error {
+func (l *GitLab) CheckTokenScope() error {
 	type scopes struct {
 		Data struct {
 			Viewer struct {
