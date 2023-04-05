@@ -62,6 +62,9 @@ func handleListUpdate(m *model, msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		pullIssue(m)
 		m.isLoading = false
 
+		// Re-set viewport view to the top
+		m.viewport.GotoTop()
+
 		if m.failure {
 			return m, tea.Quit
 		}
