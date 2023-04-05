@@ -17,7 +17,7 @@ func FormatQuitText(str string) string {
 	cp := quitText.Copy()
 	cp.Width(maxWidth)
 
-	return cp.Render(str)
+	return cp.Render(str) + "\n"
 }
 
 func PrintErrAndExit(str string) {
