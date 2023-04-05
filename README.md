@@ -6,7 +6,6 @@
 - [ ] Issues view all => Fix filtering view
 - [ ] Add GitHub support
 - [ ] Config add/edit show error in TUI, not after
-- [ ] Add selection for when multiple configs match
 - [ ] Add cli command to check token validity
 
 ### Won't do
@@ -14,6 +13,7 @@
 
 ## v2
 - [ ] Add PR support
+- [ ] Add selection for when multiple configs match
 
 # Acknowledgements
 This project would not have been possible without [bubbletea](https://github.com/charmbracelet/bubbletea/).
