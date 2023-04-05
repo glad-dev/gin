@@ -9,7 +9,7 @@ import (
 //nolint:goconst
 func Execute() error {
 	rootCmd := &cobra.Command{
-		Use:     "gn",
+		Use:     constants.ProgramName,
 		Version: constants.Version,
 	}
 
