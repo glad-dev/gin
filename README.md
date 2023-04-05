@@ -6,6 +6,7 @@
 - [ ] Issues view all => Fix filtering view
 - [ ] Add GitHub support
 - [ ] Config add/edit show error in TUI, not after
+- [ ] Add selection for when multiple configs match
 
 ### Won't do
 - Repo based query without token (How do I get the correct details?)
