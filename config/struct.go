@@ -13,11 +13,11 @@ import (
 )
 
 type Wrapper struct {
-	Configs      []GitLab
-	MajorVersion int
+	Configs       []GitLab
+	ConfigVersion int
 }
 
-type GitLab struct {
+type GitLab struct { // TODO: Add support for Github, maybe bool field?
 	URL      url.URL
 	Token    string
 	Username string
@@ -31,7 +31,7 @@ func (config *Wrapper) CheckValidity() error {
 	}
 
 	// Check version
-	if config.MajorVersion > constants.CurrentMajorVersion {
+	if config.ConfigVersion > constants.ConfigVersion {
 		return fmt.Errorf("config was written by a newer version of the tool")
 	}
 
@@ -43,7 +43,7 @@ func (config *Wrapper) CheckValidity() error {
 		}
 
 		// Check if token is semantically correct. The tokens validity is not checked
-		if len(singleConfig.Token) < 20 {
+		if len(singleConfig.Token) < 20 { // TODO: Get actual sizes
 			return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(singleConfig.Token))
 		}
 

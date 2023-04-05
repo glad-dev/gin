@@ -12,7 +12,7 @@ import (
 )
 
 func writeConfig(config *Wrapper) error {
-	config.MajorVersion = constants.CurrentMajorVersion
+	config.ConfigVersion = constants.ConfigVersion
 
 	err := config.CheckValidity()
 	if err != nil {

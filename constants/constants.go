@@ -1,8 +1,8 @@
 package constants
 
 const (
-	Version             = "1.0.0"
-	CurrentMajorVersion = 1
+	Version       = "1.0.0"
+	ConfigVersion = 1
 )
 
 var (

@@ -27,8 +27,8 @@ func Load() (*Wrapper, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &Wrapper{
-				Configs:      []GitLab{},
-				MajorVersion: constants.CurrentMajorVersion,
+				Configs:       []GitLab{},
+				ConfigVersion: constants.ConfigVersion,
 			}, ErrConfigDoesNotExist
 		}
 
