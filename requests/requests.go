@@ -83,17 +83,17 @@ func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
 func checkForError(response io.Reader) error {
 	errorResponse := struct {
 		Errors []struct {
-			Message   string `json:"message"`
-			Locations []struct {
-				Line   int `json:"line"`
-				Column int `json:"column"`
-			} `json:"locations"`
-			Path       []string `json:"path"`
 			Extensions struct {
 				Code      string `json:"code"`
 				TypeName  string `json:"typeName"`
 				FieldName string `json:"fieldName"`
 			} `json:"extensions"`
+			Message   string `json:"message"`
+			Locations []struct {
+				Line   int `json:"line"`
+				Column int `json:"column"`
+			} `json:"locations"`
+			Path []string `json:"path"`
 		} `json:"errors"`
 	}{}
 

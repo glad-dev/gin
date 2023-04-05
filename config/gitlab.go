@@ -15,9 +15,10 @@ import (
 )
 
 type GitLab struct { // TODO: Add support for Github, maybe bool field?
-	URL      url.URL
-	Token    string
-	Username string
+	URL       url.URL
+	Token     string
+	Username  string
+	TokenName string
 }
 
 func (l *GitLab) Init() error {
@@ -37,7 +38,7 @@ func (l *GitLab) GetToken() string {
 	return l.Token
 }
 
-func (l *GitLab) CheckValidity() error {
+func (l *GitLab) CheckSemantics() error {
 	// Check URL
 	_, err := checkURLStr(l.URL.String())
 	if err != nil {
@@ -51,6 +52,10 @@ func (l *GitLab) CheckValidity() error {
 
 	if len(l.Username) == 0 {
 		return fmt.Errorf("config contains empty username")
+	}
+
+	if len(l.TokenName) == 0 {
+		return fmt.Errorf("config contains empty token name")
 	}
 
 	return nil
@@ -101,15 +106,15 @@ func (l *GitLab) GetUsername() error {
 
 func (l *GitLab) CheckTokenScope() error {
 	response := struct {
-		Id         int         `json:"id"`
-		Name       string      `json:"name"`
-		Revoked    bool        `json:"revoked"`
 		CreatedAt  time.Time   `json:"created_at"`
-		Scopes     []string    `json:"scopes"`
-		UserId     int         `json:"user_id"`
 		LastUsedAt time.Time   `json:"last_used_at"`
-		Active     bool        `json:"active"`
 		ExpiresAt  interface{} `json:"expires_at"`
+		Name       string      `json:"name"`
+		Scopes     []string    `json:"scopes"`
+		ID         int         `json:"id"`
+		UserID     int         `json:"user_id"`
+		Revoked    bool        `json:"revoked"`
+		Active     bool        `json:"active"`
 	}{}
 
 	req, err := http.NewRequest("GET", "https://gitlab.com/api/v4/personal_access_tokens/self", bytes.NewBufferString(""))
@@ -122,7 +127,7 @@ func (l *GitLab) CheckTokenScope() error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to make request: %s", err)
+		return fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -130,7 +135,7 @@ func (l *GitLab) CheckTokenScope() error {
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to decode response: %s", err)
+		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	if response.Revoked {
@@ -162,6 +167,8 @@ func (l *GitLab) CheckTokenScope() error {
 	if len(required) > 0 {
 		return fmt.Errorf("some scopes are missing: %s", strings.Join(required, ", "))
 	}
+
+	l.TokenName = response.Name
 
 	return nil
 }

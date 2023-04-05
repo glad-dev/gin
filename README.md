@@ -7,6 +7,7 @@
 - [ ] Add GitHub support
 - [ ] Config add/edit show error in TUI, not after
 - [ ] Add selection for when multiple configs match
+- [ ] Add cli command to check token validity
 
 ### Won't do
 - Repo based query without token (How do I get the correct details?)
