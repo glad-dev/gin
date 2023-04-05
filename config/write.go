@@ -30,7 +30,7 @@ func writeConfig(config *Wrapper) error {
 		return err
 	}
 
-	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("could not open config file: %w", err)
@@ -43,7 +43,7 @@ func writeConfig(config *Wrapper) error {
 		}
 
 		// Attempt to create the config file
-		f, err = os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+		f, err = os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			return fmt.Errorf("could not open config file: %w", err)
 		}

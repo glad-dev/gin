@@ -11,8 +11,10 @@ import (
 	"reflect"
 )
 
-var ErrProjectDoesNotExist = errors.New("the project does not exist")
-var ErrNotFound = errors.New("received a 404 - not found when contacting API")
+var (
+	ErrProjectDoesNotExist = errors.New("the project does not exist")
+	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
+)
 
 func Do(query *GraphqlQuery, config ConfigInterface) ([]byte, error) {
 	requestBody, err := json.Marshal(query)

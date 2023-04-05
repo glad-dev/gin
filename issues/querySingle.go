@@ -116,7 +116,6 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		Query:     querySingleQuery,
 		Variables: variables,
 	}, lab)
-
 	if err != nil {
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}

@@ -3,8 +3,9 @@ package config
 import (
 	"errors"
 	"fmt"
-	"gn/constants"
 	"os"
+
+	"gn/constants"
 
 	"github.com/BurntSushi/toml"
 )

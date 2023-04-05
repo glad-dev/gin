@@ -1,8 +1,9 @@
 package shared
 
 import (
-	"gn/repo"
 	"net/url"
+
+	"gn/repo"
 
 	"github.com/charmbracelet/bubbles/spinner"
 )

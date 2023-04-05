@@ -102,7 +102,7 @@ func (m *editModel) View() string {
 }
 
 func (m *editModel) updateFocus() tea.Cmd {
-	var cmds = make([]tea.Cmd, len(m.inputs))
+	cmds := make([]tea.Cmd, len(m.inputs))
 	for i := 0; i < len(m.inputs); i++ {
 		if i == m.focusIndex {
 			// Set focused state

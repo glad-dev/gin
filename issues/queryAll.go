@@ -72,7 +72,6 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 		Query:     queryAllQuery,
 		Variables: variables,
 	}, lab)
-
 	if err != nil {
 		return nil, fmt.Errorf("query all issues failed: %w", err)
 	}

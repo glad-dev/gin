@@ -108,7 +108,6 @@ func (l *GitLab) GetUsername() error { // ToDo: Is this a good idea?
 		Query:     query,
 		Variables: nil,
 	}, l)
-
 	if err != nil {
 		return err
 	}
@@ -149,7 +148,6 @@ func (l *GitLab) CheckTokenValidity() error {
 		Query:     query,
 		Variables: map[string]string{},
 	}, l)
-
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}

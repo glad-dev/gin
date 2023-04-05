@@ -5,6 +5,4 @@ const (
 	ConfigVersion = 1
 )
 
-var (
-	RequiredScopes = []string{"read_user", "read_repository"}
-)
+var RequiredScopes = []string{"read_user", "read_repository"}
