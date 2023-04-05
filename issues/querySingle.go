@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/url"
 	"reflect"
@@ -125,7 +126,10 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 	}
 
 	querySingle := querySingleResponse{}
-	err = json.Unmarshal(response, &querySingle)
+
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err = dec.Decode(&querySingle)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}
@@ -211,7 +215,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 	return &issueDetails, nil
 }
 
-func issueDoesNotExist(response []byte) bool {
+func issueDoesNotExist(response io.Reader) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project struct {
@@ -220,7 +224,9 @@ func issueDoesNotExist(response []byte) bool {
 		} `json:"data"`
 	}{}
 
-	err := json.Unmarshal(response, &emptyResponse)
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&emptyResponse)
 	if err != nil {
 		return false
 	}

@@ -3,7 +3,7 @@
 - [ ] Color config
 - [ ] Loading screens during transition
 - [ ] Repo based query without token
-- [ ] Pagination for all issues/comments of a discussion
+- [x] Pagination for all issues
 - [ ] Issues view all => Fix filtering view
 - [ ] Add GitHub support
 - [ ] Config add/edit show error in TUI, not after

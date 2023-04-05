@@ -16,7 +16,7 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
-func Do(query *GraphqlQuery, config ConfigInterface) ([]byte, error) {
+func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
@@ -59,30 +59,70 @@ func Do(query *GraphqlQuery, config ConfigInterface) ([]byte, error) {
 		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
 	}
 
-	return body, nil
+	return bytes.NewBuffer(body), nil
 }
 
-func Project(query *GraphqlQuery, config ConfigInterface) ([]byte, error) {
+func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
 	body, err := Do(query, config)
 	if err != nil {
 		return nil, err
 	}
 
-	if projectDoesNotExist(body) {
+	err = checkForError(bytes.NewBuffer(body.Bytes()))
+	if err != nil {
+		return nil, err
+	}
+
+	if projectDoesNotExist(bytes.NewBuffer(body.Bytes())) {
 		return nil, ErrProjectDoesNotExist
 	}
 
 	return body, nil
 }
 
-func projectDoesNotExist(response []byte) bool {
+func checkForError(response io.Reader) error {
+	errorResponse := struct {
+		Errors []struct {
+			Message   string `json:"message"`
+			Locations []struct {
+				Line   int `json:"line"`
+				Column int `json:"column"`
+			} `json:"locations"`
+		} `json:"errors"`
+	}{}
+
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&errorResponse)
+	if err != nil {
+		// If unmarshal fails, then the message is not an error, thus we return nil
+		return nil //nolint:nilerr
+	}
+
+	out := ""
+	for i, err := range errorResponse.Errors {
+		out += fmt.Sprintf(
+			"Error %d: %s at line %d, column %d\n",
+			i+1,
+			err.Message,
+			err.Locations[0].Line,
+			err.Locations[0].Column,
+		)
+	}
+
+	return fmt.Errorf(out)
+}
+
+func projectDoesNotExist(response io.Reader) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`
 		} `json:"data"`
 	}{}
 
-	err := json.Unmarshal(response, &emptyResponse)
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&emptyResponse)
 	if err != nil {
 		return false
 	}

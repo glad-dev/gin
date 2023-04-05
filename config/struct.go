@@ -113,7 +113,10 @@ func (l *GitLab) GetUsername() error { // ToDo: Is this a good idea?
 	}
 
 	tmp := returnType{}
-	err = json.Unmarshal(response, &tmp)
+
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err = dec.Decode(&tmp)
 	if err != nil {
 		return fmt.Errorf("unmarshle of username failed: %w", err)
 	}
@@ -153,7 +156,10 @@ func (l *GitLab) CheckTokenValidity() error {
 	}
 
 	scp := scopes{}
-	err = json.Unmarshal(response, &scp)
+
+	dec := json.NewDecoder(response)
+	dec.DisallowUnknownFields()
+	err = dec.Decode(&scp)
 	if err != nil {
 		return fmt.Errorf("unmarshal failed: %w", err)
 	}
