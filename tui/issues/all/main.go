@@ -2,7 +2,6 @@ package all
 
 import (
 	"net/url"
-	"os"
 
 	"gn/issues"
 	"gn/repo"
@@ -54,6 +53,6 @@ func Show(details []repo.Details, u *url.URL) {
 	}
 
 	if m, ok := m.(model); ok && m.failure {
-		os.Exit(1)
+		style.PrintErrAndExit(m.error)
 	}
 }

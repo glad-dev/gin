@@ -32,8 +32,9 @@ type tabs struct {
 }
 
 type updateMsg struct {
-	conf  *config.Wrapper
-	items []itemWrapper
+	conf     *config.Wrapper
+	errorMsg string
+	items    []itemWrapper
 }
 
 func (m model) Init() tea.Cmd {
@@ -67,6 +68,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	case updateMsg:
+		if len(msg.errorMsg) > 0 {
+			m.error = msg.errorMsg
+			m.failure = true
+
+			return m, tea.Quit
+		}
+
 		return updateList(&m, &msg)
 
 	case tea.KeyMsg:
@@ -128,12 +136,20 @@ func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
 		conf, err := config.Load()
 		if err != nil {
-			style.PrintErrAndExit("Failed to load config: " + err.Error())
+			return updateMsg{
+				conf:     nil,
+				items:    nil,
+				errorMsg: "Failed to load config: " + err.Error(),
+			}
 		}
 
 		allIssues, err := issues.QueryAll(conf, m.shared.Details, m.shared.URL)
 		if err != nil {
-			style.PrintErrAndExit("Failed to query issues: " + err.Error())
+			return updateMsg{
+				conf:     nil,
+				items:    nil,
+				errorMsg: "Failed to query issues: " + err.Error(),
+			}
 		}
 
 		issueList := make([]itemWrapper, len(allIssues))
