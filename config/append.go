@@ -2,11 +2,12 @@ package config
 
 import (
 	"errors"
+	"fmt"
 )
 
 func Append(urlStr string, token string) error {
 	// Load current config
-	generalConf, err := Load()
+	wrapper, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
 		// Config exists, but there was some other error
 		return err
@@ -15,6 +16,13 @@ func Append(urlStr string, token string) error {
 	u, err := checkURLStr(urlStr)
 	if err != nil {
 		return err
+	}
+
+	// Check if a configuration with the same username and token already exists
+	for _, config := range wrapper.Configs {
+		if config.URL == *u && config.Token == token {
+			return fmt.Errorf("a configuration with the given URL and token already exists")
+		}
 	}
 
 	lab := GitLab{
@@ -28,8 +36,8 @@ func Append(urlStr string, token string) error {
 	}
 
 	// Add new config
-	generalConf.Configs = append(generalConf.Configs, lab)
+	wrapper.Configs = append(wrapper.Configs, lab)
 
 	// Write back
-	return writeConfig(generalConf)
+	return writeConfig(wrapper)
 }
