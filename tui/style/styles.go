@@ -18,7 +18,7 @@ var (
 	Focused      = lipgloss.NewStyle().Foreground(color.Focused)
 	None         = lipgloss.NewStyle()
 
-	quitText = lipgloss.NewStyle().MarginLeft(4)
+	quitText = lipgloss.NewStyle().Padding(1, 2, 1, 2)
 )
 
 var (
