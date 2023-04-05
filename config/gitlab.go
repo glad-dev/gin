@@ -1,11 +1,14 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"gn/constants"
 	"gn/requests"
@@ -53,15 +56,7 @@ func (l *GitLab) CheckValidity() error {
 	return nil
 }
 
-var debug = true
-
 func (l *GitLab) GetUsername() error {
-	if debug {
-		l.Username = "Fake username"
-
-		return nil
-	}
-
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {
@@ -105,44 +100,55 @@ func (l *GitLab) GetUsername() error {
 }
 
 func (l *GitLab) CheckTokenScope() error {
-	type scopes struct {
-		Data struct {
-			Viewer struct {
-				Scopes []string `json:"scopes"`
-			} `json:"viewer"`
-		} `json:"data"`
-	}
+	response := struct {
+		Id         int         `json:"id"`
+		Name       string      `json:"name"`
+		Revoked    bool        `json:"revoked"`
+		CreatedAt  time.Time   `json:"created_at"`
+		Scopes     []string    `json:"scopes"`
+		UserId     int         `json:"user_id"`
+		LastUsedAt time.Time   `json:"last_used_at"`
+		Active     bool        `json:"active"`
+		ExpiresAt  interface{} `json:"expires_at"`
+	}{}
 
-	query := `
-		query {
-		  viewer {
-			scopes
-		  }
-		}
-	`
-
-	response, err := requests.Do(&requests.GraphqlQuery{
-		Query:     query,
-		Variables: map[string]string{},
-	}, l)
+	req, err := http.NewRequest("GET", "https://gitlab.com/api/v4/personal_access_tokens/self", bytes.NewBufferString(""))
 	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	scp := scopes{}
+	req.Header.Set("PRIVATE-TOKEN", l.Token)
 
-	dec := json.NewDecoder(response)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to make request: %s", err)
+	}
+	defer resp.Body.Close()
+
+	dec := json.NewDecoder(resp.Body)
 	dec.DisallowUnknownFields()
-	err = dec.Decode(&scp)
+	err = dec.Decode(&response)
 	if err != nil {
-		return fmt.Errorf("unmarshal failed: %w", err)
+		return fmt.Errorf("failed to decode response: %s", err)
+	}
+
+	if response.Revoked {
+		return fmt.Errorf("token was revoked")
+	}
+
+	if response.ExpiresAt != nil {
+		date, ok := response.ExpiresAt.(time.Time)
+		if ok && time.Now().After(date) {
+			return fmt.Errorf("token expired: %s", response.ExpiresAt)
+		}
 	}
 
 	// Make a copy of the required scopes slice
 	required := make([]string, len(constants.RequiredScopes))
 	copy(required, constants.RequiredScopes)
 
-	for _, scope := range scp.Data.Viewer.Scopes {
+	for _, scope := range response.Scopes {
 		for i, s := range required {
 			if s == scope {
 				// Remove the matched scope

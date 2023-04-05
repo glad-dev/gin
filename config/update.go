@@ -27,7 +27,7 @@ func Update(wrapper *Wrapper, index int, url string, token string) error {
 		Token: token,
 	}
 
-	err = lab.GetUsername()
+	err = lab.Init()
 	if err != nil {
 		return err
 	}

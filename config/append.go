@@ -17,18 +17,18 @@ func Append(urlStr string, token string) error {
 		return err
 	}
 
-	config := GitLab{
+	lab := GitLab{
 		URL:   *u,
 		Token: token,
 	}
 
-	err = config.GetUsername()
+	err = lab.Init()
 	if err != nil {
 		return err
 	}
 
 	// Add new config
-	generalConf.Configs = append(generalConf.Configs, config)
+	generalConf.Configs = append(generalConf.Configs, lab)
 
 	// Write back
 	return writeConfig(generalConf)

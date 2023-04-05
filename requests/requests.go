@@ -59,16 +59,16 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
 	}
 
+	err = checkForError(bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
 	return bytes.NewBuffer(body), nil
 }
 
 func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
 	body, err := Do(query, config)
-	if err != nil {
-		return nil, err
-	}
-
-	err = checkForError(bytes.NewBuffer(body.Bytes()))
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +88,12 @@ func checkForError(response io.Reader) error {
 				Line   int `json:"line"`
 				Column int `json:"column"`
 			} `json:"locations"`
+			Path       []string `json:"path"`
+			Extensions struct {
+				Code      string `json:"code"`
+				TypeName  string `json:"typeName"`
+				FieldName string `json:"fieldName"`
+			} `json:"extensions"`
 		} `json:"errors"`
 	}{}
 

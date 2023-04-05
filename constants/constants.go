@@ -6,4 +6,4 @@ const (
 	ProgramName   = "gn" // TODO: Remove this once name is set
 )
 
-var RequiredScopes = []string{"read_aip", "read_user", "read_repository"}
+var RequiredScopes = []string{"read_api", "read_user", "read_repository"}
