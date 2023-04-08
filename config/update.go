@@ -6,15 +6,23 @@ import (
 
 var ErrUpdateSameValues = errors.New("called update config with existing values")
 
-func Update(wrapper *Wrapper, index int, url string, token string) error {
-	if index < 0 || index >= len(wrapper.Configs) {
-		return errors.New("update: invalid index")
+func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, token string) error {
+	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Configs) {
+		return errors.New("update: invalid wrapper index")
+	}
+
+	if detailsIndex < 0 || detailsIndex >= len(wrapper.Configs[wrapperIndex].Details) {
+		return errors.New("update: invalid details index")
 	}
 
 	// Check if there are any changes
-	old := wrapper.Configs[index]
-	if old.URL.String() == url && old.Token == token {
-		return ErrUpdateSameValues
+	old := wrapper.Configs[wrapperIndex]
+	if old.URL.String() == url {
+		for _, detail := range old.Details {
+			if detail.Token == token {
+				return ErrUpdateSameValues
+			}
+		}
 	}
 
 	u, err := checkURLStr(url)
@@ -22,17 +30,16 @@ func Update(wrapper *Wrapper, index int, url string, token string) error {
 		return err
 	}
 
-	lab := GitLab{
-		URL:   *u,
+	rd := RepoDetails{
 		Token: token,
 	}
 
-	err = lab.Init()
+	err = rd.Init(u)
 	if err != nil {
 		return err
 	}
 
-	wrapper.Configs[index] = lab
+	wrapper.Configs[wrapperIndex].Details[detailsIndex] = rd
 
 	return writeConfig(wrapper)
 }

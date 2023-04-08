@@ -19,24 +19,39 @@ func Append(urlStr string, token string) error {
 	}
 
 	// Check if a configuration with the same username and token already exists
-	for _, config := range wrapper.Configs {
-		if config.URL == *u && config.Token == token {
-			return fmt.Errorf("a configuration with the given URL and token already exists")
+	configLocation := -1
+	for i, config := range wrapper.Configs {
+		if config.URL == *u {
+			configLocation = i
+
+			for _, detail := range config.Details {
+				if detail.Token == token {
+					return fmt.Errorf("a configuration with the given URL and token already exists")
+				}
+			}
 		}
 	}
 
-	lab := GitLab{
-		URL:   *u,
+	rd := RepoDetails{
 		Token: token,
 	}
 
-	err = lab.Init()
+	err = rd.Init(u)
 	if err != nil {
 		return err
 	}
 
 	// Add new config
-	wrapper.Configs = append(wrapper.Configs, lab)
+	if configLocation == -1 {
+		// Config with given URL does not yet exist
+		wrapper.Configs = append(wrapper.Configs, Repo{
+			URL:     *u,
+			Details: []RepoDetails{rd},
+		})
+	} else {
+		// Config with given URL exists
+		wrapper.Configs[configLocation].Details = append(wrapper.Configs[configLocation].Details, rd)
+	}
 
 	// Write back
 	return writeConfig(wrapper)

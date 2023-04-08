@@ -14,54 +14,70 @@ import (
 	"gn/requests"
 )
 
-type GitLab struct { // TODO: Add support for Github, maybe bool field?
-	URL       url.URL
+type Repo struct {
+	URL     url.URL
+	Details []RepoDetails
+}
+
+type RepoDetails struct {
 	Token     string
-	Username  string
 	TokenName string
+	Username  string
 }
 
-func (l *GitLab) Init() error {
-	err := l.CheckTokenScope()
-	if err != nil {
-		return err
+func (r *Repo) ToMatch() (*Match, error) {
+	if len(r.Details) == 0 {
+		return nil, errors.New("failed to convert Repo to Match since Repo.Details contains no elements")
 	}
 
-	return l.GetUsername()
+	// TODO: Handle multiple details and their selection
+	return &Match{
+		URL:       r.URL,
+		Token:     r.Details[0].Token,
+		Username:  r.Details[0].Username,
+		TokenName: r.Details[0].TokenName,
+	}, nil
 }
 
-func (l *GitLab) GetURL() string {
-	return l.URL.String()
-}
-
-func (l *GitLab) GetToken() string {
-	return l.Token
-}
-
-func (l *GitLab) CheckSemantics() error {
+func (r *Repo) CheckSemantics() error {
 	// Check URL
-	_, err := checkURLStr(l.URL.String())
+	_, err := checkURLStr(r.URL.String())
 	if err != nil {
 		return err
 	}
 
-	// Check if token is semantically correct. The tokens validity is not checked
-	if len(l.Token) < 20 { // TODO: Get actual sizes
-		return fmt.Errorf("config contains token that is too short. Expected: at least 20, got %d", len(l.Token))
+	if len(r.Details) == 0 {
+		return fmt.Errorf("config contains empty no details")
 	}
 
-	if len(l.Username) == 0 {
-		return fmt.Errorf("config contains empty username")
-	}
+	for _, details := range r.Details {
+		if len(details.Username) == 0 {
+			return fmt.Errorf("config contains empty username")
+		}
 
-	if len(l.TokenName) == 0 {
-		return fmt.Errorf("config contains empty token name")
+		// Check if token is semantically correct. The tokens validity is not checked.
+		if len(details.Token) == 0 { // TODO: Get actual sizes
+			return fmt.Errorf("config contains empty token")
+		}
+
+		if len(details.TokenName) == 0 {
+			return fmt.Errorf("config contains empty token name")
+		}
 	}
 
 	return nil
 }
 
-func (l *GitLab) GetUsername() error {
+func (rd *RepoDetails) Init(u *url.URL) error {
+	err := rd.CheckTokenScope(u)
+	if err != nil {
+		return err
+	}
+
+	return rd.GetUsername(u)
+}
+
+func (rd *RepoDetails) GetUsername(u *url.URL) error {
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {
@@ -81,7 +97,10 @@ func (l *GitLab) GetUsername() error {
 	response, err := requests.Do(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: nil,
-	}, l)
+	}, &Match{
+		URL:   *u,
+		Token: rd.Token,
+	})
 	if err != nil {
 		return err
 	}
@@ -99,12 +118,12 @@ func (l *GitLab) GetUsername() error {
 		return errors.New("empty username: Check API key")
 	}
 
-	l.Username = tmp.Data.CurrentUser.Username
+	rd.Username = tmp.Data.CurrentUser.Username
 
 	return nil
 }
 
-func (l *GitLab) CheckTokenScope() error {
+func (rd *RepoDetails) CheckTokenScope(u *url.URL) error {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`
 		LastUsedAt time.Time   `json:"last_used_at"`
@@ -117,12 +136,12 @@ func (l *GitLab) CheckTokenScope() error {
 		Active     bool        `json:"active"`
 	}{}
 
-	req, err := http.NewRequest("GET", "https://gitlab.com/api/v4/personal_access_tokens/self", bytes.NewBufferString(""))
+	req, err := http.NewRequest("GET", u.JoinPath("/api/v4/personal_access_tokens/self").String(), bytes.NewBufferString(""))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	req.Header.Set("PRIVATE-TOKEN", l.Token)
+	req.Header.Set("PRIVATE-TOKEN", rd.Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -168,7 +187,7 @@ func (l *GitLab) CheckTokenScope() error {
 		return fmt.Errorf("some scopes are missing: %s", strings.Join(required, ", "))
 	}
 
-	l.TokenName = response.Name
+	rd.TokenName = response.Name
 
 	return nil
 }

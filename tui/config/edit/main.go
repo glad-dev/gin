@@ -25,8 +25,13 @@ func Config() {
 
 	items := make([]list.Item, len(wrapper.Configs))
 	for i, conf := range wrapper.Configs {
+		match, err := conf.ToMatch()
+		if err != nil {
+			style.PrintErrAndExit("Failed to parse config: " + err.Error())
+		}
+
 		items[i] = shared.ListItem{
-			Lab: conf,
+			Match: *match,
 		}
 	}
 

@@ -75,7 +75,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				m.currentlyDisplaying = displayingEdit
-				m.edit.Set(&selected.Lab, m.list.Index())
+				m.edit.Set(&selected.Match, m.list.Index())
 
 				return m, nil
 			}

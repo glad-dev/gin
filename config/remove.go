@@ -14,7 +14,7 @@ func Remove(wrapper *Wrapper, index int) error {
 	// Remove the selected config
 	wrapper.Configs = append(wrapper.Configs[:index], wrapper.Configs[index+1:]...)
 
-	// If there are no GitLab configs, delete the config file
+	// If there are no configs, delete the config file
 	if len(wrapper.Configs) == 0 {
 		location, err := getConfigLocation()
 		if err != nil {

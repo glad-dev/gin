@@ -81,7 +81,7 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 	}
 }
 
-func (m *editModel) Set(lab *config.GitLab, listIndex int) {
+func (m *editModel) Set(lab *config.Match, listIndex int) {
 	// Set the new values
 	m.inputs[0].SetValue(lab.URL.String())
 	m.inputs[1].SetValue(lab.Token)
@@ -123,7 +123,7 @@ func (m *editModel) updateFocus() tea.Cmd {
 
 func (m *editModel) submit() (string, bool) {
 	oldURL := m.oldConfig.Configs[m.listIndex].URL.String()
-	err := config.Update(m.oldConfig, m.listIndex, m.inputs[0].Value(), m.inputs[1].Value())
+	err := config.Update(m.oldConfig, m.listIndex, 0, m.inputs[0].Value(), m.inputs[1].Value()) // TODO: Get correct details index
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
 			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg), true

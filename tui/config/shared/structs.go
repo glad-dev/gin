@@ -13,12 +13,12 @@ import (
 )
 
 type ListItem struct {
-	Lab config.GitLab
+	Match config.Match
 }
 
 func (i ListItem) FilterValue() string { return "" }
 func (i ListItem) Title() string {
-	return i.Lab.URL.String()
+	return i.Match.URL.String()
 }
 
 type ItemDelegate struct{}
@@ -32,7 +32,7 @@ func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, i.Lab.URL.String())
+	str := fmt.Sprintf("%d. %s", index+1, i.Match.URL.String())
 
 	fn := style.Item.Render
 	if index == m.Index() {
