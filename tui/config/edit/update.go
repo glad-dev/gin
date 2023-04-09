@@ -34,9 +34,9 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 
 				items := make([]list.Item, len(selected.Remote.Details))
 				for i, details := range selected.Remote.Details {
-					items[i] = detailItem{
-						username:  details.Username,
-						tokenName: details.TokenName,
+					items[i] = shared.DetailItem{
+						Username:  details.Username,
+						TokenName: details.TokenName,
 					}
 				}
 

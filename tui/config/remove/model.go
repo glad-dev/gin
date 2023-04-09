@@ -11,13 +11,23 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type displaying int
+
+const (
+	displayingList displaying = iota
+	displayingDetails
+	displayingEdit
+	displayingError
+)
+
 type model struct {
-	exitText  string
-	list      list.Model
-	oldConfig config.Wrapper
-	quitting  bool
-	finished  bool
-	failure   bool
+	remotes             list.Model
+	exitText            string
+	oldConfig           config.Wrapper
+	currentlyDisplaying displaying
+	quitting            bool
+	finished            bool
+	failure             bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -28,7 +38,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := style.InputField.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+		m.remotes.SetSize(msg.Width-h, msg.Height-v)
 
 		return m, nil
 	case tea.KeyMsg:
@@ -47,7 +57,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
+	m.remotes, cmd = m.remotes.Update(msg)
 
 	return m, cmd
 }
@@ -61,13 +71,13 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	return shared.RenderList(m.list)
+	return shared.RenderList(m.remotes)
 }
 
 func onSubmit(m *model) (string, bool) {
-	index := m.list.Index()
+	index := m.remotes.Index()
 
-	selected, ok := m.list.Items()[index].(shared.ListItem)
+	selected, ok := m.remotes.Items()[index].(shared.ListItem)
 	if !ok {
 		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}

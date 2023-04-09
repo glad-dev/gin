@@ -32,7 +32,7 @@ func Config() {
 
 	p := tea.NewProgram(model{
 		remotes: shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to edit?"),
-		details: shared.NewList([]list.Item{}, detailsItemDelegate{}, "Which token do you want to edit?"),
+		details: shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to edit?"),
 		failure: false,
 		edit: editModel{
 			inputs:    shared.GetTextInputs(),
