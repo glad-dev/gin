@@ -15,19 +15,19 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 		return errors.New("update: invalid details index")
 	}
 
+	u, err := checkURLStr(url)
+	if err != nil {
+		return err
+	}
+
 	// Check if there are any changes
 	old := wrapper.Configs[wrapperIndex]
-	if old.URL.String() == url {
+	if old.URL == *u {
 		for _, detail := range old.Details {
 			if detail.Token == token {
 				return ErrUpdateSameValues
 			}
 		}
-	}
-
-	u, err := checkURLStr(url)
-	if err != nil {
-		return err
 	}
 
 	rd := RemoteDetails{
