@@ -1,11 +1,14 @@
 package edit
 
 import (
+	"fmt"
+
 	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type displaying int
@@ -16,6 +19,8 @@ const (
 	displayingEdit
 	displayingError
 )
+
+var errorStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF0000"))
 
 type model struct {
 	remotes             list.Model
@@ -39,8 +44,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.remotes.SetSize(msg.Width-h, msg.Height-v)
 		m.details.SetSize(msg.Width-h, msg.Height-v)
 
-		m.edit.width = msg.Width - h
-		m.edit.height = msg.Height - v
+		m.edit.width = msg.Width
+		m.edit.height = msg.Height
 
 		return m, nil
 	case tea.KeyMsg:
@@ -98,10 +103,21 @@ func (m model) View() string {
 		return shared.RenderList(m.details)
 
 	case displayingEdit:
-		return m.edit.View()
+		return m.edit.view()
 
 	case displayingError:
-		return m.error
+		return lipgloss.Place(
+			m.edit.width,
+			m.edit.height,
+			lipgloss.Center,
+			0.75,
+
+			fmt.Sprintf(
+				"%s\n%s\n\nPress the 'q', 'esc' or 'enter' key to go back.",
+				errorStyle.Render("An error occurred:"),
+				m.error,
+			),
+		)
 
 	default:
 		return "Unkown view"

@@ -5,7 +5,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func (m *model) updateList(msg tea.Msg) tea.Cmd {
@@ -55,7 +54,7 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 			}
 
 			m.currentlyDisplaying = displayingEdit
-			m.edit.Set(match, m.remotes.Index(), 0)
+			m.edit.set(match, m.remotes.Index(), 0)
 
 			return nil
 		}
@@ -96,7 +95,7 @@ func (m *model) updateDetails(msg tea.Msg) tea.Cmd {
 			}
 
 			m.currentlyDisplaying = displayingEdit
-			m.edit.Set(match, m.remotes.Index(), m.details.Index())
+			m.edit.set(match, m.remotes.Index(), m.details.Index())
 
 			return nil
 		}
@@ -108,48 +107,63 @@ func (m *model) updateDetails(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) updateEdit(msg tea.Msg) tea.Cmd {
-	var cmd tea.Cmd
-
-	switch msg := msg.(type) { //nolint:gocritic
+	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
-		switch msg.String() {
+		switch s := msg.String(); s {
 		case "esc":
-			if len(m.details.Items()) > 0 {
-				m.currentlyDisplaying = displayingDetails
+			if len(m.details.Items()) == 0 {
+				m.currentlyDisplaying = displayingList
 
 				return nil
 			}
 
-			m.currentlyDisplaying = displayingList
+			m.currentlyDisplaying = displayingDetails
 
 			return nil
 
-		case "enter":
-			var errorStr string
-			var failure bool
+		case "tab", "shift+tab", "enter", "up", "down": //nolint: goconst
+			// Did the user press enter while the submit button was focused?
+			// If so, exit.
+			if s == "enter" && m.edit.focusIndex == len(m.edit.inputs) {
+				str, failure := m.edit.submit()
+				if !failure {
+					m.exitText = style.FormatQuitText(str)
 
-			errorStr, failure, cmd = m.edit.Update(msg)
-			if !failure {
-				return tea.Quit
+					return tea.Quit
+				}
+
+				m.error = str
+				m.currentlyDisplaying = displayingError
+
+				return nil
 			}
 
-			m.currentlyDisplaying = displayingError
-			m.error = lipgloss.Place(
-				m.remotes.Width(),
-				m.remotes.Height(),
-				lipgloss.Center,
-				lipgloss.Center,
+			// Cycle indexes
+			if s == "up" || s == "shift+tab" {
+				m.edit.focusIndex--
+			} else {
+				m.edit.focusIndex++
+			}
 
-				errorStr,
-			)
+			if m.edit.focusIndex > len(m.edit.inputs) {
+				m.edit.focusIndex = 0
+			} else if m.edit.focusIndex < 0 {
+				m.edit.focusIndex = len(m.edit.inputs)
+			}
 
-			return cmd
+			return m.edit.updateFocus()
 		}
 	}
 
-	m.exitText, m.failure, cmd = m.edit.Update(msg)
+	cmds := make([]tea.Cmd, len(m.edit.inputs))
+	// Handle character input and blinking
+	// Only text inputs with Focus() set will respond, so it's safe to simply
+	// update all of them here without any further logic.
+	for i := range m.edit.inputs {
+		m.edit.inputs[i], cmds[i] = m.edit.inputs[i].Update(msg)
+	}
 
-	return cmd
+	return tea.Batch(cmds...)
 }
 
 func (m *model) updateError(msg tea.Msg) {
