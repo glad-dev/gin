@@ -32,6 +32,7 @@ func Config() {
 
 	p := tea.NewProgram(model{
 		remotes:   shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to delete?"),
+		details:   shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to delete?"),
 		oldConfig: *wrapper,
 	})
 
