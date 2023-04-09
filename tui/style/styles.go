@@ -14,6 +14,7 @@ var (
 	Pagination   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
 	Help         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
 	List         = list.DefaultStyles().HelpStyle.PaddingLeft(4)
+	ListDetails  = list.DefaultStyles().HelpStyle.PaddingLeft(6)
 	InputField   = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80)
 	Focused      = lipgloss.NewStyle().Foreground(color.Focused)
 	None         = lipgloss.NewStyle()
