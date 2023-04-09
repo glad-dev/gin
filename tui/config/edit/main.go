@@ -24,22 +24,15 @@ func Config() {
 	}
 
 	items := make([]list.Item, len(wrapper.Configs))
-	for i, conf := range wrapper.Configs {
+	for i := range wrapper.Configs {
 		items[i] = shared.ListItem{
-			Lab: conf,
+			Remote: &wrapper.Configs[i],
 		}
 	}
 
-	lst := list.New(items, shared.ItemDelegate{}, 0, 0)
-	lst.Title = "Which remote do you want to edit?"
-	lst.SetShowStatusBar(false)
-	lst.SetFilteringEnabled(false)
-	lst.Styles.Title = style.Title
-	lst.Styles.PaginationStyle = style.Pagination
-	lst.Styles.HelpStyle = style.Help
-
 	p := tea.NewProgram(model{
-		list:    lst,
+		remotes: shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to edit?"),
+		details: shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to edit?"),
 		failure: false,
 		edit: editModel{
 			inputs:    shared.GetTextInputs(),

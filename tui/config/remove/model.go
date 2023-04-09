@@ -11,13 +11,24 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type displaying int
+
+const (
+	displayingList displaying = iota
+	displayingDetails
+	displayingConfirmation
+)
+
 type model struct {
-	exitText  string
-	list      list.Model
-	oldConfig config.Wrapper
-	quitting  bool
-	finished  bool
-	failure   bool
+	remotes             list.Model
+	details             list.Model
+	exitText            string
+	oldConfig           config.Wrapper
+	currentlyDisplaying displaying
+	confirmPosition     int
+	quit                bool
+	finished            bool
+	failure             bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -28,54 +39,80 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := style.InputField.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+		m.remotes.SetSize(msg.Width-h, msg.Height-v)
+		m.details.SetSize(msg.Width-h, msg.Height-v)
 
 		return m, nil
+
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c", "esc":
-			m.quitting = true
-
-			return m, tea.Quit
-
-		case "enter":
-			m.exitText, m.failure = onSubmit(&m)
-			m.finished = true
+		if msg.String() == "ctrl+c" {
+			m.quit = true
 
 			return m, tea.Quit
 		}
 	}
 
 	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
+	switch m.currentlyDisplaying {
+	case displayingList:
+		cmd = m.updateRemoteList(msg)
 
-	return m, cmd
+		return m, cmd
+
+	case displayingDetails:
+		cmd = m.updateDetailsList(msg)
+
+		return m, cmd
+
+	case displayingConfirmation:
+		cmd = m.updateConfirmation(msg)
+
+		return m, cmd
+
+	default:
+		m.failure = true
+		m.exitText = "Invalid display state"
+
+		return m, tea.Quit
+	}
 }
 
 func (m model) View() string {
-	if m.quitting {
+	if m.quit {
 		return style.FormatQuitText("No changes were made.")
 	}
 
-	if m.finished {
+	if m.finished || m.failure {
 		return m.exitText
 	}
 
-	return shared.RenderList(m.list)
+	switch m.currentlyDisplaying {
+	case displayingList:
+		return shared.RenderList(m.remotes)
+
+	case displayingDetails:
+		return shared.RenderList(m.details)
+
+	case displayingConfirmation:
+		return m.viewConfirmation()
+
+	default:
+		return "Invalid state!"
+	}
 }
 
-func onSubmit(m *model) (string, bool) {
-	index := m.list.Index()
-
-	selected, ok := m.list.Items()[index].(shared.ListItem)
+func submit(m *model) (string, bool) {
+	selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
 	if !ok {
 		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}
 
-	err := config.Remove(&m.oldConfig, index)
+	tokenName := selected.Remote.Details[m.details.Index()].TokenName
+
+	err := config.Remove(&m.oldConfig, m.remotes.Index(), m.details.Index())
 	if err != nil {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Lab.URL.String())), false
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the token '%s'\nRemember to delete the API key on Gitlab", tokenName)), false
 }

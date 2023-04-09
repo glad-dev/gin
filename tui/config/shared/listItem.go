@@ -13,26 +13,23 @@ import (
 )
 
 type ListItem struct {
-	Lab config.GitLab
+	Remote *config.Remote
 }
 
 func (i ListItem) FilterValue() string { return "" }
-func (i ListItem) Title() string {
-	return i.Lab.URL.String()
-}
 
 type ItemDelegate struct{}
 
 func (d ItemDelegate) Height() int                             { return 1 }
 func (d ItemDelegate) Spacing() int                            { return 0 }
 func (d ItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(ListItem)
+func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
+	i, ok := item.(ListItem)
 	if !ok {
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, i.Lab.URL.String())
+	str := fmt.Sprintf("%d. %s", index+1, i.Remote.URL.String())
 
 	fn := style.Item.Render
 	if index == m.Index() {
