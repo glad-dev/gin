@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -91,10 +92,15 @@ func (r *Remote) CheckSemantics() error {
 func (rd *RemoteDetails) Init(u *url.URL) error {
 	err := rd.CheckTokenScope(u)
 	if err != nil {
-		return err
+		return fmt.Errorf("RemoteDetails.Init: Failed to check scope: %w", err)
 	}
 
-	return rd.GetUsername(u)
+	err = rd.GetUsername(u)
+	if err != nil {
+		return fmt.Errorf("RemoteDetails.Init: Failed to get username: %w", err)
+	}
+
+	return nil
 }
 
 func (rd *RemoteDetails) GetUsername(u *url.URL) error {
@@ -170,11 +176,24 @@ func (rd *RemoteDetails) CheckTokenScope(u *url.URL) error {
 	}
 	defer resp.Body.Close()
 
-	dec := json.NewDecoder(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read body: %w", err)
+	}
+
+	if resp.StatusCode == 401 {
+		return errors.New("the provided URL or token are invalid")
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 399 {
+		return fmt.Errorf("the status code of %d indicates failure: %s", resp.StatusCode, body)
+	}
+
+	dec := json.NewDecoder(bytes.NewBuffer(body))
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&response)
 	if err != nil {
-		return fmt.Errorf("failed to decode response: %w", err)
+		return fmt.Errorf("failed to decode response: %w - %s", err, body)
 	}
 
 	if response.Revoked {
