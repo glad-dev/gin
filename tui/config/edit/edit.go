@@ -22,13 +22,7 @@ type editModel struct {
 	height       int
 }
 
-type ret struct {
-	cmd     tea.Cmd
-	str     string
-	failure bool
-}
-
-func (m *editModel) Update(msg tea.Msg) *ret {
+func (m *editModel) Update(msg tea.Msg) (string, bool, tea.Cmd) {
 	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
 		s := msg.String()
@@ -39,11 +33,7 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 			if s == "enter" && m.focusIndex == len(m.inputs) {
 				str, failure := m.submit()
 
-				return &ret{
-					str:     str,
-					cmd:     tea.Quit,
-					failure: failure,
-				}
+				return str, failure, nil
 			}
 
 			// Cycle indexes
@@ -59,11 +49,7 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 				m.focusIndex = len(m.inputs)
 			}
 
-			return &ret{
-				str:     "",
-				cmd:     m.updateFocus(),
-				failure: false,
-			}
+			return "", false, m.updateFocus()
 		}
 	}
 
@@ -75,11 +61,7 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
 	}
 
-	return &ret{
-		str:     "",
-		cmd:     tea.Batch(cmds...),
-		failure: false,
-	}
+	return "", false, tea.Batch(cmds...)
 }
 
 func (m *editModel) Set(match *config.Match, listIndex int, detailsIndex int) {
@@ -99,7 +81,7 @@ func (m *editModel) View() string {
 		m.inputs,
 		m.focusIndex,
 		m.width,
-		m.height-2*style.InputField.GetVerticalPadding(),
+		m.height-2*style.InputField.GetVerticalFrameSize(),
 	)
 }
 
@@ -114,6 +96,7 @@ func (m *editModel) updateFocus() tea.Cmd {
 
 			continue
 		}
+
 		// Remove focused state
 		m.inputs[i].Blur()
 		m.inputs[i].PromptStyle = style.None

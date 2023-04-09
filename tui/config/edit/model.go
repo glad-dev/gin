@@ -14,12 +14,14 @@ const (
 	displayingList displaying = iota
 	displayingDetails
 	displayingEdit
+	displayingError
 )
 
 type model struct {
 	remotes             list.Model
 	details             list.Model
 	exitText            string
+	error               string
 	edit                editModel
 	currentlyDisplaying displaying
 	quit                bool
@@ -31,8 +33,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var tmp *ret
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := style.InputField.GetFrameSize()
@@ -44,139 +44,38 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m, nil
 	case tea.KeyMsg:
-		// q should only quit the program if we're in list view. Otherwise, the user would be unable to enter a URL
-		// or token that contains the letter q
-		if m.currentlyDisplaying == displayingList && msg.String() == "q" {
+		if msg.String() == "ctrl+c" {
 			m.quit = true
 
 			return m, tea.Quit
-		}
-
-		switch msg.String() {
-		case "ctrl+c":
-			m.quit = true
-
-			return m, tea.Quit
-
-		case "q":
-			if m.currentlyDisplaying == displayingDetails {
-				m.currentlyDisplaying = displayingList
-
-				return m, nil
-			}
-
-		case "esc":
-			if m.currentlyDisplaying == displayingList {
-				m.quit = true
-
-				return m, tea.Quit
-			}
-
-			m.currentlyDisplaying--
-
-			return m, nil
-		case "enter":
-			switch m.currentlyDisplaying {
-			case displayingList:
-				// User selected a config
-				selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
-				if !ok {
-					m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
-					m.failure = true
-
-					return m, tea.Quit
-				}
-
-				if len(selected.remote.Details) > 1 {
-					m.currentlyDisplaying = displayingDetails
-
-					items := make([]list.Item, len(selected.remote.Details))
-					for i, details := range selected.remote.Details {
-						items[i] = detail{
-							username:  details.Username,
-							tokenName: details.TokenName,
-						}
-					}
-
-					m.details.SetItems(items)
-					m.details.ResetSelected()
-
-					return m, nil
-				}
-
-				match, err := selected.remote.ToMatch()
-				if err != nil {
-					m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
-					m.failure = true
-
-					return m, tea.Quit
-				}
-
-				m.currentlyDisplaying = displayingEdit
-				m.edit.Set(match, m.remotes.Index(), 0)
-
-				return m, nil
-
-			case displayingDetails:
-				selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
-				if !ok {
-					m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
-					m.failure = true
-
-					return m, tea.Quit
-				}
-
-				match, err := selected.remote.ToMatchAtIndex(m.details.Index())
-				if err != nil {
-					m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
-					m.failure = true
-
-					return m, tea.Quit
-				}
-
-				m.currentlyDisplaying = displayingEdit
-				m.edit.Set(match, m.remotes.Index(), m.details.Index())
-
-				return m, nil
-
-			case displayingEdit:
-				tmp = m.edit.Update(msg)
-				m.exitText = tmp.str
-				m.failure = tmp.failure
-
-				return m, tmp.cmd
-
-			default:
-				m.failure = true
-				m.exitText = style.FormatQuitText("Invalid displaying item.")
-
-				return m, tea.Quit
-			}
 		}
 	}
 
 	var cmd tea.Cmd
 	switch m.currentlyDisplaying {
 	case displayingList:
-		m.remotes, cmd = m.remotes.Update(msg)
+		cmd = m.updateList(msg)
 
 		return m, cmd
 
 	case displayingDetails:
-		m.details, cmd = m.details.Update(msg)
+		cmd = m.updateDetails(msg)
 
 		return m, cmd
 
 	case displayingEdit:
-		tmp = m.edit.Update(msg)
-		m.exitText = tmp.str
-		m.failure = tmp.failure
+		cmd = m.updateEdit(msg)
 
-		return m, tmp.cmd
+		return m, cmd
+
+	case displayingError:
+		m.updateError(msg)
+
+		return m, nil
 
 	default:
 		m.failure = true
-		m.exitText = style.FormatQuitText("Invalid dispaly type")
+		m.exitText = style.FormatQuitText("Invalid display type")
 
 		return m, tea.Quit
 	}
@@ -200,6 +99,9 @@ func (m model) View() string {
 
 	case displayingEdit:
 		return m.edit.View()
+
+	case displayingError:
+		return m.error
 
 	default:
 		return "Unkown view"
