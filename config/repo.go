@@ -41,8 +41,22 @@ func (r *Remote) ToMatch() (*Match, error) {
 		}, nil
 	}
 
-	// TODO: Handle multiple details and their selection
-	return nil, ErrMultipleRepoDetails
+	return &Match{
+		URL: r.URL,
+	}, ErrMultipleRepoDetails
+}
+
+func (r *Remote) ToMatchAtIndex(index int) (*Match, error) {
+	if index < 0 || index >= len(r.Details) {
+		return nil, errors.New("ToMatchAtIndex: invalid index")
+	}
+
+	return &Match{
+		URL:       r.URL,
+		Token:     r.Details[index].Token,
+		Username:  r.Details[index].Username,
+		TokenName: r.Details[index].TokenName,
+	}, nil
 }
 
 func (r *Remote) CheckSemantics() error {
