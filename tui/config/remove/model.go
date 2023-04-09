@@ -77,5 +77,5 @@ func onSubmit(m *model) (string, bool) {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Match.URL.String())), false
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the remote %s\nRemember to delete the API key on Gitlab", selected.Remote.URL.String())), false
 }

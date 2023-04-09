@@ -11,12 +11,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type detail struct {
+type detailItem struct {
 	username  string
 	tokenName string
 }
 
-func (d detail) FilterValue() string {
+func (d detailItem) FilterValue() string {
 	return ""
 }
 
@@ -26,7 +26,7 @@ func (d detailsItemDelegate) Height() int                             { return 1
 func (d detailsItemDelegate) Spacing() int                            { return 0 }
 func (d detailsItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d detailsItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
-	i, ok := item.(detail)
+	i, ok := item.(detailItem)
 	if !ok {
 		return
 	}

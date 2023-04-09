@@ -1,6 +1,7 @@
 package edit
 
 import (
+	"gn/tui/config/shared"
 	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -20,7 +21,7 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 
 		case "enter":
 			// User selected a config
-			selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
+			selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
 			if !ok {
 				m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
 				m.failure = true
@@ -28,12 +29,12 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 				return tea.Quit
 			}
 
-			if len(selected.remote.Details) > 1 {
+			if len(selected.Remote.Details) > 1 {
 				m.currentlyDisplaying = displayingDetails
 
-				items := make([]list.Item, len(selected.remote.Details))
-				for i, details := range selected.remote.Details {
-					items[i] = detail{
+				items := make([]list.Item, len(selected.Remote.Details))
+				for i, details := range selected.Remote.Details {
+					items[i] = detailItem{
 						username:  details.Username,
 						tokenName: details.TokenName,
 					}
@@ -45,7 +46,7 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 				return nil
 			}
 
-			match, err := selected.remote.ToMatch()
+			match, err := selected.Remote.ToMatch()
 			if err != nil {
 				m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
 				m.failure = true
@@ -78,7 +79,7 @@ func (m *model) updateDetails(msg tea.Msg) tea.Cmd {
 			return nil
 
 		case "enter":
-			selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
+			selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
 			if !ok {
 				m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
 				m.failure = true
@@ -86,7 +87,7 @@ func (m *model) updateDetails(msg tea.Msg) tea.Cmd {
 				return tea.Quit
 			}
 
-			match, err := selected.remote.ToMatchAtIndex(m.details.Index())
+			match, err := selected.Remote.ToMatchAtIndex(m.details.Index())
 			if err != nil {
 				m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
 				m.failure = true

@@ -25,12 +25,12 @@ func Config() {
 
 	items := make([]list.Item, len(wrapper.Configs))
 	for i := range wrapper.Configs {
-		items[i] = editListItem{
-			remote: &wrapper.Configs[i],
+		items[i] = shared.ListItem{
+			Remote: &wrapper.Configs[i],
 		}
 	}
 
-	lst := list.New(items, editItemDelegate{}, 0, 0)
+	lst := list.New(items, shared.ItemDelegate{}, 0, 0)
 	lst.Title = "Which remote do you want to edit?"
 	lst.SetFilteringEnabled(false)
 	lst.SetShowStatusBar(false)

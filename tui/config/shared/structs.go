@@ -13,7 +13,7 @@ import (
 )
 
 type ListItem struct {
-	Match config.Match
+	Remote *config.Remote
 }
 
 func (i ListItem) FilterValue() string { return "" }
@@ -29,7 +29,7 @@ func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Ite
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, i.Match.URL.String())
+	str := fmt.Sprintf("%d. %s", index+1, i.Remote.URL.String())
 
 	fn := style.Item.Render
 	if index == m.Index() {
