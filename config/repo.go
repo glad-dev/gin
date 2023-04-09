@@ -68,7 +68,7 @@ func (r *Remote) CheckSemantics() error {
 	}
 
 	if len(r.Details) == 0 {
-		return fmt.Errorf("config contains empty no details")
+		return fmt.Errorf("config contains no details")
 	}
 
 	for _, details := range r.Details {
