@@ -1,9 +1,13 @@
 #!/bin/bash
+failure=0
+
 # Check if the code builds
 go build -o gn
 if [ $? -ne 0 ]; then
 	echo "Failed to build!"
-	exit 1
+	echo
+	
+	failure=1
 fi
 rm gn
 
@@ -12,7 +16,9 @@ out=$(gofumpt -w .)
 if [ $? -ne 0 ]; then
 	echo "Formater failed!"
 	echo "$out"
-	exit 1
+	echo
+
+	failure=1
 fi
 
 # Sort imports
@@ -20,7 +26,9 @@ out=$(goimports -w *.go)
 if [ $? -ne 0 ]; then
 	echo "Sorting imports failed!"
 	echo "$out"
-	exit 1
+	echo
+
+	failure=1
 fi
 
 # Check struct alignment
@@ -28,7 +36,9 @@ out=$(betteralign ./...)
 if [ $? -ne 0 ]; then
 	echo "There are misaligned structs!"
 	echo "$out"
-	exit 1
+	echo
+
+	failure=1
 fi
 
 # Run golangcli-lint
@@ -36,7 +46,9 @@ golangci-lint run
 if [ $? -ne 0 ]; then
 	echo
 	echo "golangcli has found some issues"
-	exit 1
+	echo
+
+	failure=1
 fi
 
-exit 0
+exit $failure

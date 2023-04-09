@@ -40,7 +40,6 @@ linters:
         - exhaustive
         - exportloopref
         - gochecknoinits
-        - goconst
         - gocritic
         - godot
         - gofmt
