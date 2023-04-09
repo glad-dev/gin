@@ -11,9 +11,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var ErrUserQuit = errors.New("user quit selection program")
+var (
+	ErrUserQuit     = errors.New("user quit selection program")
+	ErrUserWentBack = errors.New("user wants to go back")
+)
 
-func Select(selectedRemote config.Remote, title string) (int, error) {
+func Select(selectedRemote *config.Remote, title string) (int, error) {
 	items := make([]list.Item, len(selectedRemote.Details))
 	for i, conf := range selectedRemote.Details {
 		items[i] = selectListItem{
@@ -49,8 +52,12 @@ func Select(selectedRemote config.Remote, title string) (int, error) {
 		return -1, fmt.Errorf("failed to convert m to model")
 	}
 
-	if mod.quitting {
+	if mod.quit {
 		return -1, ErrUserQuit
+	}
+
+	if mod.back {
+		return -1, ErrUserWentBack
 	}
 
 	return mod.list.Index(), nil

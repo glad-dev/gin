@@ -9,9 +9,10 @@ import (
 )
 
 type model struct {
-	list     list.Model
-	done     bool
-	quitting bool
+	list list.Model
+	done bool
+	quit bool
+	back bool
 }
 
 func (m model) Init() tea.Cmd {
@@ -26,9 +27,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m, nil
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c", "esc":
-			m.quitting = true
+		switch msg.String() {
+		case "ctrl+c":
+			m.quit = true
+
+			return m, tea.Quit
+
+		case "q", "esc":
+			m.back = true
 
 			return m, tea.Quit
 
@@ -46,7 +52,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if m.quitting || m.done {
+	if m.quit || m.back || m.done {
 		return ""
 	}
 
