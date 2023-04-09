@@ -30,25 +30,9 @@ func Config() {
 		}
 	}
 
-	lst := list.New(items, shared.ItemDelegate{}, 0, 0)
-	lst.Title = "Which remote do you want to edit?"
-	lst.SetFilteringEnabled(false)
-	lst.SetShowStatusBar(false)
-	lst.Styles.Title = style.Title
-	lst.Styles.PaginationStyle = style.Pagination
-	lst.Styles.HelpStyle = style.Help
-
-	detailsLst := list.New([]list.Item{}, detailsItemDelegate{}, 0, 0)
-	detailsLst.Title = "Which token do you want to edit?"
-	detailsLst.SetFilteringEnabled(false)
-	detailsLst.SetShowStatusBar(false)
-	detailsLst.Styles.Title = style.Title
-	detailsLst.Styles.PaginationStyle = style.Pagination
-	detailsLst.Styles.HelpStyle = style.Help
-
 	p := tea.NewProgram(model{
-		remotes: lst,
-		details: detailsLst,
+		remotes: shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to edit?"),
+		details: shared.NewList([]list.Item{}, detailsItemDelegate{}, "Which token do you want to edit?"),
 		failure: false,
 		edit: editModel{
 			inputs:    shared.GetTextInputs(),

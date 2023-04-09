@@ -24,28 +24,14 @@ func Config() {
 	}
 
 	items := make([]list.Item, len(wrapper.Configs))
-	// var match *config.Match
-	for i, conf := range wrapper.Configs {
-		_, err = conf.ToMatch()
-		if err != nil {
-			style.PrintErrAndExit("Failed to parse config: " + err.Error())
-		}
-
+	for i := range wrapper.Configs {
 		items[i] = shared.ListItem{
-			// Match: *match,
+			Remote: &wrapper.Configs[i],
 		}
 	}
 
-	lst := list.New(items, shared.ItemDelegate{}, 0, 0)
-	lst.Title = "Which remote do you want to delete?"
-	lst.SetShowStatusBar(false)
-	lst.SetFilteringEnabled(false)
-	lst.Styles.Title = style.Title
-	lst.Styles.PaginationStyle = style.Pagination
-	lst.Styles.HelpStyle = style.Help
-
 	p := tea.NewProgram(model{
-		list:      lst,
+		list:      shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to delete?"),
 		oldConfig: *wrapper,
 	})
 
