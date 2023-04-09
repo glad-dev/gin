@@ -32,7 +32,7 @@ func Append(urlStr string, token string) error {
 		}
 	}
 
-	rd := RepoDetails{
+	rd := RemoteDetails{
 		Token: token,
 	}
 
@@ -44,9 +44,9 @@ func Append(urlStr string, token string) error {
 	// Add new config
 	if configLocation == -1 {
 		// Config with given URL does not yet exist
-		wrapper.Configs = append(wrapper.Configs, Repo{
+		wrapper.Configs = append(wrapper.Configs, Remote{
 			URL:     *u,
-			Details: []RepoDetails{rd},
+			Details: []RemoteDetails{rd},
 		})
 	} else {
 		// Config with given URL exists

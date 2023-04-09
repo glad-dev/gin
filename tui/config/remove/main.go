@@ -24,8 +24,9 @@ func Config() {
 	}
 
 	items := make([]list.Item, len(wrapper.Configs))
+	var match *config.Match
 	for i, conf := range wrapper.Configs {
-		match, err := conf.ToMatch()
+		match, err = conf.ToMatch()
 		if err != nil {
 			style.PrintErrAndExit("Failed to parse config: " + err.Error())
 		}

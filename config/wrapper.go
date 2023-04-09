@@ -9,7 +9,7 @@ import (
 )
 
 type Wrapper struct {
-	Configs       []Repo
+	Configs       []Remote
 	ConfigVersion int
 }
 

@@ -30,7 +30,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 		return err
 	}
 
-	rd := RepoDetails{
+	rd := RemoteDetails{
 		Token: token,
 	}
 

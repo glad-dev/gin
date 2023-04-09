@@ -14,32 +14,38 @@ import (
 	"gn/requests"
 )
 
-type Repo struct {
+type Remote struct {
 	URL     url.URL
-	Details []RepoDetails
+	Details []RemoteDetails
 }
 
-type RepoDetails struct {
+type RemoteDetails struct {
 	Token     string
 	TokenName string
 	Username  string
 }
 
-func (r *Repo) ToMatch() (*Match, error) {
+var ErrMultipleRepoDetails = errors.New("config contains multiple matching configs")
+
+func (r *Remote) ToMatch() (*Match, error) {
 	if len(r.Details) == 0 {
-		return nil, errors.New("failed to convert Repo to Match since Repo.Details contains no elements")
+		return nil, errors.New("failed to convert Remote to Match since Remote.Details contains no elements")
+	}
+
+	if len(r.Details) == 1 {
+		return &Match{
+			URL:       r.URL,
+			Token:     r.Details[0].Token,
+			Username:  r.Details[0].Username,
+			TokenName: r.Details[0].TokenName,
+		}, nil
 	}
 
 	// TODO: Handle multiple details and their selection
-	return &Match{
-		URL:       r.URL,
-		Token:     r.Details[0].Token,
-		Username:  r.Details[0].Username,
-		TokenName: r.Details[0].TokenName,
-	}, nil
+	return nil, ErrMultipleRepoDetails
 }
 
-func (r *Repo) CheckSemantics() error {
+func (r *Remote) CheckSemantics() error {
 	// Check URL
 	_, err := checkURLStr(r.URL.String())
 	if err != nil {
@@ -68,7 +74,7 @@ func (r *Repo) CheckSemantics() error {
 	return nil
 }
 
-func (rd *RepoDetails) Init(u *url.URL) error {
+func (rd *RemoteDetails) Init(u *url.URL) error {
 	err := rd.CheckTokenScope(u)
 	if err != nil {
 		return err
@@ -77,7 +83,7 @@ func (rd *RepoDetails) Init(u *url.URL) error {
 	return rd.GetUsername(u)
 }
 
-func (rd *RepoDetails) GetUsername(u *url.URL) error {
+func (rd *RemoteDetails) GetUsername(u *url.URL) error {
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {
@@ -123,7 +129,7 @@ func (rd *RepoDetails) GetUsername(u *url.URL) error {
 	return nil
 }
 
-func (rd *RepoDetails) CheckTokenScope(u *url.URL) error {
+func (rd *RemoteDetails) CheckTokenScope(u *url.URL) error {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`
 		LastUsedAt time.Time   `json:"last_used_at"`

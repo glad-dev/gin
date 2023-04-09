@@ -28,7 +28,7 @@ func Load() (*Wrapper, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &Wrapper{
-				Configs:       []Repo{},
+				Configs:       []Remote{},
 				ConfigVersion: constants.ConfigVersion,
 			}, ErrConfigDoesNotExist
 		}
