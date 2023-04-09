@@ -170,6 +170,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case displayingEdit:
 		tmp = m.edit.Update(msg)
 		m.exitText = tmp.str
+		m.failure = tmp.failure
 
 		return m, tmp.cmd
 
