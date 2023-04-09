@@ -8,21 +8,23 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type displaying int
+
+const (
+	displayingList displaying = iota
+	displayingDetails
+	displayingEdit
+)
+
 type model struct {
-	list                list.Model
+	remotes             list.Model
+	details             list.Model
 	exitText            string
 	edit                editModel
 	currentlyDisplaying displaying
 	quit                bool
 	failure             bool
 }
-
-type displaying int
-
-const (
-	displayingList displaying = iota
-	displayingEdit
-)
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -34,9 +36,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := style.InputField.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
-		m.edit.width = msg.Width
-		m.edit.height = msg.Height
+		m.remotes.SetSize(msg.Width-h, msg.Height-v)
+		m.details.SetSize(msg.Width-h, msg.Height-v)
+
+		m.edit.width = msg.Width - h
+		m.edit.height = msg.Height - v
 
 		return m, nil
 	case tea.KeyMsg:
@@ -53,6 +57,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quit = true
 
 			return m, tea.Quit
+
+		case "q":
+			if m.currentlyDisplaying == displayingDetails {
+				m.currentlyDisplaying = displayingList
+
+				return m, nil
+			}
+
 		case "esc":
 			if m.currentlyDisplaying == displayingList {
 				m.quit = true
@@ -60,45 +72,113 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
-			// We are currently displaying the edit view => Move back to list view
-			m.currentlyDisplaying = displayingList
+			m.currentlyDisplaying--
 
 			return m, nil
 		case "enter":
-			if m.currentlyDisplaying == displayingList {
+			switch m.currentlyDisplaying {
+			case displayingList:
 				// User selected a config
-				selected, ok := m.list.Items()[m.list.Index()].(shared.ListItem)
+				selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
 				if !ok {
 					m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
+					m.failure = true
+
+					return m, tea.Quit
+				}
+
+				if len(selected.remote.Details) > 1 {
+					m.currentlyDisplaying = displayingDetails
+
+					items := make([]list.Item, len(selected.remote.Details))
+					for i, details := range selected.remote.Details {
+						items[i] = detail{
+							username:  details.Username,
+							tokenName: details.TokenName,
+						}
+					}
+
+					m.details.SetItems(items)
+					m.details.ResetSelected()
+
+					return m, nil
+				}
+
+				match, err := selected.remote.ToMatch()
+				if err != nil {
+					m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
+					m.failure = true
 
 					return m, tea.Quit
 				}
 
 				m.currentlyDisplaying = displayingEdit
-				m.edit.Set(&selected.Match, m.list.Index())
+				m.edit.Set(match, m.remotes.Index(), 0)
 
 				return m, nil
+
+			case displayingDetails:
+				selected, ok := m.remotes.Items()[m.remotes.Index()].(editListItem)
+				if !ok {
+					m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
+					m.failure = true
+
+					return m, tea.Quit
+				}
+
+				match, err := selected.remote.ToMatchAtIndex(m.details.Index())
+				if err != nil {
+					m.exitText = style.FormatQuitText("Failed to convert item to match: " + err.Error())
+					m.failure = true
+
+					return m, tea.Quit
+				}
+
+				m.currentlyDisplaying = displayingEdit
+				m.edit.Set(match, m.remotes.Index(), m.details.Index())
+
+				return m, nil
+
+			case displayingEdit:
+				tmp = m.edit.Update(msg)
+				m.exitText = tmp.str
+				m.failure = tmp.failure
+
+				return m, tmp.cmd
+
+			default:
+				m.failure = true
+				m.exitText = style.FormatQuitText("Invalid displaying item.")
+
+				return m, tea.Quit
 			}
-
-			tmp = m.edit.Update(msg)
-			m.exitText = tmp.str
-			m.failure = tmp.failure
-
-			return m, tmp.cmd
 		}
 	}
 
-	if m.currentlyDisplaying == displayingList {
-		var cmd tea.Cmd
-		m.list, cmd = m.list.Update(msg)
+	var cmd tea.Cmd
+	switch m.currentlyDisplaying {
+	case displayingList:
+		m.remotes, cmd = m.remotes.Update(msg)
 
 		return m, cmd
+
+	case displayingDetails:
+		m.details, cmd = m.details.Update(msg)
+
+		return m, cmd
+
+	case displayingEdit:
+		tmp = m.edit.Update(msg)
+		m.exitText = tmp.str
+
+		return m, tmp.cmd
+
+	default:
+		m.failure = true
+		m.exitText = style.FormatQuitText("Invalid dispaly type")
+
+		return m, tea.Quit
 	}
-
-	tmp = m.edit.Update(msg)
-	m.exitText = tmp.str
-
-	return m, tmp.cmd
 }
 
 func (m model) View() string {
@@ -110,9 +190,17 @@ func (m model) View() string {
 		return m.exitText
 	}
 
-	if m.currentlyDisplaying == displayingList {
-		return shared.RenderList(m.list)
-	}
+	switch m.currentlyDisplaying {
+	case displayingList:
+		return shared.RenderList(m.remotes)
 
-	return m.edit.View()
+	case displayingDetails:
+		return shared.RenderList(m.details)
+
+	case displayingEdit:
+		return m.edit.View()
+
+	default:
+		return "Unkown view"
+	}
 }

@@ -13,12 +13,13 @@ import (
 )
 
 type editModel struct {
-	oldConfig  *config.Wrapper
-	inputs     []textinput.Model
-	focusIndex int
-	listIndex  int
-	width      int
-	height     int
+	oldConfig    *config.Wrapper
+	inputs       []textinput.Model
+	focusIndex   int
+	listIndex    int
+	detailsIndex int
+	width        int
+	height       int
 }
 
 type ret struct {
@@ -81,11 +82,12 @@ func (m *editModel) Update(msg tea.Msg) *ret {
 	}
 }
 
-func (m *editModel) Set(lab *config.Match, listIndex int) {
+func (m *editModel) Set(match *config.Match, listIndex int, detailsIndex int) {
 	// Set the new values
-	m.inputs[0].SetValue(lab.URL.String())
-	m.inputs[1].SetValue(lab.Token)
+	m.inputs[0].SetValue(match.URL.String())
+	m.inputs[1].SetValue(match.Token)
 	m.listIndex = listIndex
+	m.detailsIndex = detailsIndex
 
 	// Set the focus to the first element
 	m.focusIndex = 0
@@ -121,9 +123,11 @@ func (m *editModel) updateFocus() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+// submit returns exit text and if the operation failed.
 func (m *editModel) submit() (string, bool) {
 	oldURL := m.oldConfig.Configs[m.listIndex].URL.String()
-	err := config.Update(m.oldConfig, m.listIndex, 0, m.inputs[0].Value(), m.inputs[1].Value()) // TODO: Get correct details index
+
+	err := config.Update(m.oldConfig, m.listIndex, m.detailsIndex, m.inputs[0].Value(), m.inputs[1].Value())
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
 			return style.FormatQuitText(config.ErrConfigDoesNotExistMsg), true
