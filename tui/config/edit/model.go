@@ -20,8 +20,6 @@ const (
 	displayingError
 )
 
-var errorStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF0000"))
-
 type model struct {
 	remotes             list.Model
 	details             list.Model
@@ -113,8 +111,8 @@ func (m model) View() string {
 			0.75,
 
 			fmt.Sprintf(
-				"%s\n%s\n\nPress the 'q', 'esc' or 'enter' key to go back.",
-				errorStyle.Render("An error occurred:"),
+				"%s\n%s\n\nPress the 'q', 'esc' or 'backspace' key to go back.",
+				style.Error.Render("An error occurred:"),
 				m.error,
 			),
 		)

@@ -18,6 +18,7 @@ var (
 	InputField   = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80)
 	Focused      = lipgloss.NewStyle().Foreground(color.Focused)
 	None         = lipgloss.NewStyle()
+	Error        = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF0000"))
 
 	quitText = lipgloss.NewStyle().Padding(1, 2, 1, 2)
 )

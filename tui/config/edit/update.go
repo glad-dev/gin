@@ -171,7 +171,7 @@ func (m *model) updateError(msg tea.Msg) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc", "enter":
+		case "q", "esc", "backspace":
 			m.currentlyDisplaying = displayingEdit
 
 			return
