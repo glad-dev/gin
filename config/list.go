@@ -19,12 +19,12 @@ func List() error {
 	}
 
 	fmt.Println()
-	fmt.Print(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
+	fmt.Println(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
 	for i, config := range wrapper.Configs {
-		fmt.Print(style.List.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
+		fmt.Println(style.List.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
 
 		for k, detail := range config.Details {
-			fmt.Print(style.ListDetails.Render(fmt.Sprintf(
+			fmt.Println(style.ListDetails.Render(fmt.Sprintf(
 				"%d.%d) Username: '%s' - Token name: '%s'", // TODO: Improve output
 				i+1, k+1,
 				detail.Username,
@@ -32,7 +32,7 @@ func List() error {
 			)))
 		}
 	}
-	fmt.Print("\n\n")
+	fmt.Print("\n")
 
 	return nil
 }
