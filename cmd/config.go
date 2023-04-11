@@ -20,7 +20,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			style.PrintErrAndExit("Use commands like add|list|remove|update")
+			style.PrintErrAndExit("Use commands like add|edit|list|remove|update|verify")
 		},
 	}
 
@@ -41,7 +41,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	cmdEdit := &cobra.Command{
+	cmdAdd := &cobra.Command{
 		Use:   "add",
 		Short: "Add remote",
 		Long:  "Long - add remote",
@@ -61,7 +61,7 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	cmdUpdate := &cobra.Command{
+	cmdEdit := &cobra.Command{
 		Use:   "edit",
 		Short: "Edit the configuration of an existing remote",
 		Long:  "Long - edit config",
@@ -86,7 +86,22 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	root.AddCommand(cmdList, cmdEdit, cmdRemove, cmdUpdate, cmdVerify)
+	cmdUpdate := &cobra.Command{
+		Use:   "update",
+		Short: "Update the username and token names",
+		Long:  "Update the username and token names",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := config.UpdateToken()
+			if err != nil {
+				style.PrintErrAndExit(err.Error())
+			}
+
+			fmt.Print(style.FormatQuitText("All tokens were successfully updated."))
+		},
+	}
+
+	root.AddCommand(cmdList, cmdAdd, cmdRemove, cmdEdit, cmdVerify, cmdUpdate)
 
 	return root
 }
