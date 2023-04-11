@@ -26,8 +26,6 @@ func VerifyTokens() error {
 					tokenName: detail.TokenName,
 					err:       err,
 				})
-
-				continue
 			}
 		}
 	}
@@ -39,7 +37,12 @@ func VerifyTokens() error {
 	out := "The following configs have issues:\n"
 	for urlStr, errorStructs := range invalid {
 		for _, errStruct := range errorStructs {
-			out += fmt.Sprintf("- Remote '%s' contains token '%s' with error: %s\n", urlStr, errStruct.tokenName, errStruct.err)
+			out += fmt.Sprintf(
+				"- Remote '%s' contains token '%s' with error: %s\n",
+				urlStr,
+				errStruct.tokenName,
+				errStruct.err.Error(),
+			)
 		}
 	}
 
