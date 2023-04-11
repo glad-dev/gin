@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	"gn/config"
 	"gn/tui/config/add"
@@ -70,7 +71,22 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	root.AddCommand(cmdList, cmdEdit, cmdRemove, cmdUpdate)
+	cmdVerify := &cobra.Command{
+		Use:   "verify",
+		Short: "Check the validity of all stored tokens",
+		Long:  "Check the validity of all stored tokens",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := config.VerifyTokens()
+			if err != nil {
+				style.PrintErrAndExit(err.Error())
+			}
+
+			fmt.Print(style.FormatQuitText("All tokens are valid."))
+		},
+	}
+
+	root.AddCommand(cmdList, cmdEdit, cmdRemove, cmdUpdate, cmdVerify)
 
 	return root
 }
