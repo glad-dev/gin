@@ -113,7 +113,7 @@ func (m model) View() string {
 			fmt.Sprintf(
 				"%s\n%s\n\nPress the 'q', 'esc' or 'backspace' key to go back.",
 				style.Error.Render("An error occurred:"),
-				m.error,
+				lipgloss.NewStyle().Width(m.edit.width).Render(m.error),
 			),
 		)
 
