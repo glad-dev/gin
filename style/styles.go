@@ -1,7 +1,7 @@
 package style
 
 import (
-	"gn/tui/style/color"
+	"gn/style/color"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"

@@ -1,8 +1,8 @@
 package remove
 
 import (
+	"gn/style"
 	"gn/tui/config/shared"
-	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

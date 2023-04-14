@@ -5,8 +5,8 @@ import (
 
 	"gn/config"
 	"gn/issues"
+	"gn/style"
 	"gn/tui/issues/shared"
-	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"

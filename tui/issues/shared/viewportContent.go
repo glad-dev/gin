@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"gn/issues"
-	"gn/tui/style"
+	"gn/style"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"

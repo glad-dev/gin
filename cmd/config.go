@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"gn/config"
+	"gn/style"
 	"gn/tui/config/add"
 	"gn/tui/config/edit"
 	"gn/tui/config/remove"
-	"gn/tui/style"
 
 	"github.com/spf13/cobra"
 )

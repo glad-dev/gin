@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"gn/tui/style"
+	"gn/style"
 )
 
 func List() error {

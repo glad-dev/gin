@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"gn/repo"
+	"gn/style"
 	allIssues "gn/tui/issues/all"
 	singleIssue "gn/tui/issues/single"
-	"gn/tui/style"
 
 	"github.com/spf13/cobra"
 )

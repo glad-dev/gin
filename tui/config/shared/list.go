@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"gn/tui/style"
+	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"

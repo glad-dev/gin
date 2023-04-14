@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"gn/constants"
-	"gn/tui/style"
+	"gn/style"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"

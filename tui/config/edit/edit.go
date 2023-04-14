@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"gn/config"
+	"gn/style"
 	"gn/tui/config/shared"
-	"gn/tui/style"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"

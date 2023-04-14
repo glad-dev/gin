@@ -3,7 +3,7 @@ package remove
 import (
 	"fmt"
 
-	"gn/tui/style"
+	"gn/style"
 
 	"github.com/charmbracelet/lipgloss"
 )
