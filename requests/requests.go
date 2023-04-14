@@ -56,7 +56,7 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("request returned invalid status code %d with message: %s", resp.StatusCode, body)
+		return nil, fmt.Errorf("request returned invalid status code %d", resp.StatusCode)
 	}
 
 	err = checkForError(bytes.NewBuffer(body))
