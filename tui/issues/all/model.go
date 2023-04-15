@@ -14,16 +14,32 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type (
+	displaying uint8
+	state      uint8
+)
+
+const (
+	displayingInitalLoading displaying = iota
+	displayingList
+	displaySecondLoading
+	displayingDetails
+)
+
+const (
+	stateRunning state = iota
+	exitFailure
+)
+
 type model struct {
-	shared       *shared.Shared
-	conf         *config.Wrapper
-	viewedIssues map[string]issues.IssueDetails
-	tabs         tabs
-	error        string
-	viewport     viewport.Model
-	isLoading    bool
-	viewingList  bool
-	failure      bool
+	shared              *shared.Shared
+	conf                *config.Wrapper
+	viewedIssues        map[string]issues.IssueDetails
+	tabs                tabs
+	error               string
+	viewport            viewport.Model
+	state               state
+	currentlyDisplaying displaying
 }
 
 type tabs struct {
@@ -31,10 +47,16 @@ type tabs struct {
 	activeTab int
 }
 
-type updateMsg struct {
+type allIssuesUpdateMsg struct {
 	conf     *config.Wrapper
 	errorMsg string
 	items    []itemWrapper
+}
+
+type singleIsseUpdateMsg struct {
+	details  *issues.IssueDetails
+	errorMsg string
+	issueID  string
 }
 
 func (m model) Init() tea.Cmd {
@@ -45,8 +67,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
@@ -57,64 +77,80 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		shared.ViewportSetSize(&m.viewport, &msg, m.shared.IssueID)
 
-		if m.viewingList {
-			m.tabs.lists[m.tabs.activeTab], cmd = m.tabs.lists[m.tabs.activeTab].Update(msg)
+		return m, nil
 
-			return m, cmd
-		}
-
-		m.viewport, cmd = m.viewport.Update(msg)
-
-		return m, cmd
-
-	case updateMsg:
+	case allIssuesUpdateMsg:
 		if len(msg.errorMsg) > 0 {
 			m.error = msg.errorMsg
-			m.failure = true
+			m.state = exitFailure
 
 			return m, tea.Quit
 		}
 
-		return updateList(&m, &msg)
+		return m.initList(&msg)
+
+	case singleIsseUpdateMsg:
+		if len(msg.errorMsg) > 0 {
+			m.error = msg.errorMsg
+			m.state = exitFailure
+
+			return m, tea.Quit
+		}
+
+		// Store issue in map
+		m.viewedIssues[m.shared.IssueID] = *msg.details
+
+		m.shared.IssueID = msg.issueID
+		m.viewport.SetContent(shared.PrettyPrintIssue(msg.details, m.viewport.Width, m.viewport.Height))
+		m.currentlyDisplaying = displayingDetails
+		m.viewport.GotoTop()
+
+		return m, nil
 
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
-
-		if m.viewingList {
-			return handleListUpdate(&m, msg)
-		}
-
-		// Not needed but added for clarity
-		break //nolint:gosimple
-
-	case tea.MouseMsg:
-		// Mouse msg are only intended for the viewport
-		if m.viewingList {
-			// We don't handle MouseMsg for the list
-			return m, nil
-		}
-
-		// Not needed but added for clarity
-		break //nolint:gosimple
-
-	default:
-		m.shared.Spinner, cmd = m.shared.Spinner.Update(msg)
-
-		return m, cmd
 	}
 
-	// Can only be reached if we are displaying the viewport, and we either got a tea.MouseMsg or a tea.KeyMsg
-	return handleViewportUpdate(&m, msg)
+	cmds := make([]tea.Cmd, 2)
+	m.shared.Spinner, cmds[0] = m.shared.Spinner.Update(msg)
+
+	switch m.currentlyDisplaying {
+	case displayingInitalLoading:
+		return m, cmds[0]
+
+	case displayingList:
+		cmds[1] = m.updateList(msg)
+
+		return m, tea.Batch(cmds...)
+
+	case displaySecondLoading:
+		return m, tea.Batch(
+			cmds[0],
+			m.loadDetails(),
+		)
+
+	case displayingDetails:
+		cmds[1] = m.updateViewport(msg)
+
+		return m, tea.Batch(cmds...)
+
+	default:
+		m.state = exitFailure
+		m.error = "Invalid update state"
+
+		return m, tea.Quit
+	}
 }
 
 func (m model) View() string {
-	if m.failure {
+	if m.state == exitFailure {
 		return style.FormatQuitText("An error occurred: " + m.error)
 	}
 
-	if m.isLoading {
+	switch m.currentlyDisplaying {
+	case displayingInitalLoading, displaySecondLoading:
 		return lipgloss.Place(
 			m.tabs.lists[m.tabs.activeTab].Width(),
 			m.tabs.lists[m.tabs.activeTab].Height(),
@@ -123,20 +159,23 @@ func (m model) View() string {
 
 			fmt.Sprintf("Loading %s", m.shared.Spinner.View()),
 		)
-	}
 
-	if m.viewingList {
+	case displayingList:
 		return renderTab(&m.tabs)
-	}
 
-	return shared.ViewportView(&m.viewport, m.shared.IssueID)
+	case displayingDetails:
+		return shared.ViewportView(&m.viewport, m.shared.IssueID)
+
+	default:
+		return "Unkonwn view"
+	}
 }
 
 func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
 		conf, err := config.Load()
 		if err != nil {
-			return updateMsg{
+			return allIssuesUpdateMsg{
 				conf:     nil,
 				items:    nil,
 				errorMsg: "Failed to load config: " + err.Error(),
@@ -145,7 +184,7 @@ func getIssues(m *model) func() tea.Msg {
 
 		allIssues, err := issues.QueryAll(conf, m.shared.Details, m.shared.URL)
 		if err != nil {
-			return updateMsg{
+			return allIssuesUpdateMsg{
 				conf:     nil,
 				items:    nil,
 				errorMsg: "Failed to query issues: " + err.Error(),
@@ -159,7 +198,7 @@ func getIssues(m *model) func() tea.Msg {
 			}
 		}
 
-		return updateMsg{
+		return allIssuesUpdateMsg{
 			items: issueList,
 			conf:  conf,
 		}

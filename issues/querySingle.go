@@ -103,6 +103,7 @@ const querySingleQuery = `
 	`
 
 func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*IssueDetails, error) {
+	// TODO: Fix this broken
 	lab, projectPath, err := getMatchingConfig(config, details, u)
 	if err != nil {
 		return nil, err

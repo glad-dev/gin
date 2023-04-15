@@ -35,10 +35,10 @@ func Show(details []repo.Details, u *url.URL) {
 				Details: details,
 				Spinner: *widgets.GetSpinner(),
 			},
-			viewport:     viewport.New(0, 0),
-			viewedIssues: make(map[string]issues.IssueDetails),
-			isLoading:    true,
-			viewingList:  true,
+			viewport:            viewport.New(0, 0),
+			viewedIssues:        make(map[string]issues.IssueDetails),
+			currentlyDisplaying: displayingInitalLoading,
+			state:               stateRunning,
 		},
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
@@ -49,7 +49,7 @@ func Show(details []repo.Details, u *url.URL) {
 		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.failure {
+	if m, ok := m.(model); ok && m.state == exitFailure {
 		style.PrintErrAndExit(m.error)
 	}
 }
