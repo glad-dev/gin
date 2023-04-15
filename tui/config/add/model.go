@@ -43,7 +43,7 @@ func (m model) Init() tea.Cmd {
 
 type updateMsg struct {
 	str     string
-	failure bool
+	success bool
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -61,15 +61,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateMsg:
 		m.text = msg.str
-		if msg.failure {
-			m.currentlyDisplaying = displayingError
+		if msg.success {
+			m.state = exitSuccess
 
-			return m, nil
+			return m, tea.Quit
 		}
 
-		m.state = exitSuccess
+		m.currentlyDisplaying = displayingError
 
-		return m, tea.Quit
+		return m, nil
 	}
 
 	cmds := make([]tea.Cmd, 2)

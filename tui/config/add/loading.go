@@ -16,13 +16,13 @@ func (m *model) updateLoading() tea.Cmd {
 		if err != nil {
 			return updateMsg{
 				str:     fmt.Sprintf("Could not add config: %s", err),
-				failure: true,
+				success: false,
 			}
 		}
 
 		return updateMsg{
 			str:     style.FormatQuitText(fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value())),
-			failure: false,
+			success: true,
 		}
 	}
 }
