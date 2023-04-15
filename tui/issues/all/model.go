@@ -146,6 +146,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.state == exitFailure {
+		// This isn't shown?
 		return style.FormatQuitText("An error occurred: " + m.error)
 	}
 
