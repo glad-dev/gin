@@ -9,6 +9,7 @@ import (
 )
 
 type Wrapper struct {
+	Colors        colors
 	Configs       []Remote
 	ConfigVersion int
 }

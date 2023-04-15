@@ -46,5 +46,10 @@ func Load() (*Wrapper, error) {
 		return nil, fmt.Errorf("config is invalid: %w", err)
 	}
 
+	err = config.Colors.setColors()
+	if err != nil {
+		return nil, err
+	}
+
 	return config, nil
 }
