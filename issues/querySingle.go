@@ -1,6 +1,7 @@
 package issues
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -103,7 +104,6 @@ const querySingleQuery = `
 	`
 
 func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*IssueDetails, error) {
-	// TODO: Fix this broken
 	lab, projectPath, err := getMatchingConfig(config, details, u)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		"issueIID":    issueID,
 	}
 
-	response, err := requests.Project(&requests.GraphqlQuery{
+	tmp, err := requests.Project(&requests.GraphqlQuery{
 		Query:     querySingleQuery,
 		Variables: variables,
 	}, lab)
@@ -122,13 +122,18 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
-	if issueDoesNotExist(response) {
+	response, err := io.ReadAll(tmp)
+	if err != nil {
+		return nil, fmt.Errorf("query single - failed to read request: %w", err)
+	}
+
+	if issueDoesNotExist(bytes.NewBuffer(response)) {
 		return nil, ErrIssueDoesNotExist
 	}
 
 	querySingle := querySingleResponse{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&querySingle)
 	if err != nil {
