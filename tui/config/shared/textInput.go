@@ -6,13 +6,14 @@ import (
 
 	"gn/constants"
 	"gn/style"
+	"gn/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 )
 
 var (
-	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	blurredStyle = lipgloss.NewStyle().Foreground(color.Blurred)
 	cursorStyle  = style.Focused.Copy()
 
 	focusedButton = style.Focused.Copy().Render("[ Submit ]")
