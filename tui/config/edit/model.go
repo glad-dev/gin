@@ -1,8 +1,6 @@
 package edit
 
 import (
-	"fmt"
-
 	"gn/style"
 	"gn/tui/config/shared"
 
@@ -110,10 +108,12 @@ func (m model) View() string {
 			lipgloss.Center,
 			0.75,
 
-			fmt.Sprintf(
-				"%s\n%s\n\nPress the 'q', 'esc' or 'backspace' key to go back.",
+			lipgloss.JoinVertical(
+				lipgloss.Center,
 				style.Error.Render("An error occurred:"),
-				lipgloss.NewStyle().Width(m.edit.width).Render(m.error),
+				lipgloss.NewStyle().Width(m.edit.width).Align(lipgloss.Center, lipgloss.Center).Render(m.error),
+				"\n",
+				"Press the 'q', 'esc' or 'backspace' key to go back.",
 			),
 		)
 

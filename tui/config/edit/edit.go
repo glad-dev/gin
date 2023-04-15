@@ -39,7 +39,7 @@ func (m *editModel) view() string {
 		m.inputs,
 		m.focusIndex,
 		m.width,
-		m.height-2*style.InputField.GetVerticalFrameSize(),
+		m.height,
 	)
 }
 
