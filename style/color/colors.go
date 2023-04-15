@@ -3,7 +3,7 @@ package color
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	Focused = lipgloss.Color("170")
-	Border  = lipgloss.Color("69")
-	Blurred = lipgloss.Color("240")
+	Blurred = lipgloss.Color("#585858")
+	Border  = lipgloss.Color("#5f87ff")
+	Focused = lipgloss.Color("#D75FD7")
 )
