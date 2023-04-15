@@ -1,9 +1,6 @@
 package edit
 
 import (
-	"errors"
-	"fmt"
-
 	"gn/config"
 	"gn/style"
 	"gn/tui/config/shared"
@@ -22,7 +19,7 @@ type editModel struct {
 	height       int
 }
 
-func (m *editModel) set(match *config.Match, listIndex int, detailsIndex int) {
+func (m *editModel) init(match *config.Match, listIndex int, detailsIndex int) {
 	// Set the new values
 	m.inputs[0].SetValue(match.URL.String())
 	m.inputs[1].SetValue(match.Token)
@@ -32,6 +29,57 @@ func (m *editModel) set(match *config.Match, listIndex int, detailsIndex int) {
 	// Set the focus to the first element
 	m.focusIndex = 0
 	m.updateFocus()
+}
+
+func (m *model) updateEdit(msg tea.Msg) tea.Cmd {
+	switch msg := msg.(type) { //nolint: gocritic
+	case tea.KeyMsg:
+		switch s := msg.String(); s {
+		case "esc":
+			if len(m.details.Items()) == 0 {
+				m.currentlyDisplaying = displayingList
+
+				return nil
+			}
+
+			m.currentlyDisplaying = displayingDetails
+
+			return nil
+
+		case "tab", "shift+tab", "enter", "up", "down": //nolint: goconst
+			// Did the user press enter while the submit button was focused?
+			if s == "enter" && m.edit.focusIndex == len(m.edit.inputs) {
+				m.currentlyDisplaying = displayingLoading
+
+				return nil
+			}
+
+			// Cycle indexes
+			if s == "up" || s == "shift+tab" {
+				m.edit.focusIndex--
+			} else {
+				m.edit.focusIndex++
+			}
+
+			if m.edit.focusIndex > len(m.edit.inputs) {
+				m.edit.focusIndex = 0
+			} else if m.edit.focusIndex < 0 {
+				m.edit.focusIndex = len(m.edit.inputs)
+			}
+
+			return m.edit.updateFocus()
+		}
+	}
+
+	cmds := make([]tea.Cmd, len(m.edit.inputs))
+	// Handle character input and blinking
+	// Only text inputs with Focus() set will respond, so it's safe to simply
+	// update all of them here without any further logic.
+	for i := range m.edit.inputs {
+		m.edit.inputs[i], cmds[i] = m.edit.inputs[i].Update(msg)
+	}
+
+	return tea.Batch(cmds...)
 }
 
 func (m *editModel) view() string {
@@ -62,22 +110,4 @@ func (m *editModel) updateFocus() tea.Cmd {
 	}
 
 	return tea.Batch(cmds...)
-}
-
-// submit returns exit text and if the operation failed.
-func (m *editModel) submit() (string, bool) {
-	oldURL := m.oldConfig.Configs[m.listIndex].URL.String()
-
-	err := config.Update(m.oldConfig, m.listIndex, m.detailsIndex, m.inputs[0].Value(), m.inputs[1].Value())
-	if err != nil {
-		if errors.Is(err, config.ErrConfigDoesNotExist) {
-			return config.ErrConfigDoesNotExistMsg, true
-		} else if errors.Is(err, config.ErrUpdateSameValues) {
-			return "No need to update the config: No changes were made.", false
-		}
-
-		return fmt.Sprintf("Failed to update remote: %s", err), true
-	}
-
-	return fmt.Sprintf("Sucessfully updated the remote %s", oldURL), false
 }

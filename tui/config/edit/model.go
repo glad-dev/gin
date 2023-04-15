@@ -4,33 +4,49 @@ import (
 	"gn/style"
 	"gn/tui/config/shared"
 
+	"github.com/charmbracelet/bubbles/spinner"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
-type displaying int
+type (
+	displaying uint8
+	state      uint8
+)
 
 const (
 	displayingList displaying = iota
 	displayingDetails
 	displayingEdit
+	displayingLoading
 	displayingError
+)
+
+const (
+	stateRunning state = iota
+	exitFailure
+	exitSuccess
+	exitNoChange
 )
 
 type model struct {
 	remotes             list.Model
 	details             list.Model
-	exitText            string
-	error               string
+	text                string
+	spinner             spinner.Model
 	edit                editModel
 	currentlyDisplaying displaying
-	quit                bool
-	failure             bool
+	state               state
+}
+
+type updateMsg struct {
+	str     string
+	success bool
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return m.spinner.Tick
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -44,51 +60,75 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.edit.height = msg.Height
 
 		return m, nil
+
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
-			m.quit = true
+			m.state = exitNoChange
 
 			return m, tea.Quit
 		}
+
+	case updateMsg:
+		m.text = msg.str
+		if msg.success {
+			m.state = exitSuccess
+
+			return m, tea.Quit
+		}
+
+		m.currentlyDisplaying = displayingError
+
+		return m, nil
 	}
 
-	var cmd tea.Cmd
+	cmds := make([]tea.Cmd, 2)
+	m.spinner, cmds[0] = m.spinner.Update(msg)
+
 	switch m.currentlyDisplaying {
 	case displayingList:
-		cmd = m.updateList(msg)
+		cmds[1] = m.updateList(msg)
 
-		return m, cmd
+		return m, tea.Batch(cmds...)
 
 	case displayingDetails:
-		cmd = m.updateDetails(msg)
+		cmds[1] = m.updateDetails(msg)
 
-		return m, cmd
+		return m, tea.Batch(cmds...)
 
 	case displayingEdit:
-		cmd = m.updateEdit(msg)
+		cmds[1] = m.updateEdit(msg)
 
-		return m, cmd
+		return m, tea.Batch(cmds...)
+
+	case displayingLoading:
+		return m, tea.Batch(
+			cmds[0],
+			m.updateLoading(),
+		)
 
 	case displayingError:
 		m.updateError(msg)
 
-		return m, nil
+		return m, cmds[0]
 
 	default:
-		m.failure = true
-		m.exitText = style.FormatQuitText("Invalid display type")
+		m.state = exitFailure
+		m.text = style.FormatQuitText("Invalid display type")
 
 		return m, tea.Quit
 	}
 }
 
 func (m model) View() string {
-	if m.quit {
-		return style.FormatQuitText("No changes were made.")
-	}
+	switch m.state {
+	case stateRunning:
+		break
 
-	if len(m.exitText) > 0 {
-		return m.exitText
+	case exitNoChange:
+		return style.FormatQuitText("No changes were made")
+
+	case exitFailure, exitSuccess:
+		return m.text
 	}
 
 	switch m.currentlyDisplaying {
@@ -101,21 +141,11 @@ func (m model) View() string {
 	case displayingEdit:
 		return m.edit.view()
 
-	case displayingError:
-		return lipgloss.Place(
-			m.edit.width,
-			m.edit.height,
-			lipgloss.Center,
-			0.75,
+	case displayingLoading:
+		return m.viewLoading()
 
-			lipgloss.JoinVertical(
-				lipgloss.Center,
-				style.Error.Render("An error occurred:"),
-				lipgloss.NewStyle().Width(m.edit.width).Align(lipgloss.Center, lipgloss.Center).Render(m.error),
-				"\n",
-				"Press the 'q', 'esc' or 'backspace' key to go back.",
-			),
-		)
+	case displayingError:
+		return m.viewError()
 
 	default:
 		return "Unkown view"

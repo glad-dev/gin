@@ -4,6 +4,8 @@ import (
 	"errors"
 	"os"
 
+	"gn/tui/widgets"
+
 	"gn/config"
 	"gn/style"
 	"gn/tui/config/shared"
@@ -33,7 +35,8 @@ func Config() {
 	p := tea.NewProgram(model{
 		remotes: shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to edit?"),
 		details: shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to edit?"),
-		failure: false,
+		state:   stateRunning,
+		spinner: *widgets.GetSpinner(),
 		edit: editModel{
 			inputs:    shared.GetTextInputs(),
 			oldConfig: wrapper,
@@ -47,7 +50,7 @@ func Config() {
 		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.failure {
+	if m, ok := m.(model); ok && m.state == exitFailure {
 		os.Exit(1)
 	}
 }
