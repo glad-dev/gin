@@ -3,16 +3,22 @@ package add
 import (
 	"os"
 
+	"gn/style"
 	"gn/tui/config/shared"
-	"gn/tui/style"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func Config() {
+	s := spinner.New()
+	s.Spinner = spinner.Points
+
 	p := tea.NewProgram(model{
-		inputs:  shared.GetTextInputs(),
-		failure: false,
+		inputs:              shared.GetTextInputs(),
+		spinner:             s,
+		currentlyDisplaying: displayingAdd,
+		failure:             false,
 	})
 
 	m, err := p.Run()

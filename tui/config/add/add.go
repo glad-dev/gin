@@ -1,13 +1,8 @@
 package add
 
 import (
-	"errors"
-	"fmt"
-
+	"gn/style"
 	"gn/tui/config/shared"
-
-	"gn/config"
-	"gn/tui/style"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -19,7 +14,7 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			m.quit = true
+			m.noChanges = true
 
 			return tea.Quit
 
@@ -28,20 +23,10 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 			s := msg.String()
 
 			// Did the user press enter while the submit button was focused?
-			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				str, failure := submit(m)
-				if failure {
-					m.error = str
-					m.currentlyDisplaying = displayingError
+				m.currentlyDisplaying = displayingLoading
 
-					return nil
-				}
-
-				m.submit = true
-				m.exitText = style.FormatQuitText(str)
-
-				return tea.Quit
+				return nil
 			}
 
 			// Cycle indexes
@@ -66,6 +51,7 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 
 					continue
 				}
+
 				// Remove focused state
 				m.inputs[i].Blur()
 				m.inputs[i].PromptStyle = style.None
@@ -84,19 +70,6 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 	}
 
 	return tea.Batch(cmds...)
-}
-
-func submit(m *model) (string, bool) {
-	err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
-	if err != nil {
-		if errors.Is(err, config.ErrConfigDoesNotExist) {
-			return config.ErrConfigDoesNotExistMsg, true
-		}
-
-		return fmt.Sprintf("Could not add config: %s", err), true
-	}
-
-	return fmt.Sprintf("Successfully added config for %s", m.inputs[0].Value()), false
 }
 
 func (m *model) viewAdd() string {

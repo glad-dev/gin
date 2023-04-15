@@ -1,9 +1,7 @@
 package add
 
 import (
-	"fmt"
-
-	"gn/tui/style"
+	"gn/style"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,23 +12,27 @@ func (m *model) updateError(msg tea.Msg) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc", "backspace":
-			m.error = ""
+			m.text = ""
 			m.currentlyDisplaying = displayingAdd
 		}
 	}
 }
 
 func (m *model) viewError() string {
+	width := m.width - style.InputField.GetHorizontalFrameSize()
+
 	return lipgloss.Place(
-		m.width,
+		width,
 		m.height,
 		lipgloss.Center,
 		0.75,
 
-		fmt.Sprintf(
-			"%s\n%s\n\nPress the 'q', 'esc' or 'backspace' key to go back.",
+		lipgloss.JoinVertical(
+			lipgloss.Center,
 			style.Error.Render("An error occurred:"),
-			lipgloss.NewStyle().Width(m.width).Render(m.error),
+			lipgloss.NewStyle().Width(width).Align(lipgloss.Center, lipgloss.Center).Render(m.text),
+			"\n",
+			"Press the 'q', 'esc' or 'backspace' key to go back.",
 		),
 	)
 }
