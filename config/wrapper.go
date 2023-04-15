@@ -9,7 +9,7 @@ import (
 )
 
 type Wrapper struct {
-	Colors        colors
+	Colors        Colors
 	Configs       []Remote
 	ConfigVersion int
 }
@@ -26,11 +26,18 @@ func (config *Wrapper) CheckValidity() error {
 		return fmt.Errorf("config was written by a newer version of the tool")
 	}
 
+	// Check configs
 	for _, singleConfig := range config.Configs {
 		err := singleConfig.CheckSemantics()
 		if err != nil {
 			return err
 		}
+	}
+
+	// Check colors
+	err := config.Colors.CheckValidity()
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -27,3 +27,12 @@ var (
 	Comment    = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.RoundedBorder()).Padding(1)
 	Discussion = Comment.Copy()
 )
+
+// Update needs to be called if the colors have been changed. Otherwise the pre-defined colors will be used.
+func Update() {
+	SelectedItem = lipgloss.NewStyle().PaddingLeft(2).Foreground(color.Focused)
+	InputField = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80)
+	Focused = lipgloss.NewStyle().Foreground(color.Focused)
+	Comment = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.RoundedBorder()).Padding(1)
+	Discussion = Comment.Copy()
+}

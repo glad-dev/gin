@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"regexp"
 
+	"gn/style"
 	"gn/style/color"
 
 	"github.com/charmbracelet/lipgloss"
 )
 
-type colors struct {
+type Colors struct {
 	Blurred string
 	Border  string
 	Focused string
 }
 
-func (c *colors) setColors() error {
+func (c *Colors) setColors() error {
 	err := c.CheckValidity()
 	if err != nil {
 		return err
@@ -33,10 +34,12 @@ func (c *colors) setColors() error {
 		color.Focused = lipgloss.Color(c.Focused)
 	}
 
+	style.Update()
+
 	return nil
 }
 
-func (c *colors) CheckValidity() error {
+func (c *Colors) CheckValidity() error {
 	if len(c.Blurred) > 0 {
 		err := checkColor(c.Blurred)
 		if err != nil {
