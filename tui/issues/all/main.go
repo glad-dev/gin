@@ -1,6 +1,7 @@
 package all
 
 import (
+	"gn/config"
 	"net/url"
 
 	"gn/issues"
@@ -15,6 +16,9 @@ import (
 )
 
 func Show(details []repo.Details, u *url.URL) {
+	_, _ = config.Load() // To set the colors
+	initStyles()
+
 	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	lst.SetShowFilter(false) // TODO: Fix filtering bug
 

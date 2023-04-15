@@ -7,6 +7,7 @@ import (
 	"gn/config"
 	"gn/style"
 	"gn/tui/config/add"
+	"gn/tui/config/color"
 	"gn/tui/config/edit"
 	"gn/tui/config/remove"
 
@@ -98,7 +99,17 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
-	root.AddCommand(cmdList, cmdAdd, cmdRemove, cmdEdit, cmdVerify, cmdUpdate)
+	cmdColors := &cobra.Command{
+		Use:   "colors",
+		Short: "Update the colors",
+		Long:  "Update the colors. Delete the input field to revert back to the default color.",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			color.Config()
+		},
+	}
+
+	root.AddCommand(cmdList, cmdAdd, cmdRemove, cmdEdit, cmdVerify, cmdUpdate, cmdColors)
 
 	return root
 }

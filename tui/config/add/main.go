@@ -1,6 +1,7 @@
 package add
 
 import (
+	"gn/config"
 	"os"
 
 	"gn/style"
@@ -11,6 +12,8 @@ import (
 )
 
 func Config() {
+	_, _ = config.Load() // To load the colors
+
 	p := tea.NewProgram(model{
 		inputs:              shared.GetTextInputs(),
 		spinner:             *widgets.GetSpinner(),

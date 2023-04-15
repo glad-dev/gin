@@ -34,7 +34,7 @@ func (c *Colors) setColors() error {
 		color.Focused = lipgloss.Color(c.Focused)
 	}
 
-	style.Update()
+	style.Init()
 
 	return nil
 }
