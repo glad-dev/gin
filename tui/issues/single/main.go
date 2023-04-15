@@ -7,15 +7,12 @@ import (
 
 	"gn/repo"
 	"gn/tui/issues/shared"
+	"gn/tui/widgets"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func Show(details []repo.Details, u *url.URL, issueID string) {
-	s := spinner.New()
-	s.Spinner = spinner.Points
-
 	p := tea.NewProgram(
 		model{
 			content: "",
@@ -23,7 +20,7 @@ func Show(details []repo.Details, u *url.URL, issueID string) {
 				Details: details,
 				URL:     u,
 				IssueID: issueID,
-				Spinner: s,
+				Spinner: *widgets.GetSpinner(),
 			},
 		},
 		tea.WithAltScreen(),

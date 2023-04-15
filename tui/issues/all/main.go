@@ -7,9 +7,9 @@ import (
 	"gn/repo"
 	"gn/style"
 	"gn/tui/issues/shared"
+	"gn/tui/widgets"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -23,9 +23,6 @@ func Show(details []repo.Details, u *url.URL) {
 		lsts[i] = lst
 	}
 
-	s := spinner.New()
-	s.Spinner = spinner.Points
-
 	p := tea.NewProgram(
 		model{
 			tabs: tabs{
@@ -36,7 +33,7 @@ func Show(details []repo.Details, u *url.URL) {
 				IssueID: "",
 				URL:     u,
 				Details: details,
-				Spinner: s,
+				Spinner: *widgets.GetSpinner(),
 			},
 			viewport:     viewport.New(0, 0),
 			viewedIssues: make(map[string]issues.IssueDetails),
