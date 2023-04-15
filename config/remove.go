@@ -32,5 +32,5 @@ func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 	}
 
 	// Write back the updated config
-	return writeConfig(wrapper)
+	return Write(wrapper)
 }

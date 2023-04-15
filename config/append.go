@@ -54,5 +54,5 @@ func Append(urlStr string, token string) error {
 	}
 
 	// Write back
-	return writeConfig(wrapper)
+	return Write(wrapper)
 }

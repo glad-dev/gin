@@ -11,7 +11,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func writeConfig(config *Wrapper) error {
+func Write(config *Wrapper) error {
 	config.ConfigVersion = constants.ConfigVersion
 
 	err := config.CheckValidity()

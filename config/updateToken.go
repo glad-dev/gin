@@ -32,7 +32,7 @@ func UpdateToken() error {
 		wrapper.Configs[i] = config
 	}
 
-	err = writeConfig(wrapper)
+	err = Write(wrapper)
 	if err != nil {
 		return fmt.Errorf("Failed to write config: %w", err)
 	}
