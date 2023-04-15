@@ -19,9 +19,6 @@ func newCmdConfig() *cobra.Command {
 		Short: "Interact with config",
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			style.PrintErrAndExit("Use commands like add|edit|list|remove|update|verify")
-		},
 	}
 
 	cmdList := &cobra.Command{
