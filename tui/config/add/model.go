@@ -8,12 +8,22 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type displaying int8
+type (
+	displaying uint8
+	state      uint8
+)
 
 const (
 	displayingAdd displaying = iota
 	displayingLoading
 	displayingError
+)
+
+const (
+	stateRunning state = iota
+	exitNoChange
+	exitFailure
+	exitSuccess
 )
 
 type model struct {
@@ -24,9 +34,7 @@ type model struct {
 	width               int
 	height              int
 	currentlyDisplaying displaying
-	done                bool
-	noChanges           bool
-	failure             bool
+	state               state
 }
 
 func (m model) Init() tea.Cmd {
@@ -46,7 +54,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
-			m.noChanges = true
+			m.state = exitNoChange
 
 			return m, tea.Quit
 		}
@@ -59,8 +67,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-		m.done = true
-		m.text = "Test: " + m.text
+		m.state = exitSuccess
 
 		return m, tea.Quit
 	}
@@ -86,19 +93,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	default:
 		m.text = style.FormatQuitText("Invalid update state")
-		m.failure = true
+		m.state = exitFailure
 
 		return m, tea.Quit
 	}
 }
 
 func (m model) View() string {
-	if m.noChanges {
-		return style.FormatQuitText("No changes were made")
-	}
+	switch m.state {
+	case stateRunning:
+		break
 
-	if m.done {
-		return "What?"
+	case exitNoChange:
+		return style.FormatQuitText("No changes were made")
+
+	case exitFailure, exitSuccess:
+		return m.text
 	}
 
 	switch m.currentlyDisplaying {

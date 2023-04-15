@@ -14,7 +14,7 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			m.noChanges = true
+			m.state = exitNoChange
 
 			return tea.Quit
 

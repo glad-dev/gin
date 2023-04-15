@@ -18,7 +18,7 @@ func Config() {
 		inputs:              shared.GetTextInputs(),
 		spinner:             s,
 		currentlyDisplaying: displayingAdd,
-		failure:             false,
+		state:               stateRunning,
 	})
 
 	m, err := p.Run()
@@ -26,7 +26,7 @@ func Config() {
 		style.PrintErrAndExit("Failed to start program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.failure {
+	if m, ok := m.(model); ok && m.state == exitFailure {
 		os.Exit(1)
 	}
 }
