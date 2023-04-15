@@ -1,16 +1,16 @@
 # To do
 ## v1
 - [ ] Color config
-- [ ] Loading screens during transition
 - [ ] Issues view all => Fix filtering view
 - [ ] Add GitHub support
-- [ ] Add cli command to check token validity
 - [ ] Add selection for when multiple configs match
 
 ### Done
 - [x] Config add show error in TUI, not after
 - [x] Pagination for all issues
 - [x] Config add/edit show error in TUI, not after
+- [x] Loading screens during transition
+- [x] Add cli command to check token validity
 
 ### Won't do
 - Repo based query without token (How do I get the correct details?)
