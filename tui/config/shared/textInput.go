@@ -2,9 +2,7 @@ package shared
 
 import (
 	"fmt"
-	"strings"
 
-	"gn/constants"
 	"gn/style"
 	"gn/style/color"
 
@@ -46,7 +44,7 @@ func GetTextInputs() []textinput.Model {
 			t.PromptStyle = style.Focused
 			t.TextStyle = style.Focused
 		case 1:
-			t.Placeholder = "Requires the following scopes: " + strings.Join(constants.RequiredScopes, ", ")
+			t.Placeholder = "E.g. bfgQeo8JAnMSz4SnDq8l"
 		}
 
 		inputs[i] = t
@@ -70,7 +68,7 @@ func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, heig
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 
-			"Gitlab URL",
+			"URL",
 			style.InputField.Render(inputs[0].View()),
 			"\n",
 			"API Key",

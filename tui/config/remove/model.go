@@ -118,12 +118,17 @@ func submit(m *model) (string, bool) {
 		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}
 
-	tokenName := selected.Remote.Details[m.details.Index()].TokenName
+	tokenName := selected.Remote.Details[m.details.Index()].GetTokenName()
 
 	err := config.Remove(&m.oldConfig, m.remotes.Index(), m.details.Index())
 	if err != nil {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the token '%s'\nRemember to delete the API key on Gitlab", tokenName)), false
+	platform := "Gitlab"
+	if m.oldConfig.Remotes[m.remotes.Index()].URL.Host == "github.com" {
+		platform = "Github"
+	}
+
+	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the token '%s'\nRemember to delete the API key on %s", tokenName, platform)), false
 }

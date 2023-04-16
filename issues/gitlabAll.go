@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"gn/config"
+	"gn/config/remote"
 	"gn/logger"
 	"gn/requests"
 )
@@ -64,7 +64,7 @@ const queryAllQuery = `
 		}
 	`
 
-func gitlabQueryAll(match *config.Match, projectPath string) ([]Issue, error) {
+func gitlabQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)
 	variables := map[string]string{

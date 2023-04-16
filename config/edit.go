@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	"gn/config/remote"
 	"gn/logger"
 )
 
@@ -30,7 +31,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 	old := wrapper.Remotes[wrapperIndex]
 	if old.URL == *u {
 		for _, detail := range old.Details {
-			if detail.Token == token {
+			if detail.GetToken() == token {
 				logger.Log.Warn("Attempted to update the remote '%s' with the same token", u.String())
 
 				return ErrUpdateSameValues
@@ -38,11 +39,18 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 		}
 	}
 
-	rd := RemoteDetails{
-		Token: token,
+	var rd remote.Details
+	if u.Host == "github.com" {
+		rd = remote.GithubDetails{
+			Token: token,
+		}
+	} else {
+		rd = remote.GitlabDetails{
+			Token: token,
+		}
 	}
 
-	err = rd.Init(u)
+	rd, err = rd.Init(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to initalize token: %s", err)
 

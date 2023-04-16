@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"gn/config"
+	"gn/config/remote"
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -13,11 +14,11 @@ import (
 
 var ErrUserQuit = errors.New("user quit selection program")
 
-func Select(selectedRemote *config.Remote, title string) (*config.RemoteDetails, error) {
+func Select(selectedRemote *config.Remote, title string) (*remote.Details, error) {
 	items := make([]list.Item, len(selectedRemote.Details))
 	for i := range selectedRemote.Details {
 		items[i] = itemWrapper{
-			item: &selectedRemote.Details[i],
+			item: selectedRemote.Details[i],
 		}
 	}
 
@@ -57,5 +58,5 @@ func Select(selectedRemote *config.Remote, title string) (*config.RemoteDetails,
 		return nil, fmt.Errorf("failed to selected item to selectListItem")
 	}
 
-	return item.item, nil
+	return &item.item, nil
 }

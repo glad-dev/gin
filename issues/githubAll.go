@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"gn/config"
+	"gn/config/remote"
 	"gn/logger"
 	"gn/requests"
 )
@@ -106,7 +106,7 @@ var queryAllFollowing = `
 	}
 `
 
-func githubQueryAll(match *config.Match, projectPath string) ([]Issue, error) {
+func githubQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Errorf("Project path is invalid: %s", projectPath)

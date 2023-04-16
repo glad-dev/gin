@@ -3,14 +3,33 @@ package config
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 
 	"gn/config/location"
+	"gn/config/remote"
 	"gn/constants"
 	"gn/logger"
+	"gn/style"
 
 	"github.com/BurntSushi/toml"
 )
+
+// These are needed since the toml libary is unable to decode not-empty interfaces.
+type helperWrapper struct {
+	Colors  Colors
+	Remotes []helperRemote
+	Version uint8
+}
+
+type helperRemote struct {
+	URL     url.URL
+	Details []struct {
+		Token     string
+		TokenName string
+		Username  string
+	}
+}
 
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
@@ -25,8 +44,8 @@ func Load() (*Wrapper, error) {
 	}
 
 	// Load config
-	config := &Wrapper{}
-	metaData, err := toml.DecodeFile(fileLocation, config)
+	helper := &helperWrapper{}
+	metaData, err := toml.DecodeFile(fileLocation, helper)
 	if err != nil {
 		if os.IsNotExist(err) {
 			logger.Log.Infof("Found no configuration file at: %s", fileLocation)
@@ -49,15 +68,41 @@ func Load() (*Wrapper, error) {
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
 	}
 
-	err = config.CheckValidity()
+	wrap := &Wrapper{
+		Colors:  helper.Colors,
+		Version: helper.Version,
+		Remotes: make([]Remote, len(helper.Remotes)),
+	}
+
+	var toAdd Remote
+	for i, r := range helper.Remotes {
+		toAdd = Remote{
+			URL:     r.URL,
+			Details: make([]remote.Details, 0),
+		}
+
+		for _, details := range r.Details {
+			toAdd.Details = append(toAdd.Details, remote.GithubDetails{
+				Token:     details.Token,
+				TokenName: details.TokenName,
+				Username:  details.Username,
+			})
+		}
+
+		wrap.Remotes[i] = toAdd
+	}
+
+	err = wrap.CheckValidity()
 	if err != nil {
 		return nil, fmt.Errorf("config is invalid: %w", err)
 	}
 
-	err = config.Colors.setColors()
+	err = wrap.Colors.setColors()
 	if err != nil {
 		return nil, err
 	}
 
-	return config, nil
+	style.Init()
+
+	return wrap, nil
 }

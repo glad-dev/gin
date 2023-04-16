@@ -23,9 +23,12 @@ func (m *model) viewConfirmation() string {
 		lipgloss.JoinVertical(
 			lipgloss.Center,
 
-			fmt.Sprintf(
-				"Are you sure that you want to delete the token '%s'?",
-				lipgloss.NewStyle().Width(m.remotes.Width()).Render(m.oldConfig.Remotes[m.remotes.Index()].Details[m.details.Index()].TokenName),
+			lipgloss.NewStyle().Width(m.remotes.Width()).Align(lipgloss.Center, lipgloss.Center).Render(
+				fmt.Sprintf(
+					"Are you sure that you want to delete the token '%s' for %s?",
+					m.oldConfig.Remotes[m.remotes.Index()].Details[m.details.Index()].GetTokenName(),
+					m.oldConfig.Remotes[m.remotes.Index()].URL.String(),
+				),
 			),
 			"\n",
 			renderButtons(m.confirmPosition),

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"gn/config"
+	"gn/config/remote"
 	"gn/repo"
 	selectconfig "gn/tui/config/select"
 )
@@ -22,7 +23,7 @@ func SelectConfig(details []repo.Details) (*config.Wrapper, error) {
 						Remotes: []config.Remote{
 							{
 								URL:     conf.URL,
-								Details: []config.RemoteDetails{conf.Details[0]},
+								Details: []remote.Details{conf.Details[0]},
 							},
 						},
 					}, nil
@@ -37,7 +38,7 @@ func SelectConfig(details []repo.Details) (*config.Wrapper, error) {
 					Remotes: []config.Remote{
 						{
 							URL:     conf.URL,
-							Details: []config.RemoteDetails{*selected},
+							Details: []remote.Details{*selected},
 						},
 					},
 				}, nil
