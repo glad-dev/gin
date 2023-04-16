@@ -1,46 +1,22 @@
-package issues
+package single
 
 import (
-	"fmt"
 	"net/url"
 	"time"
-)
 
-type Issue struct {
-	Title     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Iid       string
-	State     string
-	Author    User
-	Assignees []User
-}
+	"gn/issues/user"
+)
 
 type IssueDetails struct {
 	Title       string
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Author      User
+	Author      user.Details
 	BaseURL     url.URL
-	Assignees   []User
+	Assignees   []user.Details
 	Labels      []Label
 	Discussion  []Comment
-}
-
-type Comment struct {
-	Author       User
-	Body         string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	LastEditedBy User
-	Comments     []Comment
-	Resolved     bool
-}
-
-type User struct {
-	Name     string
-	Username string
 }
 
 type Label struct {
@@ -48,38 +24,14 @@ type Label struct {
 	Color string
 }
 
-func (u *User) String() string {
-	if u.Username == "" {
-		return u.Name
-	}
-
-	return fmt.Sprintf("%s (%s)", u.Name, u.Username)
-}
-
-func (i *Issue) HasBeenUpdated() bool {
-	return i.CreatedAt != i.UpdatedAt
-}
-
-func (i *Issue) UpdateUsername(ownUsername string) {
-	if len(ownUsername) == 0 {
-		return
-	}
-
-	// Update author
-	if i.Author.Username == ownUsername {
-		i.Author.Name = "you"
-		i.Author.Username = ""
-	}
-
-	// Update assignees
-	for k, assignee := range i.Assignees {
-		if assignee.Username == ownUsername {
-			i.Assignees[k] = User{
-				Name:     "you",
-				Username: "",
-			}
-		}
-	}
+type Comment struct {
+	Author       user.Details
+	Body         string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	LastEditedBy user.Details
+	Comments     []Comment
+	Resolved     bool
 }
 
 func (id *IssueDetails) UpdateUsername(ownUsername string) {
@@ -87,7 +39,7 @@ func (id *IssueDetails) UpdateUsername(ownUsername string) {
 		return
 	}
 
-	you := User{
+	you := user.Details{
 		Name:     "you",
 		Username: "",
 	}

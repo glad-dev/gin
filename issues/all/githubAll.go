@@ -1,4 +1,4 @@
-package issues
+package all
 
 import (
 	"encoding/json"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"gn/config/remote"
+	"gn/issues/user"
 	"gn/logger"
 	"gn/requests"
 )
@@ -106,7 +107,7 @@ var queryAllFollowing = `
 	}
 `
 
-func queryAllGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryAllGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Errorf("Project path is invalid: %s", projectPath)
@@ -181,9 +182,9 @@ func parseResponse(response io.Reader, ownUsername string) ([]Issue, *pageInfo, 
 	var tmp Issue
 	issueList := make([]Issue, 0)
 	for _, issue := range queryAll.Data.Repository.Issues.Nodes {
-		assignees := make([]User, len(issue.Assignees.Nodes))
+		assignees := make([]user.Details, len(issue.Assignees.Nodes))
 		for i := range issue.Assignees.Nodes {
-			assignees[i] = User{Username: issue.Assignees.Nodes[i].Login}
+			assignees[i] = user.Details{Username: issue.Assignees.Nodes[i].Login}
 		}
 
 		tmp = Issue{
@@ -193,7 +194,7 @@ func parseResponse(response io.Reader, ownUsername string) ([]Issue, *pageInfo, 
 			Iid:       strconv.Itoa(issue.Number),
 			State:     issue.State,
 			Assignees: assignees,
-			Author:    User{Username: issue.Author.Login},
+			Author:    user.Details{Username: issue.Author.Login},
 		}
 
 		tmp.UpdateUsername(ownUsername)

@@ -1,34 +1,30 @@
-package issues
+package single
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"reflect"
 	"time"
 
-	"gn/config"
+	"gn/config/remote"
+	"gn/issues/user"
 	"gn/logger"
-	"gn/repo"
 	"gn/requests"
 )
 
-var ErrIssueDoesNotExist = errors.New("issue with the given iid does not exist")
-
-type querySingleResponse struct {
+type querySingleGitLabResponse struct {
 	Data struct {
 		Project struct {
 			Issue struct {
-				Title       string    `json:"title"`
-				Description string    `json:"description"`
-				CreatedAt   time.Time `json:"createdAt"`
-				UpdatedAt   time.Time `json:"updatedAt"`
-				Author      User      `json:"author"`
+				Title       string       `json:"title"`
+				Description string       `json:"description"`
+				CreatedAt   time.Time    `json:"createdAt"`
+				UpdatedAt   time.Time    `json:"updatedAt"`
+				Author      user.Details `json:"author"`
 				Assignees   struct {
-					Nodes []User `json:"nodes"`
+					Nodes []user.Details `json:"nodes"`
 				} `json:"assignees"`
 				Labels struct {
 					Nodes []Label `json:"nodes"`
@@ -37,11 +33,11 @@ type querySingleResponse struct {
 					Nodes []struct {
 						Notes struct {
 							Nodes []struct {
-								Body         string    `json:"body"`
-								CreatedAt    time.Time `json:"createdAt"`
-								UpdatedAt    time.Time `json:"updatedAt"`
-								LastEditedBy User      `json:"lastEditedBy"`
-								User         `json:"author"`
+								Body         string       `json:"body"`
+								CreatedAt    time.Time    `json:"createdAt"`
+								UpdatedAt    time.Time    `json:"updatedAt"`
+								LastEditedBy user.Details `json:"lastEditedBy"`
+								user.Details `json:"author"`
 								System       bool `json:"system"`
 								Resolved     bool `json:"resolved"`
 							} `json:"nodes"`
@@ -53,7 +49,7 @@ type querySingleResponse struct {
 	} `json:"data"`
 }
 
-const querySingleQuery = `
+const querySingleQueryGitLab = `
 		query($projectPath: ID!, $issueID: String!) {
 		  project(fullPath: $projectPath) {
 			issue(iid: $issueID) {
@@ -103,23 +99,16 @@ const querySingleQuery = `
 		}
 	`
 
-func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*IssueDetails, error) {
-	lab, projectPath, err := getMatchingConfig(config, details, u)
-	if err != nil {
-		logger.Log.Errorf("Failed to get matching config: %s", err)
-
-		return nil, err
-	}
-
+func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) (*IssueDetails, error) {
 	variables := map[string]string{
 		"projectPath": projectPath,
 		"issueID":     issueID,
 	}
 
 	tmp, err := requests.Project(&requests.GraphqlQuery{
-		Query:     querySingleQuery,
+		Query:     querySingleQueryGitLab,
 		Variables: variables,
-	}, lab)
+	}, match)
 	if err != nil {
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
@@ -131,13 +120,13 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		return nil, fmt.Errorf("query single - failed to read request: %w", err)
 	}
 
-	if issueDoesNotExist(bytes.NewBuffer(response)) {
+	if issueDoesNotExistGitLab(bytes.NewBuffer(response)) {
 		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
 	}
 
-	querySingle := querySingleResponse{}
+	querySingle := querySingleGitLabResponse{}
 
 	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
@@ -154,7 +143,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,
 		UpdatedAt:   querySingle.Data.Project.Issue.UpdatedAt,
 		Author:      querySingle.Data.Project.Issue.Author,
-		BaseURL:     lab.URL,
+		BaseURL:     match.URL,
 
 		Assignees:  nil,
 		Labels:     nil,
@@ -163,9 +152,9 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 
 	// Flatten response
 	// Assignees
-	assignees := make([]User, 0)
+	assignees := make([]user.Details, 0)
 	for _, assignee := range querySingle.Data.Project.Issue.Assignees.Nodes {
-		assignees = append(assignees, User{
+		assignees = append(assignees, user.Details{
 			Name:     assignee.Name,
 			Username: assignee.Username,
 		})
@@ -196,7 +185,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		}
 
 		comment := Comment{
-			Author: User{
+			Author: user.Details{
 				Name:     inner[0].Name,
 				Username: inner[0].Username,
 			},
@@ -211,7 +200,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		// Get sub comments
 		for _, subComment := range inner[1:] {
 			comment.Comments = append(comment.Comments, Comment{
-				Author:       subComment.User,
+				Author:       subComment.Details,
 				Body:         subComment.Body,
 				CreatedAt:    subComment.CreatedAt,
 				UpdatedAt:    subComment.UpdatedAt,
@@ -224,12 +213,12 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 		issueDetails.Discussion = append(issueDetails.Discussion, comment)
 	}
 
-	issueDetails.UpdateUsername(lab.Username)
+	issueDetails.UpdateUsername(match.Username)
 
 	return &issueDetails, nil
 }
 
-func issueDoesNotExist(response io.Reader) bool {
+func issueDoesNotExistGitLab(response io.Reader) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project struct {

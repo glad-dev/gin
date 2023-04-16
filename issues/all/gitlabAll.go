@@ -1,4 +1,4 @@
-package issues
+package all
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gn/config/remote"
+	"gn/issues/user"
 	"gn/logger"
 	"gn/requests"
 )
@@ -19,14 +20,14 @@ type queryAllGitLabResponse struct {
 					HasNextPage bool   `json:"hasNextPage"`
 				} `json:"pageInfo"`
 				Nodes []struct {
-					Title     string    `json:"title"`
-					CreatedAt time.Time `json:"createdAt"`
-					UpdatedAt time.Time `json:"updatedAt"`
-					Iid       string    `json:"iid"`
-					State     string    `json:"state"`
-					Author    User      `json:"author"`
+					Title     string       `json:"title"`
+					CreatedAt time.Time    `json:"createdAt"`
+					UpdatedAt time.Time    `json:"updatedAt"`
+					Iid       string       `json:"iid"`
+					State     string       `json:"state"`
+					Author    user.Details `json:"author"`
 					Assignees struct {
-						Nodes []User `json:"nodes"`
+						Nodes []user.Details `json:"nodes"`
 					} `json:"assignees"`
 				} `json:"nodes"`
 			} `json:"issues"`
@@ -64,7 +65,7 @@ const queryAllQuery = `
 		}
 	`
 
-func queryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)
 	variables := map[string]string{

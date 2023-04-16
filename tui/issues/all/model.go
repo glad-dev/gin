@@ -5,6 +5,7 @@ import (
 
 	"gn/config"
 	"gn/issues"
+	"gn/issues/single"
 	"gn/style"
 	"gn/tui/issues/shared"
 
@@ -34,7 +35,7 @@ const (
 type model struct {
 	shared              *shared.Shared
 	conf                *config.Wrapper
-	viewedIssues        map[string]issues.IssueDetails
+	viewedIssues        map[string]single.IssueDetails
 	tabs                tabs
 	error               string
 	viewport            viewport.Model
@@ -53,7 +54,7 @@ type allIssuesUpdateMsg struct {
 }
 
 type singleIsseUpdateMsg struct {
-	details  *issues.IssueDetails
+	details  *single.IssueDetails
 	errorMsg string
 	issueID  string
 }

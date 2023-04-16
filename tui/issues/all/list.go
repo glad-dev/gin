@@ -1,9 +1,10 @@
 package all
 
 import (
+	"strings"
+
 	"gn/issues"
 	"gn/logger"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
