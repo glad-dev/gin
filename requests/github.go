@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 func checkErrorGitHub(response []byte) error {
@@ -41,7 +42,7 @@ func checkErrorGitHub(response []byte) error {
 		)
 	}
 
-	return fmt.Errorf(out)
+	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
 func checkExistenceGitHub(response []byte) bool {

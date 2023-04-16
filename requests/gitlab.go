@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"strings"
 )
 
 func checkErrorGitLab(response io.Reader) error {
@@ -43,7 +44,7 @@ func checkErrorGitLab(response io.Reader) error {
 		)
 	}
 
-	return fmt.Errorf(out)
+	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
 func checkExistenceGitLab(response io.Reader) bool {
