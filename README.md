@@ -23,4 +23,5 @@
 - [ ] Add PR support
 
 # Acknowledgements
-This project would not have been possible without [bubbletea](https://github.com/charmbracelet/bubbletea/).
+This project would not have been possible without [charmbracelet](https://github.com/charmbracelet) and their
+[bubbltea](https://github.com/charmbracelet/bubbletea) and [glow](https://github.com/charmbracelet/glow) libraries.
