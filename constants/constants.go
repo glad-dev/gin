@@ -7,6 +7,6 @@ const (
 )
 
 var (
-	RequiredGitlabScopes = []string{"read_api", "read_user", "read_repository"}
-	RequiredGithubScopes = []string{"public_repo", "read:user"} // TODO: Verify scopes
+	RequiredGitLabScopes = []string{"read_api", "read_user", "read_repository"}
+	RequiredGitHubScopes = []string{"public_repo", "read:user"} // TODO: Verify scopes
 )

@@ -10,7 +10,7 @@ import (
 	"gn/requests"
 )
 
-type queryAllGitlab struct {
+type queryAllGitLabResponse struct {
 	Data struct {
 		Project struct {
 			Issues struct {
@@ -64,7 +64,7 @@ const queryAllQuery = `
 		}
 	`
 
-func gitlabQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
+func queryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)
 	variables := map[string]string{
@@ -82,7 +82,7 @@ func gitlabQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
 			return nil, fmt.Errorf("query all issues failed: %w", err)
 		}
 
-		queryAll := queryAllGitlab{}
+		queryAll := queryAllGitLabResponse{}
 
 		dec := json.NewDecoder(response)
 		dec.DisallowUnknownFields()

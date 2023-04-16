@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-func checkErrorGitlab(response io.Reader) error {
+func checkErrorGitLab(response io.Reader) error {
 	errorResponse := struct {
 		Errors []struct {
 			Extensions struct {
@@ -46,7 +46,7 @@ func checkErrorGitlab(response io.Reader) error {
 	return fmt.Errorf(out)
 }
 
-func checkExistenceGitlab(response io.Reader) bool {
+func checkExistenceGitLab(response io.Reader) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`

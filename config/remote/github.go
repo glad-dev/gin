@@ -10,37 +10,43 @@ import (
 	"gn/requests"
 )
 
-type GithubDetails struct {
+type GitHubDetails struct {
 	Token     string
 	TokenName string
 	Username  string
 }
 
-func (hub GithubDetails) GetToken() string {
+func (hub GitHubDetails) GetToken() string {
 	return hub.Token
 }
 
-func (hub GithubDetails) GetTokenName() string {
+func (hub GitHubDetails) GetTokenName() string {
 	return hub.TokenName
 }
 
-func (hub GithubDetails) GetUsername() string {
+func (hub GitHubDetails) GetUsername() string {
 	return hub.Username
 }
 
-func (hub GithubDetails) Init(u *url.URL) (Details, error) {
+func (hub GitHubDetails) Init(u *url.URL) (Details, error) {
+	if u.Host != "github.com" {
+		logger.Log.Errorf("Got GitHubDetails with invalid host: %s", u.Host)
+
+		return nil, errors.New("initializing GitHubDetails with a non-GitHub URL")
+	}
+
 	err := hub.getUsername(u)
 	if err != nil {
-		logger.Log.Error("Failed to get Username.", "error", err, "GithubDetails", hub)
+		logger.Log.Error("Failed to get Username.", "error", err, "GitHubDetails", hub)
 
-		return nil, fmt.Errorf("GithubDetails.Init: Failed to get Username: %w", err)
+		return nil, fmt.Errorf("GitHubDetails.Init: Failed to get Username: %w", err)
 	}
 
 	tokenName, err := hub.CheckTokenScope(u)
 	if err != nil {
-		logger.Log.Error("Failed to check scope.", "error", err, "GithubDetails", hub)
+		logger.Log.Error("Failed to check scope.", "error", err, "GitHubDetails", hub)
 
-		return nil, fmt.Errorf("GithubDetails.Init: Failed to check scope: %w", err)
+		return nil, fmt.Errorf("GitHubDetails.Init: Failed to check scope: %w", err)
 	}
 
 	hub.TokenName = tokenName
@@ -48,7 +54,7 @@ func (hub GithubDetails) Init(u *url.URL) (Details, error) {
 	return hub, nil
 }
 
-func (hub *GithubDetails) getUsername(u *url.URL) error {
+func (hub *GitHubDetails) getUsername(u *url.URL) error {
 	responseType := struct {
 		Data struct {
 			Viewer struct {
@@ -92,6 +98,6 @@ func (hub *GithubDetails) getUsername(u *url.URL) error {
 	return nil
 }
 
-func (hub GithubDetails) CheckTokenScope(_ *url.URL) (string, error) { // TODO
-	return "Github token for account " + hub.Username, nil
+func (hub GitHubDetails) CheckTokenScope(_ *url.URL) (string, error) { // TODO
+	return "GitHub token for account " + hub.Username, nil
 }

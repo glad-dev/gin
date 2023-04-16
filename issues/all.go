@@ -17,8 +17,8 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 	}
 
 	if match.URL.Host == "github.com" {
-		return githubQueryAll(match, projectPath)
+		return queryAllGitHub(match, projectPath)
 	}
 
-	return gitlabQueryAll(match, projectPath)
+	return queryAllGitLab(match, projectPath)
 }

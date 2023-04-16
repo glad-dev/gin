@@ -42,9 +42,9 @@ func newCmdConfig() *cobra.Command {
 	}
 
 	addDesc := fmt.Sprintf(
-		"Add a new token.\nA Gitlab token needs the following scopes: %s\nA Github token needs the following scopes: %s\n",
-		strings.Join(constants.RequiredGitlabScopes, ", "),
-		strings.Join(constants.RequiredGithubScopes, ", "),
+		"Add a new token.\nA GitLab token needs the following scopes: %s\nA GitHub token needs the following scopes: %s\n",
+		strings.Join(constants.RequiredGitLabScopes, ", "),
+		strings.Join(constants.RequiredGitHubScopes, ", "),
 	)
 
 	cmdAdd := &cobra.Command{

@@ -16,37 +16,43 @@ import (
 	"gn/requests"
 )
 
-type GitlabDetails struct {
+type GitLabDetails struct {
 	Token     string
 	TokenName string
 	Username  string
 }
 
-func (lab GitlabDetails) GetToken() string {
+func (lab GitLabDetails) GetToken() string {
 	return lab.Token
 }
 
-func (lab GitlabDetails) GetTokenName() string {
+func (lab GitLabDetails) GetTokenName() string {
 	return lab.TokenName
 }
 
-func (lab GitlabDetails) GetUsername() string {
+func (lab GitLabDetails) GetUsername() string {
 	return lab.Username
 }
 
-func (lab GitlabDetails) Init(u *url.URL) (Details, error) {
+func (lab GitLabDetails) Init(u *url.URL) (Details, error) {
+	if u.Host == "github.com" {
+		logger.Log.Errorf("Got GitLabDetails with invalid host: %s", u.Host)
+
+		return nil, errors.New("initializing GitLabDetails with a GitHub URL")
+	}
+
 	tokenName, err := lab.CheckTokenScope(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to check scope: %s", err)
 
-		return nil, fmt.Errorf("GitlabDetails.Init: Failed to check scope: %w", err)
+		return nil, fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
 	}
 
 	err = lab.getUsername(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to get username: %s", err)
 
-		return nil, fmt.Errorf("GitlabDetails.Init: Failed to get Username: %w", err)
+		return nil, fmt.Errorf("GitLabDetails.Init: Failed to get Username: %w", err)
 	}
 
 	lab.TokenName = tokenName
@@ -54,7 +60,7 @@ func (lab GitlabDetails) Init(u *url.URL) (Details, error) {
 	return lab, nil
 }
 
-func (lab *GitlabDetails) getUsername(u *url.URL) error {
+func (lab *GitLabDetails) getUsername(u *url.URL) error {
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {
@@ -100,7 +106,7 @@ func (lab *GitlabDetails) getUsername(u *url.URL) error {
 	return nil
 }
 
-func (lab GitlabDetails) CheckTokenScope(u *url.URL) (string, error) {
+func (lab GitLabDetails) CheckTokenScope(u *url.URL) (string, error) {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`
 		LastUsedAt time.Time   `json:"last_used_at"`
@@ -159,8 +165,8 @@ func (lab GitlabDetails) CheckTokenScope(u *url.URL) (string, error) {
 	}
 
 	// Make a copy of the required scopes slice
-	required := make([]string, len(constants.RequiredGitlabScopes))
-	copy(required, constants.RequiredGitlabScopes)
+	required := make([]string, len(constants.RequiredGitLabScopes))
+	copy(required, constants.RequiredGitLabScopes)
 
 	for _, scope := range response.Scopes {
 		for i, s := range required {

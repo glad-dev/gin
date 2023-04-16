@@ -125,9 +125,9 @@ func submit(m *model) (string, bool) {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	platform := "Gitlab"
+	platform := "GitLab"
 	if m.oldConfig.Remotes[m.remotes.Index()].URL.Host == "github.com" {
-		platform = "Github"
+		platform = "GitHub"
 	}
 
 	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the token '%s'\nRemember to delete the API key on %s", tokenName, platform)), false

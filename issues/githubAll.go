@@ -14,7 +14,7 @@ import (
 	"gn/requests"
 )
 
-type queryAllGithub struct {
+type queryAllGitHubResponse struct {
 	Data struct {
 		Repository struct {
 			Issues struct {
@@ -106,7 +106,7 @@ var queryAllFollowing = `
 	}
 `
 
-func githubQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
+func queryAllGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Errorf("Project path is invalid: %s", projectPath)
@@ -166,7 +166,7 @@ func githubQueryAll(match *remote.Match, projectPath string) ([]Issue, error) {
 }
 
 func parseResponse(response io.Reader, ownUsername string) ([]Issue, *pageInfo, error) {
-	queryAll := queryAllGithub{}
+	queryAll := queryAllGitHubResponse{}
 
 	dec := json.NewDecoder(response)
 	dec.DisallowUnknownFields()

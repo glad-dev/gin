@@ -41,11 +41,11 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	var rd remote.Details
 	if u.Host == "github.com" {
-		rd = remote.GithubDetails{
+		rd = remote.GitHubDetails{
 			Token: token,
 		}
 	} else {
-		rd = remote.GitlabDetails{
+		rd = remote.GitLabDetails{
 			Token: token,
 		}
 	}

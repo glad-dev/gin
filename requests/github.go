@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-func checkErrorGithub(response []byte) error {
+func checkErrorGitHub(response []byte) error {
 	errorResponse := struct {
 		Errors []struct {
 			Type      string   `json:"type"`
@@ -44,7 +44,7 @@ func checkErrorGithub(response []byte) error {
 	return fmt.Errorf(out)
 }
 
-func checkExistenceGithub(response []byte) bool {
+func checkExistenceGitHub(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Repository interface{} `json:"repository"`

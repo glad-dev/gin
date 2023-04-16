@@ -117,16 +117,16 @@ func getGraphQLURL(u *url.URL) string {
 
 func checkError(u *url.URL, response []byte) error {
 	if u.Host == "github.com" {
-		return checkErrorGithub(response)
+		return checkErrorGitHub(response)
 	}
 
-	return checkErrorGitlab(bytes.NewBuffer(response))
+	return checkErrorGitLab(bytes.NewBuffer(response))
 }
 
 func checkExistence(u *url.URL, response []byte) bool {
 	if u.Host == "github.com" {
-		return checkExistenceGithub(response)
+		return checkExistenceGitHub(response)
 	}
 
-	return checkExistenceGitlab(bytes.NewBuffer(response))
+	return checkExistenceGitLab(bytes.NewBuffer(response))
 }
