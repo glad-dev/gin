@@ -17,6 +17,17 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
+func GitHubComment(query *GitHubCommentQuery, config ConfigInterface) (*bytes.Buffer, error) {
+	requestBody, err := json.Marshal(query)
+	if err != nil {
+		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
+
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	return makeRequest(requestBody, config)
+}
+
 func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
@@ -25,6 +36,10 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
+	return makeRequest(requestBody, config)
+}
+
+func makeRequest(requestBody []byte, config ConfigInterface) (*bytes.Buffer, error) {
 	u, err := url.Parse(config.GetURL())
 	if err != nil {
 		logger.Log.Error("Failed to parse url", "error", err, "url", config.GetURL())

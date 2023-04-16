@@ -6,7 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"reflect"
+	"strconv"
+	"strings"
 	"time"
 
 	"gn/config/remote"
@@ -19,104 +20,146 @@ var ErrIssueDoesNotExist = errors.New("issue with the given iid does not exist")
 
 type querySingleGitHubResponse struct {
 	Data struct {
-		Project struct {
+		Repository struct {
 			Issue struct {
-				Title       string       `json:"title"`
-				Description string       `json:"description"`
-				CreatedAt   time.Time    `json:"createdAt"`
-				UpdatedAt   time.Time    `json:"updatedAt"`
-				Author      user.Details `json:"author"`
-				Assignees   struct {
-					Nodes []user.Details `json:"nodes"`
+				Title     string    `json:"title"`
+				Body      string    `json:"body"`
+				CreatedAt time.Time `json:"createdAt"`
+				UpdatedAt time.Time `json:"updatedAt"`
+				Author    struct {
+					Login string `json:"login"`
+				} `json:"author"`
+				Assignees struct {
+					Nodes []struct {
+						Login string `json:"login"`
+					} `json:"nodes"`
 				} `json:"assignees"`
 				Labels struct {
-					Nodes []Label `json:"nodes"`
-				} `json:"labels"`
-				Discussions struct {
 					Nodes []struct {
-						Notes struct {
-							Nodes []struct {
-								Body         string       `json:"body"`
-								CreatedAt    time.Time    `json:"createdAt"`
-								UpdatedAt    time.Time    `json:"updatedAt"`
-								LastEditedBy user.Details `json:"lastEditedBy"`
-								user.Details `json:"author"`
-								System       bool `json:"system"`
-								Resolved     bool `json:"resolved"`
-							} `json:"nodes"`
-						} `json:"notes"`
+						Color string `json:"color"`
+						Name  string `json:"name"`
 					} `json:"nodes"`
-				} `json:"discussions"`
+				} `json:"labels"`
+				Comments struct {
+					PageInfo pageInfo `json:"pageInfo"`
+					Nodes    []struct {
+						CreatedAt    time.Time  `json:"createdAt"`
+						UpdatedAt    time.Time  `json:"updatedAt"`
+						LastEditedAt *time.Time `json:"lastEditedAt"`
+						Author       struct {
+							Login string `json:"login"`
+						} `json:"author"`
+						Body string `json:"body"`
+					} `json:"nodes"`
+				} `json:"comments"`
 			} `json:"issue"`
-		} `json:"project"`
+		} `json:"repository"`
 	} `json:"data"`
 }
 
-const querySingleQueryGitHub = `
-		query($projectPath: ID!, $issueID: String!) {
-		  project(fullPath: $projectPath) {
-			issue(iid: $issueID) {
-			  title
-			  description
+type pageInfo struct {
+	EndCursor   string `json:"endCursor"`
+	HasNextPage bool   `json:"hasNextPage"`
+}
+
+const querySingleGitHubFirst = `
+	query($owner: String!, $name: String!, $issueID: Int!) {
+	  repository(owner: $owner, name: $name) {
+		issue(number: $issueID) {
+		  title
+		  body
+		  createdAt
+		  updatedAt
+		  author {
+			login
+		  }
+		  assignees(first: 100) {
+			nodes {
+			  login
+			}
+		  }
+		  labels(first: 100) {
+			nodes {
+			  color
+			  name
+			}
+		  }
+		  comments(first: 100) {
+			pageInfo {
+			  hasNextPage
+			  endCursor
+			}
+			nodes {
+			  
+			  author {
+				login
+			  }
+			  body
 			  createdAt
 			  updatedAt
-			  author {
-			    name
-			    username
-			  }
-			  assignees {
-				nodes {
-				  name
-				  username
-				}
-			  }
-			  labels {
-				nodes {
-				  title
-				  color	
-				}
-			  }
-			  discussions {
-				nodes {
-				  notes {
-					nodes {
-					  system
-					  author {
-						name
-						username
-					  }
-					  body
-					  createdAt
-					  updatedAt
-					  resolved
-					  lastEditedBy {
-						name
-						username
-					  }
-					}
-				  }
-				}
-			  }
+			  lastEditedAt
 			}
 		  }
 		}
-	`
+	  }
+	}
+`
+
+const querySingleGitHubFolowing = `
+	query($owner: String!, $name: String!, $cursor: String, $issueID: Int!) {
+	  repository(owner: $owner, name: $name) {
+		issue(number: $issueID) {
+		  comments(first: 100, after: $cursor) {
+			pageInfo {
+			  hasNextPage
+			  endCursor
+			}
+			nodes {
+			  
+			  author {
+				login
+			  }
+			  body
+			  createdAt
+			  updatedAt
+			  lastEditedAt
+			}
+		  }
+		}
+	  }
+	}
+`
 
 func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) (*IssueDetails, error) {
-	variables := map[string]string{
-		"projectPath": projectPath,
-		"issueID":     issueID,
+	tmp := strings.Split(projectPath, "/")
+	if len(tmp) != 2 {
+		logger.Log.Errorf("Project path is invalid: %s", projectPath)
+
+		return nil, errors.New("invalid project path")
 	}
 
-	tmp, err := requests.Project(&requests.GraphqlQuery{
-		Query:     querySingleQueryGitHub,
+	issueNumber, err := strconv.Atoi(issueID)
+	if err != nil {
+		logger.Log.Error("Failed to convert issueID to int.", "error", err, "issueID", issueID)
+
+		return nil, fmt.Errorf("failed to convert issueID to int: %w", err)
+	}
+
+	variables := map[string]interface{}{
+		"owner":   tmp[0],
+		"name":    tmp[1],
+		"issueID": issueNumber,
+	}
+
+	responseReader, err := requests.GitHubComment(&requests.GitHubCommentQuery{
+		Query:     querySingleGitHubFirst,
 		Variables: variables,
 	}, match)
 	if err != nil {
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
-	response, err := io.ReadAll(tmp)
+	response, err := io.ReadAll(responseReader)
 	if err != nil {
 		logger.Log.Errorf("Failed to read response: %s", err)
 
@@ -141,11 +184,11 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 	}
 
 	issueDetails := IssueDetails{
-		Title:       querySingle.Data.Project.Issue.Title,
-		Description: querySingle.Data.Project.Issue.Description,
-		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,
-		UpdatedAt:   querySingle.Data.Project.Issue.UpdatedAt,
-		Author:      querySingle.Data.Project.Issue.Author,
+		Title:       querySingle.Data.Repository.Issue.Title,
+		Description: querySingle.Data.Repository.Issue.Body,
+		CreatedAt:   querySingle.Data.Repository.Issue.CreatedAt,
+		UpdatedAt:   querySingle.Data.Repository.Issue.UpdatedAt,
+		Author:      user.Details{Username: querySingle.Data.Repository.Issue.Author.Login},
 		BaseURL:     match.URL,
 
 		Assignees:  nil,
@@ -156,64 +199,64 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 	// Flatten response
 	// Assignees
 	assignees := make([]user.Details, 0)
-	for _, assignee := range querySingle.Data.Project.Issue.Assignees.Nodes {
+	for _, assignee := range querySingle.Data.Repository.Issue.Assignees.Nodes {
 		assignees = append(assignees, user.Details{
-			Name:     assignee.Name,
-			Username: assignee.Username,
+			Username: assignee.Login,
 		})
 	}
 	issueDetails.Assignees = assignees
 
 	// Labels
 	labels := make([]Label, 0)
-	for _, label := range querySingle.Data.Project.Issue.Labels.Nodes {
+	for _, label := range querySingle.Data.Repository.Issue.Labels.Nodes {
 		labels = append(labels, Label{
-			Title: label.Title,
+			Title: label.Name,
 			Color: label.Color,
 		})
 	}
 	issueDetails.Labels = labels
 
-	// Discussion
-	for _, node := range querySingle.Data.Project.Issue.Discussions.Nodes {
-		inner := node.Notes.Nodes
-		if len(inner) == 0 {
-			logger.Log.Info("Discussion without nodes", "response", string(response))
+	// Parse initial comments
+	comments, info, err := parseComments(response)
+	if err != nil {
+		return nil, err
+	}
 
-			continue
+	issueDetails.Discussion = append(issueDetails.Discussion, comments...)
+
+	if info.HasNextPage {
+		endCursor := querySingle.Data.Repository.Issue.Comments.PageInfo.EndCursor
+
+		for {
+			variables["cursor"] = endCursor
+
+			responseReader, err = requests.GitHubComment(&requests.GitHubCommentQuery{
+				Query:     querySingleGitHubFolowing,
+				Variables: variables,
+			}, match)
+			if err != nil {
+				return nil, fmt.Errorf("query single - request failed: %w", err)
+			}
+
+			response, err = io.ReadAll(responseReader)
+			if err != nil {
+				logger.Log.Errorf("Failed to read response: %s", err)
+
+				return nil, fmt.Errorf("query single - failed to read request: %w", err)
+			}
+
+			comments, info, err = parseComments(response)
+			if err != nil {
+				return nil, err
+			}
+
+			issueDetails.Discussion = append(issueDetails.Discussion, comments...)
+
+			endCursor = info.EndCursor
+			if !info.HasNextPage {
+				break
+			}
 		}
-
-		if inner[0].System {
-			continue
-		}
-
-		comment := Comment{
-			Author: user.Details{
-				Name:     inner[0].Name,
-				Username: inner[0].Username,
-			},
-			Body:         inner[0].Body,
-			CreatedAt:    inner[0].CreatedAt,
-			UpdatedAt:    inner[0].UpdatedAt,
-			Resolved:     inner[0].Resolved,
-			LastEditedBy: inner[0].LastEditedBy,
-			Comments:     make([]Comment, 0),
-		}
-
-		// Get sub comments
-		for _, subComment := range inner[1:] {
-			comment.Comments = append(comment.Comments, Comment{
-				Author:       subComment.Details,
-				Body:         subComment.Body,
-				CreatedAt:    subComment.CreatedAt,
-				UpdatedAt:    subComment.UpdatedAt,
-				Resolved:     subComment.Resolved,
-				LastEditedBy: subComment.LastEditedBy,
-				Comments:     nil,
-			})
-		}
-
-		issueDetails.Discussion = append(issueDetails.Discussion, comment)
 	}
 
 	issueDetails.UpdateUsername(match.Username)
@@ -221,12 +264,45 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 	return &issueDetails, nil
 }
 
+func parseComments(response []byte) ([]Comment, *pageInfo, error) {
+	querySingle := querySingleGitHubResponse{}
+
+	dec := json.NewDecoder(bytes.NewBuffer(response))
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&querySingle)
+	if err != nil {
+		logger.Log.Error("Failed to decode issue.", "error", err, "response", string(response))
+
+		return nil, nil, fmt.Errorf("unmarshal of issues failed: %w", err)
+	}
+
+	comments := make([]Comment, len(querySingle.Data.Repository.Issue.Comments.Nodes))
+	for i, node := range querySingle.Data.Repository.Issue.Comments.Nodes {
+		/*
+			if inner[0].System {
+				continue
+			}*/
+
+		comments[i] = Comment{
+			Author: user.Details{
+				Username: node.Author.Login,
+			},
+			Body:         node.Body,
+			CreatedAt:    node.CreatedAt,
+			UpdatedAt:    node.UpdatedAt,
+			Resolved:     false,
+			LastEditedBy: user.Details{Username: "unkown"},
+			Comments:     make([]Comment, 0),
+		}
+	}
+
+	return comments, &querySingle.Data.Repository.Issue.Comments.PageInfo, nil
+}
+
 func issueDoesNotExistGitHub(response io.Reader) bool {
 	emptyResponse := struct {
 		Data struct {
-			Project struct {
-				Issue interface{} `json:"issue"`
-			} `json:"project"`
+			Repository interface{} `json:"repository"`
 		} `json:"data"`
 	}{}
 
@@ -237,5 +313,5 @@ func issueDoesNotExistGitHub(response io.Reader) bool {
 		return false
 	}
 
-	return !reflect.ValueOf(emptyResponse.Data.Project.Issue).IsValid()
+	return emptyResponse.Data.Repository == nil
 }
