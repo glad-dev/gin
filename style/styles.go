@@ -40,7 +40,7 @@ func Init() {
 	Error = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF0000"))
 
 	Comment = lipgloss.NewStyle().BorderForeground(color.Border).BorderStyle(lipgloss.RoundedBorder()).Padding(1)
-	Discussion = Comment.Copy()
+	Discussion = Comment.Copy().PaddingRight(0)
 
 	quitText = lipgloss.NewStyle().Padding(1, 2, 1, 2)
 }

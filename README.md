@@ -13,6 +13,9 @@
 - [x] Add cli command to check token validity
 - [x] Log errors
 
+### Not blocking
+- Rendering the warning emoji leads to withspace error
+
 ### Won't do
 - Repo based query without token (How do I get the correct details?)
 

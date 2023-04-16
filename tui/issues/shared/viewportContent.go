@@ -22,11 +22,8 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 	style.Comment.Width(width - style.Comment.GetHorizontalFrameSize())
 	style.Discussion.Width(availableWidth - style.Comment.GetHorizontalFrameSize() - style.Discussion.GetHorizontalFrameSize())
 
-	outerSpace := style.Comment.GetWidth() - style.Comment.GetHorizontalFrameSize()
-	innerSpace := style.Discussion.GetWidth() - style.Discussion.GetHorizontalFrameSize()
-
 	markdownOptions := []glamour.TermRendererOption{
-		glamour.WithWordWrap(outerSpace),
+		glamour.WithWordWrap(style.Comment.GetWidth() - 2),
 		glamour.WithAutoStyle(),
 		glamour.WithEmoji(),
 		glamour.WithBaseURL(issue.BaseURL.String()),
@@ -43,7 +40,7 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 	defer markdownOuter.Close()
 
 	// Update the word wrap length
-	markdownOptions[0] = glamour.WithWordWrap(innerSpace)
+	markdownOptions[0] = glamour.WithWordWrap(style.Discussion.GetWidth() - 2)
 	markdownInner, err := glamour.NewTermRenderer(
 		markdownOptions...,
 	)
