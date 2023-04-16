@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"gn/constants"
+	"gn/logger"
 	"gn/requests"
 )
 
@@ -30,6 +31,8 @@ var ErrMultipleRepoDetails = errors.New("config contains multiple matching confi
 
 func (r *Remote) ToMatch() (*Match, error) {
 	if len(r.Details) == 0 {
+		logger.Log.Error("Remote contains no details")
+
 		return nil, errors.New("failed to convert Remote to Match since Remote.Details contains no elements")
 	}
 
@@ -49,6 +52,8 @@ func (r *Remote) ToMatch() (*Match, error) {
 
 func (r *Remote) ToMatchAtIndex(index int) (*Match, error) {
 	if index < 0 || index >= len(r.Details) {
+		logger.Log.Error("Invalid index", "index", index, "len(details)", len(r.Details))
+
 		return nil, errors.New("ToMatchAtIndex: invalid index")
 	}
 
@@ -60,10 +65,12 @@ func (r *Remote) ToMatchAtIndex(index int) (*Match, error) {
 	}, nil
 }
 
-func (r *Remote) CheckSemantics() error {
+func (r *Remote) checkSemantics() error {
 	// Check URL
 	_, err := checkURLStr(r.URL.String())
 	if err != nil {
+		logger.Log.Error("URL is invalid", "error", err, "url", r.URL.String())
+
 		return err
 	}
 
@@ -90,20 +97,24 @@ func (r *Remote) CheckSemantics() error {
 }
 
 func (rd *RemoteDetails) Init(u *url.URL) error {
-	err := rd.CheckTokenScope(u)
+	err := rd.checkTokenScope(u)
 	if err != nil {
+		logger.Log.Error("Failed to check scope", "error", err, "remoteDetails", rd)
+
 		return fmt.Errorf("RemoteDetails.Init: Failed to check scope: %w", err)
 	}
 
-	err = rd.GetUsername(u)
+	err = rd.getUsername(u)
 	if err != nil {
+		logger.Log.Error("Failed to get username", "error", err, "remoteDetails", rd)
+
 		return fmt.Errorf("RemoteDetails.Init: Failed to get username: %w", err)
 	}
 
 	return nil
 }
 
-func (rd *RemoteDetails) GetUsername(u *url.URL) error {
+func (rd *RemoteDetails) getUsername(u *url.URL) error {
 	type returnType struct {
 		Data struct {
 			CurrentUser struct {
@@ -149,7 +160,7 @@ func (rd *RemoteDetails) GetUsername(u *url.URL) error {
 	return nil
 }
 
-func (rd *RemoteDetails) CheckTokenScope(u *url.URL) error {
+func (rd *RemoteDetails) checkTokenScope(u *url.URL) error {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`
 		LastUsedAt time.Time   `json:"last_used_at"`

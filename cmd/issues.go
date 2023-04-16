@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 
+	"gn/logger"
 	"gn/repo"
 	"gn/style"
 	allIssues "gn/tui/issues/all"
@@ -68,8 +69,15 @@ func preRun(cmd *cobra.Command, _ []string) error {
 	urlFlag := cmd.Flags().Lookup("url")
 	pathFlag := cmd.Flags().Lookup("path")
 
+	// Check if the flags were defined
+	if urlFlag == nil || pathFlag == nil {
+		logger.Log.Error("URL or path flag was not defined", "urlFlag", urlFlag, "pathFlag", pathFlag)
+
+		return errors.New("flag --path or --url was not defined")
+	}
+
 	// Check if flags exists and if they were set
-	if (urlFlag != nil && pathFlag != nil) && (urlFlag.Changed && pathFlag.Changed) {
+	if urlFlag.Changed && pathFlag.Changed {
 		return errors.New("flags --path and --url are mutually exclusive")
 	}
 
@@ -80,11 +88,15 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 	// Check if the flags are ok
 	dir, err := cmd.Flags().GetString("path")
 	if err != nil {
+		logger.Log.Errorf("Failed to get the path flag: %s", err)
+
 		return nil, nil, fmt.Errorf("failed to get the 'path' flag: %w", err)
 	}
 
 	urlStr, err := cmd.Flags().GetString("url")
 	if err != nil {
+		logger.Log.Errorf("Failed to get the url flag: %s", err)
+
 		return nil, nil, fmt.Errorf("failed to get the 'url' flag: %w", err)
 	}
 
@@ -94,6 +106,8 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 		var u *url.URL
 		u, err = url.ParseRequestURI(urlStr)
 		if err != nil {
+			logger.Log.Error("Invalid url passed", "error", err, "url", urlStr)
+
 			return nil, nil, fmt.Errorf("failed to parse given url: %w", err)
 		}
 
@@ -105,12 +119,16 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 		// Path flag was not set => Use current directory
 		dir, err = os.Getwd()
 		if err != nil {
+			logger.Log.Errorf("Failed to get current directory: %s", err)
+
 			return nil, nil, err
 		}
 	}
 
 	details, err := repo.Get(dir)
 	if err != nil {
+		logger.Log.Error("Failed to get repository details", "errror", err, "directory", dir)
+
 		return nil, nil, fmt.Errorf("failed to get repo details: %w", err)
 	}
 

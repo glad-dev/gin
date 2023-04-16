@@ -21,7 +21,7 @@ func List() error {
 
 	fmt.Println()
 	fmt.Println(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
-	for i, config := range wrapper.Configs {
+	for i, config := range wrapper.Remotes {
 		fmt.Println(style.List.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
 
 		for k, detail := range config.Details {

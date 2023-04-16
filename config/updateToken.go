@@ -4,16 +4,18 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"gn/logger"
 )
 
-func UpdateToken() error {
+func UpdateRemote() error {
 	wrapper, err := Load()
 	if err != nil {
 		return err
 	}
 
 	invalid := make(map[string][]errorStruct)
-	for i, config := range wrapper.Configs {
+	for i, config := range wrapper.Remotes {
 		for k, detail := range config.Details {
 			// Check token's scope and update the username
 			err = detail.Init(&config.URL)
@@ -29,12 +31,12 @@ func UpdateToken() error {
 			config.Details[k] = detail
 		}
 
-		wrapper.Configs[i] = config
+		wrapper.Remotes[i] = config
 	}
 
 	err = Write(wrapper)
 	if err != nil {
-		return fmt.Errorf("Failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 
 	if len(invalid) == 0 {
@@ -53,6 +55,8 @@ func UpdateToken() error {
 			)
 		}
 	}
+
+	logger.Log.Error("Not all remotes could be updated", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }

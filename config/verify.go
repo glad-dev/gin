@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"gn/logger"
 )
 
 type errorStruct struct {
@@ -18,10 +20,12 @@ func VerifyTokens() error {
 	}
 
 	invalid := make(map[string][]errorStruct)
-	for _, config := range wrapper.Configs {
+	for _, config := range wrapper.Remotes {
 		for _, detail := range config.Details {
-			err = detail.CheckTokenScope(&config.URL)
+			err = detail.checkTokenScope(&config.URL)
 			if err != nil {
+				logger.Log.Error("Failed to check token scope", "error", err, "URL", config.URL.String())
+
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
 					tokenName: detail.TokenName,
 					err:       err,
@@ -45,6 +49,8 @@ func VerifyTokens() error {
 			)
 		}
 	}
+
+	logger.Log.Error("Not all tokens could be verified", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }

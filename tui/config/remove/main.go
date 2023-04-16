@@ -23,10 +23,10 @@ func Config() {
 		style.PrintErrAndExit("Failed to load the configuration: " + err.Error())
 	}
 
-	items := make([]list.Item, len(wrapper.Configs))
-	for i := range wrapper.Configs {
+	items := make([]list.Item, len(wrapper.Remotes))
+	for i := range wrapper.Remotes {
 		items[i] = shared.ListItem{
-			Remote: &wrapper.Configs[i],
+			Remote: &wrapper.Remotes[i],
 		}
 	}
 

@@ -90,7 +90,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Update the username and token names",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.UpdateToken()
+			err := config.UpdateRemote()
 			if err != nil {
 				style.PrintErrAndExit(err.Error())
 			}

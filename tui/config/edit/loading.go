@@ -13,7 +13,7 @@ import (
 
 func (m *model) updateLoading() tea.Cmd {
 	return func() tea.Msg {
-		oldURL := m.edit.oldConfig.Configs[m.edit.listIndex].URL.String()
+		oldURL := m.edit.oldConfig.Remotes[m.edit.listIndex].URL.String()
 
 		err := config.Update(m.edit.oldConfig, m.edit.listIndex, m.edit.detailsIndex, m.edit.inputs[0].Value(), m.edit.inputs[1].Value())
 		if err != nil {

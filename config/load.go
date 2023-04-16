@@ -7,6 +7,7 @@ import (
 
 	"gn/config/location"
 	"gn/constants"
+	"gn/logger"
 
 	"github.com/BurntSushi/toml"
 )
@@ -28,17 +29,23 @@ func Load() (*Wrapper, error) {
 	metaData, err := toml.DecodeFile(fileLocation, config)
 	if err != nil {
 		if os.IsNotExist(err) {
+			logger.Log.Infof("Found no configuration file at: %s", fileLocation)
+
 			return &Wrapper{
-				Configs:       []Remote{},
-				ConfigVersion: constants.ConfigVersion,
+				Remotes: []Remote{},
+				Version: constants.ConfigVersion,
 			}, ErrConfigDoesNotExist
 		}
+
+		logger.Log.Errorf("toml decode failed: %s", err)
 
 		return nil, fmt.Errorf("could not decode config: %w", err)
 	}
 
 	// Check if the config only contains the keys we expect
 	if len(metaData.Undecoded()) > 0 {
+		logger.Log.Error("Config contains unexpected keys", "invalid keys", metaData.Undecoded())
+
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
 	}
 

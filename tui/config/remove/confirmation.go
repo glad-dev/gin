@@ -25,7 +25,7 @@ func (m *model) viewConfirmation() string {
 
 			fmt.Sprintf(
 				"Are you sure that you want to delete the token '%s'?",
-				lipgloss.NewStyle().Width(m.remotes.Width()).Render(m.oldConfig.Configs[m.remotes.Index()].Details[m.details.Index()].TokenName),
+				lipgloss.NewStyle().Width(m.remotes.Width()).Render(m.oldConfig.Remotes[m.remotes.Index()].Details[m.details.Index()].TokenName),
 			),
 			"\n",
 			renderButtons(m.confirmPosition),

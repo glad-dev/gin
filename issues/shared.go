@@ -25,7 +25,7 @@ func getURLConfig(conf *config.Wrapper, u *url.URL) (*config.Match, string) {
 	projectPath = strings.TrimSuffix(projectPath, "/")
 
 	// Check if we have a token
-	for _, remote := range conf.Configs {
+	for _, remote := range conf.Remotes {
 		if remote.URL.Hostname() == u.Hostname() {
 			match, err := remote.ToMatch()
 			if err != nil {
