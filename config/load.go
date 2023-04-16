@@ -44,7 +44,7 @@ func Load() (*Wrapper, error) {
 
 	// Check if the config only contains the keys we expect
 	if len(metaData.Undecoded()) > 0 {
-		logger.Log.Error("Config contains unexpected keys", "invalid keys", metaData.Undecoded())
+		logger.Log.Error("Config contains unexpected keys.", "invalid keys", metaData.Undecoded())
 
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
 	}

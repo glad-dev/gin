@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 
 	"gn/logger"
 )
@@ -19,7 +18,7 @@ func Append(urlStr string, token string) error {
 
 	u, err := checkURLStr(urlStr)
 	if err != nil {
-		logger.Log.Error("URL is invalid", "error", err, "url", urlStr)
+		logger.Log.Error("URL is invalid.", "error", err, "url", urlStr)
 
 		return err
 	}
@@ -32,7 +31,7 @@ func Append(urlStr string, token string) error {
 
 			for _, detail := range config.Details {
 				if detail.Token == token {
-					return fmt.Errorf("a configuration with the given URL and token already exists")
+					return errors.New("a configuration with the given URL and token already exists")
 				}
 			}
 		}
@@ -44,6 +43,8 @@ func Append(urlStr string, token string) error {
 
 	err = rd.Init(u)
 	if err != nil {
+		logger.Log.Errorf("Failed to initalize token: %s", err)
+
 		return err
 	}
 

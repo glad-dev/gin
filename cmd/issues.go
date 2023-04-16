@@ -71,13 +71,15 @@ func preRun(cmd *cobra.Command, _ []string) error {
 
 	// Check if the flags were defined
 	if urlFlag == nil || pathFlag == nil {
-		logger.Log.Error("URL or path flag was not defined", "urlFlag", urlFlag, "pathFlag", pathFlag)
+		logger.Log.Error("URL or path flag was not defined.", "urlFlag", urlFlag, "pathFlag", pathFlag)
 
 		return errors.New("flag --path or --url was not defined")
 	}
 
 	// Check if flags exists and if they were set
 	if urlFlag.Changed && pathFlag.Changed {
+		logger.Log.Error("User set both --path and --url.")
+
 		return errors.New("flags --path and --url are mutually exclusive")
 	}
 
@@ -106,7 +108,7 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 		var u *url.URL
 		u, err = url.ParseRequestURI(urlStr)
 		if err != nil {
-			logger.Log.Error("Invalid url passed", "error", err, "url", urlStr)
+			logger.Log.Error("Invalid url passed.", "error", err, "url", urlStr)
 
 			return nil, nil, fmt.Errorf("failed to parse given url: %w", err)
 		}
@@ -127,7 +129,7 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 
 	details, err := repo.Get(dir)
 	if err != nil {
-		logger.Log.Error("Failed to get repository details", "errror", err, "directory", dir)
+		logger.Log.Error("Failed to get repository details.", "errror", err, "directory", dir)
 
 		return nil, nil, fmt.Errorf("failed to get repo details: %w", err)
 	}

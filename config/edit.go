@@ -10,13 +10,13 @@ var ErrUpdateSameValues = errors.New("called update config with existing values"
 
 func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, token string) error {
 	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {
-		logger.Log.Error("Wrapper index is invalid", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
+		logger.Log.Error("Wrapper index is invalid.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
 
 		return errors.New("update: invalid wrapper index")
 	}
 
 	if detailsIndex < 0 || detailsIndex >= len(wrapper.Remotes[wrapperIndex].Details) {
-		logger.Log.Error("Details index is invalid", "index", detailsIndex, "len(details)", len(wrapper.Remotes[wrapperIndex].Details))
+		logger.Log.Error("Details index is invalid.", "index", detailsIndex, "len(details)", len(wrapper.Remotes[wrapperIndex].Details))
 
 		return errors.New("update: invalid details index")
 	}
@@ -31,6 +31,8 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 	if old.URL == *u {
 		for _, detail := range old.Details {
 			if detail.Token == token {
+				logger.Log.Warn("Attempted to update the remote '%s' with the same token", u.String())
+
 				return ErrUpdateSameValues
 			}
 		}
@@ -42,6 +44,8 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	err = rd.Init(u)
 	if err != nil {
+		logger.Log.Errorf("Failed to initalize token: %s", err)
+
 		return err
 	}
 

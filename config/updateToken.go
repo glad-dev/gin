@@ -56,7 +56,7 @@ func UpdateRemote() error {
 		}
 	}
 
-	logger.Log.Error("Not all remotes could be updated", "error", out)
+	logger.Log.Error("Not all remotes could be updated.", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }

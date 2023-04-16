@@ -24,7 +24,7 @@ func VerifyTokens() error {
 		for _, detail := range config.Details {
 			err = detail.checkTokenScope(&config.URL)
 			if err != nil {
-				logger.Log.Error("Failed to check token scope", "error", err, "URL", config.URL.String())
+				logger.Log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
 
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
 					tokenName: detail.TokenName,
@@ -50,7 +50,7 @@ func VerifyTokens() error {
 		}
 	}
 
-	logger.Log.Error("Not all tokens could be verified", "error", out)
+	logger.Log.Error("Not all tokens could be verified.", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }
