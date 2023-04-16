@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gn/issues"
+	"gn/logger"
 	"gn/style"
 
 	"github.com/charmbracelet/glamour"
@@ -35,6 +36,8 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 		markdownOptions...,
 	)
 	if err != nil {
+		logger.Log.Errorf("Failed to create markdown renderer: %s", err.Error())
+
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
 	defer markdownOuter.Close()
@@ -45,12 +48,16 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 		markdownOptions...,
 	)
 	if err != nil {
+		logger.Log.Errorf("Failed to create markdown renderer: %s", err.Error())
+
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
 	defer markdownInner.Close()
 
 	desc, err := markdownOuter.Render(issue.Description)
 	if err != nil {
+		logger.Log.Error("Failed to render description.", "error", err, "input", issue.Description)
+
 		return style.FormatQuitText("Failed to render markdown: " + err.Error())
 	}
 
@@ -61,7 +68,7 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 
 	// Issue details
 	out := style.Comment.Render(fmt.Sprintf(
-		"%s\nCreated by %s\nCreated on %s\n%s%s%s\n%s",
+		"%s\nCreated by %s on %s\n%s%s%s\n%s",
 		getTitle(issue, width),
 		issue.Author.String(),
 		issue.CreatedAt.Format("2006-01-02 15:04"),
@@ -76,11 +83,13 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 	for _, comment := range issue.Discussion {
 		commentBody, err = markdownOuter.Render(comment.Body)
 		if err != nil {
+			logger.Log.Error("Failed to render comment.", "error", err, "input", issue.Description)
+
 			return style.FormatQuitText("Failed to render markdown: " + err.Error())
 		}
 
 		discussion := fmt.Sprintf(
-			"Created by %s\nCreated on %s\n\n%s\n",
+			"Created by %s on %s\n\n%s\n",
 			comment.Author.String(),
 			comment.CreatedAt.Format("2006-01-02 15:04"),
 			strings.TrimSpace(commentBody),
@@ -94,20 +103,22 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 		for i, innerComment := range comment.Comments {
 			commentBody, err = markdownInner.Render(innerComment.Body)
 			if err != nil {
+				logger.Log.Error("Failed to render inner comment.", "error", err, "input", issue.Description)
+
 				return style.FormatQuitText("Failed to render markdown: " + err.Error())
 			}
 
 			editedBy := ""
 			if innerComment.LastEditedBy.Username != "" || innerComment.LastEditedBy.Name != "" {
 				editedBy = fmt.Sprintf(
-					"Last edit by: %s\nEdited on%s\n",
+					"Last edit by %s on %s\n",
 					innerComment.LastEditedBy.String(),
 					innerComment.UpdatedAt.Format("2006-01-02 15:04"),
 				)
 			}
 
 			discussion += style.Discussion.Render(fmt.Sprintf(
-				"Created by %s\nCreated on %s\n%s\n%s",
+				"Created by %s on %s\n%s\n%s",
 				innerComment.Author.String(),
 				innerComment.CreatedAt.Format("2006-01-02 15:04"),
 				editedBy,
