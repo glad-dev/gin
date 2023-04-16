@@ -28,7 +28,7 @@ func SelectConfig(details []repo.Details) (*config.Wrapper, error) {
 					}, nil
 				}
 
-				selected, err := selectconfig.Select(&wrapper.Remotes[i], "")
+				selected, err := selectconfig.Select(&wrapper.Remotes[i], "Select the token to use for "+conf.URL.String())
 				if err != nil {
 					return nil, err
 				}
