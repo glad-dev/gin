@@ -1,18 +1,17 @@
-package issues
+package all
 
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"time"
 
-	"gn/config"
+	"gn/config/remote"
+	"gn/issues/user"
 	"gn/logger"
-	"gn/repo"
 	"gn/requests"
 )
 
-type queryAllResponse struct {
+type queryAllGitLabResponse struct {
 	Data struct {
 		Project struct {
 			Issues struct {
@@ -21,14 +20,14 @@ type queryAllResponse struct {
 					HasNextPage bool   `json:"hasNextPage"`
 				} `json:"pageInfo"`
 				Nodes []struct {
-					Title     string    `json:"title"`
-					CreatedAt time.Time `json:"createdAt"`
-					UpdatedAt time.Time `json:"updatedAt"`
-					Iid       string    `json:"iid"`
-					State     string    `json:"state"`
-					Author    User      `json:"author"`
+					Title     string       `json:"title"`
+					CreatedAt time.Time    `json:"createdAt"`
+					UpdatedAt time.Time    `json:"updatedAt"`
+					Iid       string       `json:"iid"`
+					State     string       `json:"state"`
+					Author    user.Details `json:"author"`
 					Assignees struct {
-						Nodes []User `json:"nodes"`
+						Nodes []user.Details `json:"nodes"`
 					} `json:"assignees"`
 				} `json:"nodes"`
 			} `json:"issues"`
@@ -66,16 +65,9 @@ const queryAllQuery = `
 		}
 	`
 
-func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue, error) {
-	lab, projectPath, err := getMatchingConfig(conf, details, u)
-	if err != nil {
-		logger.Log.Errorf("Failed to get matching config: %s", err)
-
-		return nil, err
-	}
-
+func QueryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
-	issues := make([]Issue, 0)
+	issueList := make([]Issue, 0)
 	variables := map[string]string{
 		"projectPath": projectPath,
 	}
@@ -86,12 +78,12 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 		response, err := requests.Project(&requests.GraphqlQuery{
 			Query:     queryAllQuery,
 			Variables: variables,
-		}, lab)
+		}, match)
 		if err != nil {
 			return nil, fmt.Errorf("query all issues failed: %w", err)
 		}
 
-		queryAll := queryAllResponse{}
+		queryAll := queryAllGitLabResponse{}
 
 		dec := json.NewDecoder(response)
 		dec.DisallowUnknownFields()
@@ -115,9 +107,9 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 				Author:    issue.Author,
 			}
 
-			tmp.UpdateUsername(lab.Username)
+			tmp.UpdateUsername(match.Username)
 
-			issues = append(issues, tmp)
+			issueList = append(issueList, tmp)
 		}
 
 		endCursor = queryAll.Data.Project.Issues.PageInfo.EndCursor
@@ -126,5 +118,5 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 		}
 	}
 
-	return issues, nil
+	return issueList, nil
 }

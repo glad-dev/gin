@@ -5,8 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"gn/config"
-
+	"gn/config/remote"
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -14,7 +13,7 @@ import (
 )
 
 type itemWrapper struct {
-	item *config.RemoteDetails
+	item remote.Details
 }
 
 func (i itemWrapper) FilterValue() string { return "" }
@@ -30,7 +29,7 @@ func (d selectItemDelegate) Render(w io.Writer, m list.Model, index int, item li
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s - %s", index+1, i.item.Username, i.item.TokenName)
+	str := fmt.Sprintf("%d. %s - %s", index+1, i.item.GetUsername(), i.item.GetTokenName())
 
 	fn := style.Item.Render
 	if index == m.Index() {

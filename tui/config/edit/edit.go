@@ -2,6 +2,7 @@ package edit
 
 import (
 	"gn/config"
+	"gn/config/remote"
 	"gn/style"
 	"gn/tui/config/shared"
 
@@ -19,7 +20,7 @@ type editModel struct {
 	height       int
 }
 
-func (m *editModel) init(match *config.Match, listIndex int, detailsIndex int) {
+func (m *editModel) init(match *remote.Match, listIndex int, detailsIndex int) {
 	// Set the new values
 	m.inputs[0].SetValue(match.URL.String())
 	m.inputs[1].SetValue(match.Token)

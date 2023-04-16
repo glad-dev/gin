@@ -22,12 +22,12 @@ func VerifyTokens() error {
 	invalid := make(map[string][]errorStruct)
 	for _, config := range wrapper.Remotes {
 		for _, detail := range config.Details {
-			err = detail.checkTokenScope(&config.URL)
+			_, err = detail.CheckTokenScope(&config.URL)
 			if err != nil {
 				logger.Log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
 
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
-					tokenName: detail.TokenName,
+					tokenName: detail.GetTokenName(),
 					err:       err,
 				})
 			}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"gn/config/remote"
 	"gn/constants"
 	"gn/logger"
 	"gn/repo"
@@ -52,7 +53,7 @@ func (config *Wrapper) CheckValidity() error {
 	return nil
 }
 
-func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*Match, string, error) {
+func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match, string, error) {
 	if len(details) == 0 {
 		logger.Log.Error("No details passed.")
 

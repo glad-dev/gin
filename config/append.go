@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	"gn/config/remote"
 	"gn/logger"
 )
 
@@ -30,18 +31,25 @@ func Append(urlStr string, token string) error {
 			configLocation = i
 
 			for _, detail := range config.Details {
-				if detail.Token == token {
+				if detail.GetToken() == token {
 					return errors.New("a configuration with the given URL and token already exists")
 				}
 			}
 		}
 	}
 
-	rd := RemoteDetails{
-		Token: token,
+	var rd remote.Details
+	if u.Host == "github.com" {
+		rd = remote.GitHubDetails{
+			Token: token,
+		}
+	} else {
+		rd = remote.GitLabDetails{
+			Token: token,
+		}
 	}
 
-	err = rd.Init(u)
+	rd, err = rd.Init(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to initalize token: %s", err)
 
@@ -53,7 +61,7 @@ func Append(urlStr string, token string) error {
 		// Config with given URL does not yet exist
 		wrapper.Remotes = append(wrapper.Remotes, Remote{
 			URL:     *u,
-			Details: []RemoteDetails{rd},
+			Details: []remote.Details{rd},
 		})
 	} else {
 		// Config with given URL exists

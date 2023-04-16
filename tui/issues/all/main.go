@@ -3,7 +3,7 @@ package all
 import (
 	"net/url"
 
-	"gn/issues"
+	"gn/issues/single"
 	"gn/repo"
 	"gn/style"
 	"gn/tui/issues/shared"
@@ -15,7 +15,7 @@ import (
 )
 
 func Show(details []repo.Details, u *url.URL) {
-	conf, err := shared.SelectConfig(details)
+	conf, err := shared.SelectConfig(details, u)
 	if err != nil {
 		style.PrintErrAndExit("Failed to select config: " + err.Error())
 	}
@@ -43,7 +43,7 @@ func Show(details []repo.Details, u *url.URL) {
 			},
 			conf:                conf,
 			viewport:            viewport.New(0, 0),
-			viewedIssues:        make(map[string]issues.IssueDetails),
+			viewedIssues:        make(map[string]single.IssueDetails),
 			currentlyDisplaying: displayingInitalLoading,
 			state:               stateRunning,
 		},

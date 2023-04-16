@@ -6,4 +6,7 @@ const (
 	ProgramName         = "gn" // TODO: Remove this once name is set
 )
 
-var RequiredScopes = []string{"read_api", "read_user", "read_repository"}
+var (
+	RequiredGitLabScopes = []string{"read_api", "read_user", "read_repository"}
+	RequiredGitHubScopes = []string{"public_repo", "read:user"} // TODO: Verify scopes
+)

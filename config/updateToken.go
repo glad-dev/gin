@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"gn/config/remote"
 	"gn/logger"
 )
 
@@ -15,20 +16,21 @@ func UpdateRemote() error {
 	}
 
 	invalid := make(map[string][]errorStruct)
+	var d remote.Details
 	for i, config := range wrapper.Remotes {
 		for k, detail := range config.Details {
 			// Check token's scope and update the username
-			err = detail.Init(&config.URL)
+			d, err = detail.Init(&config.URL)
 			if err != nil {
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
-					tokenName: detail.TokenName,
+					tokenName: detail.GetTokenName(),
 					err:       err,
 				})
 
 				continue
 			}
 
-			config.Details[k] = detail
+			config.Details[k] = d
 		}
 
 		wrapper.Remotes[i] = config

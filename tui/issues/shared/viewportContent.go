@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gn/issues"
+	"gn/issues/single"
 	"gn/logger"
 	"gn/style"
 
@@ -15,7 +15,7 @@ import (
 
 var issueTitleStyle = lipgloss.NewStyle().Bold(true).Underline(true)
 
-func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string {
+func PrettyPrintIssue(issue *single.IssueDetails, width int, height int) string {
 	_, w := style.Comment.GetFrameSize()
 	availableWidth := width - w
 
@@ -140,7 +140,7 @@ func PrettyPrintIssue(issue *issues.IssueDetails, width int, height int) string 
 	)
 }
 
-func getTitle(issue *issues.IssueDetails, width int) string {
+func getTitle(issue *single.IssueDetails, width int) string {
 	return lipgloss.PlaceHorizontal(
 		width-style.Comment.GetHorizontalFrameSize(),
 		lipgloss.Center,
@@ -148,7 +148,7 @@ func getTitle(issue *issues.IssueDetails, width int) string {
 	)
 }
 
-func getAssignees(issue *issues.IssueDetails) string {
+func getAssignees(issue *single.IssueDetails) string {
 	if len(issue.Assignees) == 0 {
 		return ""
 	}
@@ -161,7 +161,7 @@ func getAssignees(issue *issues.IssueDetails) string {
 	return fmt.Sprintf("Assigned to: %s\n", strings.Join(assignees, ", "))
 }
 
-func getLabels(issue *issues.IssueDetails) string {
+func getLabels(issue *single.IssueDetails) string {
 	if len(issue.Labels) == 0 {
 		return ""
 	}

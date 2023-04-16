@@ -3,8 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"gn/config"
+	"gn/constants"
 	"gn/style"
 	"gn/tui/config/add"
 	"gn/tui/config/color"
@@ -39,10 +41,16 @@ func newCmdConfig() *cobra.Command {
 		},
 	}
 
+	addDesc := fmt.Sprintf(
+		"Add a new token.\nA GitLab token needs the following scopes: %s\nA GitHub token needs the following scopes: %s\n",
+		strings.Join(constants.RequiredGitLabScopes, ", "),
+		strings.Join(constants.RequiredGitHubScopes, ", "),
+	)
+
 	cmdAdd := &cobra.Command{
 		Use:   "add",
 		Short: "Add remote",
-		Long:  "Long - add remote",
+		Long:  addDesc,
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			add.Config()

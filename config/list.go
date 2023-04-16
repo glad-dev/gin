@@ -28,8 +28,8 @@ func List() error {
 			fmt.Println(style.ListDetails.Render(fmt.Sprintf(
 				"%d.%d) Username: '%s' - Token name: '%s'", // TODO: Improve output
 				i+1, k+1,
-				detail.Username,
-				detail.TokenName,
+				detail.GetUsername(),
+				detail.GetTokenName(),
 			)))
 		}
 	}

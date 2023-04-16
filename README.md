@@ -2,9 +2,9 @@
 ## v1
 - [ ] Issues view all => Fix filtering view
 - [ ] Add GitHub support
-- [ ] Add selection for when multiple configs match
 
 ### Done
+- [x] Add selection for when multiple configs match
 - [x] Color config
 - [x] Config add show error in TUI, not after
 - [x] Pagination for all issues

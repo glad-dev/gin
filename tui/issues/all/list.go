@@ -1,7 +1,10 @@
 package all
 
 import (
+	"strings"
+
 	"gn/issues"
+	"gn/logger"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,13 +18,16 @@ func (m *model) initList(msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 	closed := make([]list.Item, 0)
 	all := make([]list.Item, 0)
 	for _, item := range msg.items {
-		switch item.issue.State {
+		switch strings.ToLower(item.issue.State) {
 		case "open", "opened":
 			open = append(open, item)
 			all = append(all, item)
 		case "closed":
 			closed = append(closed, item)
 			item.issue.Title = "[closed] " + item.issue.Title
+			all = append(all, item)
+		default:
+			logger.Log.Warnf("Got item with unkown state: %s", item.issue.State)
 			all = append(all, item)
 		}
 	}
