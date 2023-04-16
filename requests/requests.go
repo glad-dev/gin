@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"reflect"
 
 	"gn/logger"
 )
@@ -33,8 +32,7 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("failed to parse url: %w", err)
 	}
 
-	u = u.JoinPath("/api/graphql")
-	req, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", getGraphQLURL(u), bytes.NewBuffer(requestBody))
 	if err != nil {
 		logger.Log.Error("Failed to create HTTP request", "error", err, "url", u.String(), "body", string(requestBody))
 
@@ -72,12 +70,12 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		logger.Log.Error("Request an unexpected status code", "statusCode", resp.Status, "body", string(body))
+		logger.Log.Error("Request has an unexpected status code", "statusCode", resp.Status, "body", string(body))
 
 		return nil, fmt.Errorf("request returned invalid status code %d", resp.StatusCode)
 	}
 
-	err = checkForError(bytes.NewBuffer(body))
+	err = checkError(u, body)
 	if err != nil {
 		logger.Log.Error("Request body contains an error", "error", err, "body", string(body))
 
@@ -93,7 +91,14 @@ func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
 		return nil, err
 	}
 
-	if projectDoesNotExist(bytes.NewBuffer(body.Bytes())) {
+	u, err := url.Parse(config.GetURL())
+	if err != nil {
+		logger.Log.Error("Failed to parse url", "error", err, "url", config.GetURL())
+
+		return nil, fmt.Errorf("failed to parse url: %w", err)
+	}
+
+	if checkExistence(u, body.Bytes()) {
 		logger.Log.Error("Project does not exist", "body", body)
 
 		return nil, ErrProjectDoesNotExist
@@ -102,58 +107,26 @@ func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
 	return body, nil
 }
 
-func checkForError(response io.Reader) error {
-	errorResponse := struct {
-		Errors []struct {
-			Extensions struct {
-				Code      string `json:"code"`
-				TypeName  string `json:"typeName"`
-				FieldName string `json:"fieldName"`
-			} `json:"extensions"`
-			Message   string `json:"message"`
-			Locations []struct {
-				Line   int `json:"line"`
-				Column int `json:"column"`
-			} `json:"locations"`
-			Path []string `json:"path"`
-		} `json:"errors"`
-	}{}
-
-	dec := json.NewDecoder(response)
-	dec.DisallowUnknownFields()
-	err := dec.Decode(&errorResponse)
-	if err != nil {
-		// If unmarshal fails, then the message is not an error, thus we return nil
-		return nil //nolint:nilerr
+func getGraphQLURL(u *url.URL) string {
+	if u.Host == "github.com" {
+		return "https://api.github.com/graphql"
 	}
 
-	out := ""
-	for i, err := range errorResponse.Errors {
-		out += fmt.Sprintf(
-			"Error %d: %s at line %d, column %d\n",
-			i+1,
-			err.Message,
-			err.Locations[0].Line,
-			err.Locations[0].Column,
-		)
-	}
-
-	return fmt.Errorf(out)
+	return u.JoinPath("/api/graphql").String()
 }
 
-func projectDoesNotExist(response io.Reader) bool {
-	emptyResponse := struct {
-		Data struct {
-			Project interface{} `json:"project"`
-		} `json:"data"`
-	}{}
-
-	dec := json.NewDecoder(response)
-	dec.DisallowUnknownFields()
-	err := dec.Decode(&emptyResponse)
-	if err != nil {
-		return false
+func checkError(u *url.URL, response []byte) error {
+	if u.Host == "github.com" {
+		return checkErrorGithub(response)
 	}
 
-	return !reflect.ValueOf(emptyResponse.Data.Project).IsValid()
+	return checkErrorGitlab(bytes.NewBuffer(response))
+}
+
+func checkExistence(u *url.URL, response []byte) bool {
+	if u.Host == "github.com" {
+		return checkExistenceGithub(response)
+	}
+
+	return checkExistenceGitlab(bytes.NewBuffer(response))
 }
