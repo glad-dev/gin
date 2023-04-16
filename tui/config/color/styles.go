@@ -2,9 +2,11 @@ package color
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
+
 	"gn/style"
 	"gn/style/color"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (

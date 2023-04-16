@@ -1,9 +1,9 @@
 package all
 
 import (
-	"gn/config"
 	"net/url"
 
+	"gn/config"
 	"gn/issues"
 	"gn/repo"
 	"gn/style"

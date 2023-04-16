@@ -1,9 +1,9 @@
 package add
 
 import (
-	"gn/config"
 	"os"
 
+	"gn/config"
 	"gn/style"
 	"gn/tui/config/shared"
 	"gn/tui/widgets"

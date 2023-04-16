@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"gn/config/location"
 	"gn/constants"
 
 	"github.com/BurntSushi/toml"
@@ -17,7 +18,7 @@ const ErrConfigDoesNotExistMsg = "No configuration exists.\nRun `" + constants.P
 // Load returns the config located at '~/.config/gn/gn.toml' if it exists. If it does not exist, function returns a
 // ErrConfigDoesNotExist error and an initialized Wrapper config.
 func Load() (*Wrapper, error) {
-	fileLocation, err := getConfigLocation()
+	fileLocation, err := location.Get()
 	if err != nil {
 		return nil, err
 	}

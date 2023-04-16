@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"gn/config/location"
 	"gn/constants"
 
 	"github.com/BurntSushi/toml"
@@ -25,7 +26,7 @@ func Write(config *Wrapper) error {
 		return fmt.Errorf("could not encode config: %w", err)
 	}
 
-	fileLocation, err := getConfigLocation()
+	fileLocation, err := location.Get()
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func Write(config *Wrapper) error {
 		}
 
 		// Create config directory
-		err = createConfigDir()
+		err = location.CreateDir()
 		if err != nil {
 			return fmt.Errorf("could not create config directory: %w", err)
 		}

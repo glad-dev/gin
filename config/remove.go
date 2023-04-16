@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"os"
+
+	"gn/config/location"
 )
 
 func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
@@ -23,7 +25,7 @@ func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 
 	// If there are no configs, delete the config file
 	if len(wrapper.Configs) == 0 {
-		location, err := getConfigLocation()
+		location, err := location.Get()
 		if err != nil {
 			return err
 		}

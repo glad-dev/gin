@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"gn/config/location"
 	"gn/style"
 )
 
@@ -13,7 +14,7 @@ func List() error {
 		return err
 	}
 
-	configLocation, err := getConfigLocation()
+	configLocation, err := location.Get()
 	if err != nil {
 		return err
 	}
