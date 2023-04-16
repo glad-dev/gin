@@ -12,7 +12,7 @@ import (
 )
 
 func Show(details []repo.Details, u *url.URL, issueID string) {
-	conf, err := shared.SelectConfig(details)
+	conf, err := shared.SelectConfig(details, u)
 	if err != nil {
 		style.PrintErrAndExit("Failed to select config: " + err.Error())
 	}
