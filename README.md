@@ -1,9 +1,9 @@
 # To do
 ## v1
 - [ ] Issues view all => Fix filtering view
-- [ ] Add GitHub support
 
 ### Done
+- [x] Add GitHub support
 - [x] Add selection for when multiple configs match
 - [x] Color config
 - [x] Config add show error in TUI, not after
