@@ -82,7 +82,17 @@ func Load() (*Wrapper, error) {
 		}
 
 		for _, details := range r.Details {
-			toAdd.Details = append(toAdd.Details, remote.GithubDetails{
+			if r.URL.Host == "github.com" {
+				toAdd.Details = append(toAdd.Details, remote.GitHubDetails{
+					Token:     details.Token,
+					TokenName: details.TokenName,
+					Username:  details.Username,
+				})
+
+				continue
+			}
+
+			toAdd.Details = append(toAdd.Details, remote.GitLabDetails{
 				Token:     details.Token,
 				TokenName: details.TokenName,
 				Username:  details.Username,
