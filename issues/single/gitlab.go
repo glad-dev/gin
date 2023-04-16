@@ -49,7 +49,7 @@ type querySingleGitLabResponse struct {
 	} `json:"data"`
 }
 
-const querySingleQueryGitLab = `
+const querySingleGitLab = `
 		query($projectPath: ID!, $issueID: String!) {
 		  project(fullPath: $projectPath) {
 			issue(iid: $issueID) {
@@ -106,7 +106,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 	}
 
 	tmp, err := requests.Project(&requests.GraphqlQuery{
-		Query:     querySingleQueryGitLab,
+		Query:     querySingleGitLab,
 		Variables: variables,
 	}, match)
 	if err != nil {
