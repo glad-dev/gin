@@ -26,7 +26,7 @@ func (config *Wrapper) CheckValidity() error {
 
 	// Check version
 	if config.Version > constants.ConfigVersion {
-		logger.Log.Error("Config has newer version than the program.", "config version", config.Version, "expected version", constants.ConfigVersion)
+		logger.Log.Error("Config has newer version than the program.", "configVersion", config.Version, "expectedVersion", constants.ConfigVersion)
 
 		return fmt.Errorf("config was written by a newer version of the tool")
 	}

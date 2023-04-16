@@ -72,7 +72,7 @@ func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		logger.Log.Error("Request an unexpected status code", "status code", resp.Status, "body", string(body))
+		logger.Log.Error("Request an unexpected status code", "statusCode", resp.Status, "body", string(body))
 
 		return nil, fmt.Errorf("request returned invalid status code %d", resp.StatusCode)
 	}
