@@ -8,11 +8,17 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type state uint8
+
+const (
+	stateRunning state = iota
+	exitSuccess
+	exitNoSelection
+)
+
 type model struct {
-	list list.Model
-	done bool
-	quit bool
-	back bool
+	list  list.Model
+	state state
 }
 
 func (m model) Init() tea.Cmd {
@@ -28,18 +34,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
-			m.quit = true
-
-			return m, tea.Quit
-
-		case "q", "esc":
-			m.back = true
+		case "ctrl+c", "q", "esc":
+			m.state = exitNoSelection
 
 			return m, tea.Quit
 
 		case "enter":
-			m.done = true
+			m.state = exitSuccess
 
 			return m, tea.Quit
 		}
@@ -52,9 +53,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if m.quit || m.back || m.done {
-		return ""
+	if m.state == stateRunning {
+		return shared.RenderList(m.list)
 	}
 
-	return shared.RenderList(m.list)
+	return ""
 }

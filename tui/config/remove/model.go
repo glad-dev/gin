@@ -11,7 +11,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type displaying int
+type (
+	displaying uint8
+	state      uint8
+)
 
 const (
 	displayingList displaying = iota
@@ -19,16 +22,21 @@ const (
 	displayingConfirmation
 )
 
+const (
+	stateRunning state = iota
+	exitSuccess
+	exitFailure
+	exitNoChange
+)
+
 type model struct {
 	remotes             list.Model
 	details             list.Model
-	exitText            string
+	text                string
 	oldConfig           config.Wrapper
-	currentlyDisplaying displaying
 	confirmPosition     int
-	quit                bool
-	finished            bool
-	failure             bool
+	currentlyDisplaying displaying
+	state               state
 }
 
 func (m model) Init() tea.Cmd {
@@ -46,7 +54,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
-			m.quit = true
+			m.state = exitNoChange
 
 			return m, tea.Quit
 		}
@@ -70,20 +78,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	default:
-		m.failure = true
-		m.exitText = "Invalid display state"
+		m.state = exitFailure
+		m.text = "Invalid display state"
 
 		return m, tea.Quit
 	}
 }
 
 func (m model) View() string {
-	if m.quit {
-		return style.FormatQuitText("No changes were made.")
-	}
+	switch m.state {
+	case stateRunning:
+		break
 
-	if m.finished || m.failure {
-		return m.exitText
+	case exitNoChange:
+		return style.FormatQuitText("No changes were made.")
+
+	case exitFailure, exitSuccess:
+		return m.text
 	}
 
 	switch m.currentlyDisplaying {

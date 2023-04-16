@@ -6,12 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/url"
 	"reflect"
 	"time"
 
 	"gn/config"
+	"gn/logger"
 	"gn/repo"
 	"gn/requests"
 )
@@ -54,9 +54,9 @@ type querySingleResponse struct {
 }
 
 const querySingleQuery = `
-		query($projectPath: ID!, $issueIID: String!) {
+		query($projectPath: ID!, $issueID: String!) {
 		  project(fullPath: $projectPath) {
-			issue(iid: $issueIID) {
+			issue(iid: $issueID) {
 			  title
 			  description
 			  createdAt
@@ -106,12 +106,14 @@ const querySingleQuery = `
 func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*IssueDetails, error) {
 	lab, projectPath, err := getMatchingConfig(config, details, u)
 	if err != nil {
+		logger.Log.Errorf("Failed to get matching config: %s", err)
+
 		return nil, err
 	}
 
 	variables := map[string]string{
 		"projectPath": projectPath,
-		"issueIID":    issueID,
+		"issueID":     issueID,
 	}
 
 	tmp, err := requests.Project(&requests.GraphqlQuery{
@@ -124,10 +126,14 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 
 	response, err := io.ReadAll(tmp)
 	if err != nil {
+		logger.Log.Errorf("Failed to read response: %s", err)
+
 		return nil, fmt.Errorf("query single - failed to read request: %w", err)
 	}
 
 	if issueDoesNotExist(bytes.NewBuffer(response)) {
+		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
+
 		return nil, ErrIssueDoesNotExist
 	}
 
@@ -137,6 +143,8 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&querySingle)
 	if err != nil {
+		logger.Log.Error("Failed to decode issue.", "error", err, "response", string(response))
+
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}
 
@@ -178,7 +186,7 @@ func QuerySingle(config *config.Wrapper, details []repo.Details, u *url.URL, iss
 	for _, node := range querySingle.Data.Project.Issue.Discussions.Nodes {
 		inner := node.Notes.Nodes
 		if len(inner) == 0 {
-			log.Printf("query single - discussion without nodes?\n%s", response)
+			logger.Log.Info("Discussion without nodes", "response", string(response))
 
 			continue
 		}

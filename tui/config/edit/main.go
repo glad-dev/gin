@@ -3,12 +3,13 @@ package edit
 import (
 	"errors"
 	"os"
-
-	"gn/tui/widgets"
+	"strings"
 
 	"gn/config"
+	"gn/logger"
 	"gn/style"
 	"gn/tui/config/shared"
+	"gn/tui/widgets"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -51,6 +52,7 @@ func Config() {
 	}
 
 	if m, ok := m.(model); ok && m.state == exitFailure {
+		logger.Log.Errorf(strings.TrimSpace(m.text))
 		os.Exit(1)
 	}
 }

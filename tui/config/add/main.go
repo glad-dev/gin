@@ -2,8 +2,10 @@ package add
 
 import (
 	"os"
+	"strings"
 
 	"gn/config"
+	"gn/logger"
 	"gn/style"
 	"gn/tui/config/shared"
 	"gn/tui/widgets"
@@ -27,6 +29,7 @@ func Config() {
 	}
 
 	if m, ok := m.(model); ok && m.state == exitFailure {
+		logger.Log.Errorf(strings.TrimSpace(m.text))
 		os.Exit(1)
 	}
 }

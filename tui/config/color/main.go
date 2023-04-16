@@ -4,12 +4,12 @@ import (
 	"errors"
 	"os"
 	"regexp"
-
-	"gn/style/color"
+	"strings"
 
 	"gn/config"
-
+	"gn/logger"
 	"gn/style"
+	"gn/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -36,6 +36,7 @@ func Config() {
 	}
 
 	if m, ok := m.(model); ok && m.state == exitFailure {
+		logger.Log.Errorf(strings.TrimSpace(m.text))
 		os.Exit(1)
 	}
 }
@@ -78,7 +79,6 @@ func getInputs() []textinput.Model {
 
 		case 2:
 			t.SetValue(string(color.Focused))
-			// t.SetValue(wrapper.Colors.Focused)
 		}
 
 		inputs[i] = t

@@ -3,8 +3,10 @@ package remove
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"gn/config"
+	"gn/logger"
 	"gn/style"
 	"gn/tui/config/shared"
 
@@ -41,7 +43,8 @@ func Config() {
 		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.failure {
+	if m, ok := m.(model); ok && m.state == exitFailure {
+		logger.Log.Errorf(strings.TrimSpace(m.text))
 		os.Exit(1)
 	}
 }

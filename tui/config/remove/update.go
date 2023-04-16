@@ -15,7 +15,7 @@ func (m *model) updateRemoteList(msg tea.Msg) tea.Cmd {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc":
-			m.quit = true
+			m.state = exitNoChange
 
 			return tea.Quit
 
@@ -23,8 +23,8 @@ func (m *model) updateRemoteList(msg tea.Msg) tea.Cmd {
 			// User selected a config
 			selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
 			if !ok {
-				m.exitText = style.FormatQuitText("Failed to cast selected item to list.Item")
-				m.failure = true
+				m.text = style.FormatQuitText("Failed to cast selected item to list.Item")
+				m.state = exitFailure
 
 				return tea.Quit
 			}
@@ -124,11 +124,11 @@ func (m *model) updateConfirmation(msg tea.Msg) tea.Cmd {
 			}
 
 			var failure bool
-			m.exitText, failure = submit(m)
+			m.text, failure = submit(m)
 			if failure {
-				m.failure = true
+				m.state = exitFailure
 			} else {
-				m.finished = true
+				m.state = exitSuccess
 			}
 
 			return tea.Quit

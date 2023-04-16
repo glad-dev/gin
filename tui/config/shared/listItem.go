@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gn/config"
+	"gn/logger"
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -26,6 +27,8 @@ func (d ItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	i, ok := item.(ListItem)
 	if !ok {
+		logger.Log.Error("Got item that is not a ListItem.", "item", item)
+
 		return
 	}
 

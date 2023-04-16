@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gn/config"
+	"gn/logger"
 	"gn/repo"
 	"gn/requests"
 )
@@ -68,6 +69,8 @@ const queryAllQuery = `
 func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue, error) {
 	lab, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
+		logger.Log.Errorf("Failed to get matching config: %s", err)
+
 		return nil, err
 	}
 
@@ -94,6 +97,8 @@ func QueryAll(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]Issue
 		dec.DisallowUnknownFields()
 		err = dec.Decode(&queryAll)
 		if err != nil {
+			logger.Log.Errorf("Failed to decode the response: %s", err)
+
 			return nil, fmt.Errorf("unmarshle of issues failed: %w", err)
 		}
 
