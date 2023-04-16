@@ -1,11 +1,10 @@
 package single
 
 import (
-	"fmt"
 	"net/url"
-	"os"
 
 	"gn/repo"
+	"gn/style"
 	"gn/tui/issues/shared"
 	"gn/tui/widgets"
 
@@ -13,9 +12,15 @@ import (
 )
 
 func Show(details []repo.Details, u *url.URL, issueID string) {
+	conf, err := shared.SelectConfig(details)
+	if err != nil {
+		style.PrintErrAndExit("Failed to select config: " + err.Error())
+	}
+
 	p := tea.NewProgram(
 		model{
 			content: "",
+			conf:    conf,
 			shared: &shared.Shared{
 				Details: details,
 				URL:     u,
@@ -29,12 +34,10 @@ func Show(details []repo.Details, u *url.URL, issueID string) {
 
 	m, err := p.Run()
 	if err != nil {
-		fmt.Println("could not run program:", err)
-		os.Exit(1)
+		style.PrintErrAndExit("could not run program:" + err.Error())
 	}
 
 	if m, ok := m.(model); ok && m.failure {
-		fmt.Fprintf(os.Stderr, m.content)
-		os.Exit(1)
+		style.PrintErrAndExit(m.content)
 	}
 }

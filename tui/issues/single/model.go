@@ -13,6 +13,7 @@ import (
 
 type model struct {
 	shared   *shared.Shared
+	conf     *config.Wrapper
 	content  string
 	viewport viewport.Model
 	ready    bool
@@ -94,15 +95,7 @@ func (m model) View() string {
 
 func getIssue(m *model) func() tea.Msg {
 	return func() tea.Msg {
-		conf, err := config.Load()
-		if err != nil {
-			return updateMsg{
-				issue:   nil,
-				errText: style.FormatQuitText("Failed to load config: " + err.Error()),
-			}
-		}
-
-		issue, err := issues.QuerySingle(conf, m.shared.Details, m.shared.URL, m.shared.IssueID)
+		issue, err := issues.QuerySingle(m.conf, m.shared.Details, m.shared.URL, m.shared.IssueID)
 		if err != nil {
 			return updateMsg{
 				issue:   nil,
