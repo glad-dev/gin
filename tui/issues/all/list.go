@@ -10,9 +10,6 @@ import (
 func (m *model) initList(msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// Set config
-	m.conf = msg.conf
-
 	// Set lists
 	open := make([]list.Item, 0)
 	closed := make([]list.Item, 0)

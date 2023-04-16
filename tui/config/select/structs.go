@@ -5,18 +5,19 @@ import (
 	"io"
 	"strings"
 
+	"gn/config"
+
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type selectListItem struct {
-	username  string
-	tokenName string
+type itemWrapper struct {
+	item *config.RemoteDetails
 }
 
-func (i selectListItem) FilterValue() string { return "" }
+func (i itemWrapper) FilterValue() string { return "" }
 
 type selectItemDelegate struct{}
 
@@ -24,12 +25,12 @@ func (d selectItemDelegate) Height() int                             { return 1 
 func (d selectItemDelegate) Spacing() int                            { return 0 }
 func (d selectItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d selectItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
-	i, ok := item.(selectListItem)
+	i, ok := item.(itemWrapper)
 	if !ok {
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s - %s", index+1, i.username, i.tokenName)
+	str := fmt.Sprintf("%d. %s - %s", index+1, i.item.Username, i.item.TokenName)
 
 	fn := style.Item.Render
 	if index == m.Index() {

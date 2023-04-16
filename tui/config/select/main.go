@@ -13,12 +13,11 @@ import (
 
 var ErrUserQuit = errors.New("user quit selection program")
 
-func Select(selectedRemote *config.Remote, title string) (int, error) {
+func Select(selectedRemote *config.Remote, title string) (*config.RemoteDetails, error) {
 	items := make([]list.Item, len(selectedRemote.Details))
-	for i, conf := range selectedRemote.Details {
-		items[i] = selectListItem{
-			username:  conf.Username,
-			tokenName: conf.TokenName,
+	for i := range selectedRemote.Details {
+		items[i] = itemWrapper{
+			item: &selectedRemote.Details[i],
 		}
 	}
 
@@ -41,17 +40,22 @@ func Select(selectedRemote *config.Remote, title string) (int, error) {
 
 	m, err := p.Run()
 	if err != nil {
-		return -1, fmt.Errorf("failed to run select program: %w", err)
+		return nil, fmt.Errorf("failed to run select program: %w", err)
 	}
 
 	mod, ok := m.(model)
 	if !ok {
-		return -1, fmt.Errorf("failed to convert m to model")
+		return nil, fmt.Errorf("failed to convert m to model")
 	}
 
 	if mod.state == exitNoSelection {
-		return -1, ErrUserQuit
+		return nil, ErrUserQuit
 	}
 
-	return mod.list.Index(), nil
+	item, ok := mod.list.SelectedItem().(itemWrapper)
+	if !ok {
+		return nil, fmt.Errorf("failed to selected item to selectListItem")
+	}
+
+	return item.item, nil
 }

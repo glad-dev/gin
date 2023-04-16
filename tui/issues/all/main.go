@@ -3,7 +3,6 @@ package all
 import (
 	"net/url"
 
-	"gn/config"
 	"gn/issues"
 	"gn/repo"
 	"gn/style"
@@ -16,7 +15,10 @@ import (
 )
 
 func Show(details []repo.Details, u *url.URL) {
-	_, _ = config.Load() // To set the colors
+	conf, err := shared.SelectConfig(details)
+	if err != nil {
+		style.PrintErrAndExit("Failed to select config: " + err.Error())
+	}
 	initStyles()
 
 	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
@@ -39,6 +41,7 @@ func Show(details []repo.Details, u *url.URL) {
 				Details: details,
 				Spinner: *widgets.GetSpinner(),
 			},
+			conf:                conf,
 			viewport:            viewport.New(0, 0),
 			viewedIssues:        make(map[string]issues.IssueDetails),
 			currentlyDisplaying: displayingInitalLoading,

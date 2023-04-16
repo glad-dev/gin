@@ -48,7 +48,6 @@ type tabs struct {
 }
 
 type allIssuesUpdateMsg struct {
-	conf     *config.Wrapper
 	errorMsg string
 	items    []itemWrapper
 }
@@ -174,19 +173,9 @@ func (m model) View() string {
 
 func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
-		conf, err := config.Load()
+		allIssues, err := issues.QueryAll(m.conf, m.shared.Details, m.shared.URL)
 		if err != nil {
 			return allIssuesUpdateMsg{
-				conf:     nil,
-				items:    nil,
-				errorMsg: "Failed to load config: " + err.Error(),
-			}
-		}
-
-		allIssues, err := issues.QueryAll(conf, m.shared.Details, m.shared.URL)
-		if err != nil {
-			return allIssuesUpdateMsg{
-				conf:     nil,
 				items:    nil,
 				errorMsg: "Failed to query issues: " + err.Error(),
 			}
@@ -201,7 +190,6 @@ func getIssues(m *model) func() tea.Msg {
 
 		return allIssuesUpdateMsg{
 			items: issueList,
-			conf:  conf,
 		}
 	}
 }
