@@ -26,30 +26,7 @@ func selectConfigForURL(u *url.URL) (*config.Wrapper, error) {
 
 	for i, conf := range wrapper.Remotes {
 		if u.Host == conf.URL.Host {
-			if len(conf.Details) == 1 {
-				return &config.Wrapper{
-					Remotes: []config.Remote{
-						{
-							URL:     conf.URL,
-							Details: []remote.Details{conf.Details[0]},
-						},
-					},
-				}, nil
-			}
-
-			selected, err := selectconfig.Select(&wrapper.Remotes[i], "Select the token to use for "+conf.URL.String())
-			if err != nil {
-				return nil, err
-			}
-
-			return &config.Wrapper{
-				Remotes: []config.Remote{
-					{
-						URL:     conf.URL,
-						Details: []remote.Details{*selected},
-					},
-				},
-			}, nil
+			return handleMatch(&wrapper.Remotes[i])
 		}
 	}
 
@@ -65,33 +42,37 @@ func selectConfigForLocal(details []repo.Details) (*config.Wrapper, error) {
 	for _, detail := range details {
 		for i, conf := range wrapper.Remotes {
 			if conf.URL.Host == detail.URL.Host {
-				if len(conf.Details) == 1 {
-					return &config.Wrapper{
-						Remotes: []config.Remote{
-							{
-								URL:     conf.URL,
-								Details: []remote.Details{conf.Details[0]},
-							},
-						},
-					}, nil
-				}
-
-				selected, err := selectconfig.Select(&wrapper.Remotes[i], "Select the token to use for "+conf.URL.String())
-				if err != nil {
-					return nil, err
-				}
-
-				return &config.Wrapper{
-					Remotes: []config.Remote{
-						{
-							URL:     conf.URL,
-							Details: []remote.Details{*selected},
-						},
-					},
-				}, nil
+				return handleMatch(&wrapper.Remotes[i])
 			}
 		}
 	}
 
 	return nil, errors.New("no matching config found")
+}
+
+func handleMatch(conf *config.Remote) (*config.Wrapper, error) {
+	if len(conf.Details) == 1 {
+		return &config.Wrapper{
+			Remotes: []config.Remote{
+				{
+					URL:     conf.URL,
+					Details: []remote.Details{conf.Details[0]},
+				},
+			},
+		}, nil
+	}
+
+	selected, err := selectconfig.Select(conf, "Select the token to use for "+conf.URL.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return &config.Wrapper{
+		Remotes: []config.Remote{
+			{
+				URL:     conf.URL,
+				Details: []remote.Details{*selected},
+			},
+		},
+	}, nil
 }
