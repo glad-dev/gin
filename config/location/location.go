@@ -1,7 +1,6 @@
 package location
 
 import (
-	"fmt"
 	"log" // We can't use out logger since that would lead to an import cycle
 	"os"
 	"os/user"
@@ -13,8 +12,6 @@ func Dir() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatalf("Failed to get the user's home directory: %s", err)
-
-		return "", fmt.Errorf("could not get current user: %w", err)
 	}
 
 	return path.Join(usr.HomeDir, ".config", "gn"), nil

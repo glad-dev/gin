@@ -51,7 +51,7 @@ func Append(urlStr string, token string) error {
 
 	rd, err = rd.Init(u)
 	if err != nil {
-		logger.Log.Errorf("Failed to initalize token: %s", err)
+		logger.Log.Errorf("Failed to initialize token: %s", err)
 
 		return err
 	}

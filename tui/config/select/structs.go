@@ -38,5 +38,5 @@ func (d selectItemDelegate) Render(w io.Writer, m list.Model, index int, item li
 		}
 	}
 
-	fmt.Fprint(w, fn(str))
+	_, _ = fmt.Fprint(w, fn(str))
 }

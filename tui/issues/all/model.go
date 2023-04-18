@@ -21,7 +21,7 @@ type (
 )
 
 const (
-	displayingInitalLoading displaying = iota
+	displayingInitialLoading displaying = iota
 	displayingList
 	displaySecondLoading
 	displayingDetails
@@ -53,7 +53,7 @@ type allIssuesUpdateMsg struct {
 	items    []itemWrapper
 }
 
-type singleIsseUpdateMsg struct {
+type singleIssueUpdateMsg struct {
 	details  *single.IssueDetails
 	errorMsg string
 	issueID  string
@@ -89,7 +89,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m.initList(&msg)
 
-	case singleIsseUpdateMsg:
+	case singleIssueUpdateMsg:
 		if len(msg.errorMsg) > 0 {
 			m.error = msg.errorMsg
 			m.state = exitFailure
@@ -117,7 +117,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.shared.Spinner, cmds[0] = m.shared.Spinner.Update(msg)
 
 	switch m.currentlyDisplaying {
-	case displayingInitalLoading:
+	case displayingInitialLoading:
 		return m, cmds[0]
 
 	case displayingList:
@@ -151,7 +151,7 @@ func (m model) View() string {
 	}
 
 	switch m.currentlyDisplaying {
-	case displayingInitalLoading, displaySecondLoading:
+	case displayingInitialLoading, displaySecondLoading:
 		return lipgloss.Place(
 			m.tabs.lists[m.tabs.activeTab].Width(),
 			m.tabs.lists[m.tabs.activeTab].Height(),
@@ -168,7 +168,7 @@ func (m model) View() string {
 		return shared.ViewportView(&m.viewport, m.shared.IssueID)
 
 	default:
-		return "Unkonwn view"
+		return "Unknown view"
 	}
 }
 

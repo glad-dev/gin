@@ -11,10 +11,10 @@ if [ $? -ne 0 ]; then
 fi
 rm gn
 
-# Run formater
+# Run formatter
 out=$(gofumpt -w .)
 if [ $? -ne 0 ]; then
-	echo "Formater failed!"
+	echo "Formatter failed!"
 	echo "$out"
 	echo
 

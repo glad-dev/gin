@@ -1,11 +1,8 @@
 package remote
 
 import (
-	"errors"
 	"net/url"
 )
-
-var ErrMultipleRepoDetails = errors.New("config contains multiple matching configs")
 
 type Details interface {
 	GetToken() string

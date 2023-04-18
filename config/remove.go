@@ -30,12 +30,12 @@ func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 
 	// If there are no configs left, delete the config file
 	if len(wrapper.Remotes) == 0 {
-		location, err := location.Get()
+		loc, err := location.Get()
 		if err != nil {
 			return err
 		}
 
-		return os.Remove(location)
+		return os.Remove(loc)
 	}
 
 	// Write back the updated config

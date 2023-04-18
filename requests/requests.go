@@ -68,7 +68,7 @@ func makeRequest(requestBody []byte, config ConfigInterface) (*bytes.Buffer, err
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logger.Log.Error("Failed to read HTTP respone body", "error", err)
+		logger.Log.Error("Failed to read HTTP response body", "error", err)
 
 		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}

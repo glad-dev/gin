@@ -148,6 +148,6 @@ func (m model) View() string {
 		return m.viewError()
 
 	default:
-		return "Unkown view"
+		return "Unknown view"
 	}
 }

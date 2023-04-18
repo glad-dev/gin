@@ -42,7 +42,7 @@ func UpdateRemote() error {
 	}
 
 	if len(invalid) == 0 {
-		// Write was successfull and there were no issues updating the usernames
+		// Write was successful and there were no issues updating the usernames
 		return nil
 	}
 

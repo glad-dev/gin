@@ -15,7 +15,7 @@
 - [x] Log errors
 
 ### Not blocking
-- Rendering the warning emoji leads to withspace error
+- Rendering the warning emoji leads to whitespace error
 
 ### Won't do
 - Repo based query without token (How do I get the correct details?)
@@ -25,4 +25,4 @@
 
 # Acknowledgements
 This project would not have been possible without [charmbracelet](https://github.com/charmbracelet) and their
-[bubbltea](https://github.com/charmbracelet/bubbletea) and [glow](https://github.com/charmbracelet/glow) libraries.
+[bubbletea](https://github.com/charmbracelet/bubbletea) and [glow](https://github.com/charmbracelet/glow) libraries.

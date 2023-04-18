@@ -44,7 +44,7 @@ func Show(details []repo.Details, u *url.URL) {
 			conf:                conf,
 			viewport:            viewport.New(0, 0),
 			viewedIssues:        make(map[string]single.IssueDetails),
-			currentlyDisplaying: displayingInitalLoading,
+			currentlyDisplaying: displayingInitialLoading,
 			state:               stateRunning,
 		},
 		tea.WithAltScreen(),

@@ -21,6 +21,6 @@ func FormatQuitText(str string) string {
 }
 
 func PrintErrAndExit(str string) {
-	fmt.Fprint(os.Stderr, FormatQuitText(str))
+	_, _ = fmt.Fprint(os.Stderr, FormatQuitText(str))
 	os.Exit(1)
 }

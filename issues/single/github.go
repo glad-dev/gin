@@ -105,7 +105,7 @@ const querySingleGitHubFirst = `
 	}
 `
 
-const querySingleGitHubFolowing = `
+const querySingleGitHubFollowing = `
 	query($owner: String!, $name: String!, $cursor: String, $issueID: Int!) {
 	  repository(owner: $owner, name: $name) {
 		issue(number: $issueID) {
@@ -231,7 +231,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 			variables["cursor"] = endCursor
 
 			responseReader, err = requests.GitHubComment(&requests.GitHubCommentQuery{
-				Query:     querySingleGitHubFolowing,
+				Query:     querySingleGitHubFollowing,
 				Variables: variables,
 			}, match)
 			if err != nil {
@@ -291,7 +291,7 @@ func parseComments(response []byte) ([]Comment, *pageInfo, error) {
 			CreatedAt:    node.CreatedAt,
 			UpdatedAt:    node.UpdatedAt,
 			Resolved:     false,
-			LastEditedBy: user.Details{Username: "unkown"},
+			LastEditedBy: user.Details{Username: "unknown"},
 			Comments:     make([]Comment, 0),
 		}
 	}

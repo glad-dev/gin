@@ -15,7 +15,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// These are needed since the toml libary is unable to decode not-empty interfaces.
+// These are needed since the toml library is unable to decode not-empty interfaces.
 type helperWrapper struct {
 	Colors  Colors
 	Remotes []helperRemote

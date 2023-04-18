@@ -43,5 +43,5 @@ func (d DetailsItemDelegate) Render(w io.Writer, m list.Model, index int, item l
 		}
 	}
 
-	fmt.Fprint(w, fn(str))
+	_, _ = fmt.Fprint(w, fn(str))
 }

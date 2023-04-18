@@ -27,7 +27,7 @@ func (m *model) initList(msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 			item.issue.Title = "[closed] " + item.issue.Title
 			all = append(all, item)
 		default:
-			logger.Log.Warnf("Got item with unkown state: %s", item.issue.State)
+			logger.Log.Warnf("Got item with unknown state: %s", item.issue.State)
 			all = append(all, item)
 		}
 	}
@@ -85,7 +85,7 @@ func (m *model) loadDetails() tea.Cmd {
 	return func() tea.Msg {
 		selected, ok := m.tabs.lists[m.tabs.activeTab].Items()[m.tabs.lists[m.tabs.activeTab].Index()].(itemWrapper)
 		if !ok {
-			return singleIsseUpdateMsg{
+			return singleIssueUpdateMsg{
 				errorMsg: "Failed to convert selected item to itemWrapper",
 				issueID:  "",
 				details:  nil,
@@ -94,7 +94,7 @@ func (m *model) loadDetails() tea.Cmd {
 
 		issue, ok := m.viewedIssues[selected.issue.Iid]
 		if ok {
-			return singleIsseUpdateMsg{
+			return singleIssueUpdateMsg{
 				errorMsg: "",
 				issueID:  selected.issue.Iid,
 				details:  &issue,
@@ -104,14 +104,14 @@ func (m *model) loadDetails() tea.Cmd {
 		// Request issue
 		tmp, err := issues.QuerySingle(m.conf, m.shared.Details, m.shared.URL, selected.issue.Iid)
 		if err != nil {
-			return singleIsseUpdateMsg{
+			return singleIssueUpdateMsg{
 				errorMsg: "Failed to query issue: " + err.Error(),
 				issueID:  "",
 				details:  nil,
 			}
 		}
 
-		return singleIsseUpdateMsg{
+		return singleIssueUpdateMsg{
 			errorMsg: "",
 			issueID:  selected.issue.Iid,
 			details:  tmp,

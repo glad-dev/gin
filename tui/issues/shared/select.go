@@ -7,7 +7,7 @@ import (
 	"gn/config"
 	"gn/config/remote"
 	"gn/repo"
-	selectconfig "gn/tui/config/select"
+	selection "gn/tui/config/select"
 )
 
 func SelectConfig(details []repo.Details, u *url.URL) (*config.Wrapper, error) {
@@ -62,7 +62,7 @@ func handleMatch(conf *config.Remote) (*config.Wrapper, error) {
 		}, nil
 	}
 
-	selected, err := selectconfig.Select(conf, "Select the token to use for "+conf.URL.String())
+	selected, err := selection.Select(conf, "Select the token to use for "+conf.URL.String())
 	if err != nil {
 		return nil, err
 	}

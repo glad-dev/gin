@@ -33,10 +33,10 @@ func (config *Wrapper) CheckValidity() error {
 	}
 
 	// Check configs
-	for _, remote := range config.Remotes {
-		err := remote.checkSemantics()
+	for _, r := range config.Remotes {
+		err := r.checkSemantics()
 		if err != nil {
-			logger.Log.Error("Invalid remote.", "error", err, "remote", remote)
+			logger.Log.Error("Invalid remote.", "error", err, "remote", r)
 
 			return err
 		}

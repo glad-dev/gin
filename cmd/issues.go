@@ -129,7 +129,7 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 
 	details, err := repo.Get(dir)
 	if err != nil {
-		logger.Log.Error("Failed to get repository details.", "errror", err, "directory", dir)
+		logger.Log.Error("Failed to get repository details.", "error", err, "directory", dir)
 
 		return nil, nil, fmt.Errorf("failed to get repo details: %w", err)
 	}
