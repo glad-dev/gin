@@ -1,13 +1,13 @@
-package user
+package remote
 
 import "fmt"
 
-type Details struct {
+type User struct {
 	Name     string
 	Username string
 }
 
-func (u *Details) String() string {
+func (u *User) String() string {
 	if u.Username == "" {
 		return u.Name
 	}

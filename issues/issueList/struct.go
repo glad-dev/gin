@@ -3,7 +3,7 @@ package issueList
 import (
 	"time"
 
-	"gn/issues/user"
+	"gn/remote"
 )
 
 type Issue struct {
@@ -12,8 +12,8 @@ type Issue struct {
 	UpdatedAt time.Time
 	Iid       string
 	State     string
-	Author    user.Details
-	Assignees []user.Details
+	Author    remote.User
+	Assignees []remote.User
 }
 
 func (i *Issue) HasBeenUpdated() bool {
@@ -34,7 +34,7 @@ func (i *Issue) UpdateUsername(ownUsername string) {
 	// Update assignees
 	for k, assignee := range i.Assignees {
 		if assignee.Username == ownUsername {
-			i.Assignees[k] = user.Details{
+			i.Assignees[k] = remote.User{
 				Name:     "you",
 				Username: "",
 			}

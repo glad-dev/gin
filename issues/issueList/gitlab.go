@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"gn/issues/user"
 	"gn/logger"
 	"gn/remote"
 	"gn/requests"
@@ -21,14 +20,14 @@ type queryAllGitLabResponse struct {
 					HasNextPage bool   `json:"hasNextPage"`
 				} `json:"pageInfo"`
 				Nodes []struct {
-					Title     string       `json:"title"`
-					CreatedAt time.Time    `json:"createdAt"`
-					UpdatedAt time.Time    `json:"updatedAt"`
-					Iid       string       `json:"iid"`
-					State     string       `json:"state"`
-					Author    user.Details `json:"author"`
+					Title     string      `json:"title"`
+					CreatedAt time.Time   `json:"createdAt"`
+					UpdatedAt time.Time   `json:"updatedAt"`
+					Iid       string      `json:"iid"`
+					State     string      `json:"state"`
+					Author    remote.User `json:"author"`
 					Assignees struct {
-						Nodes []user.Details `json:"nodes"`
+						Nodes []remote.User `json:"nodes"`
 					} `json:"assignees"`
 				} `json:"nodes"`
 			} `json:"issues"`

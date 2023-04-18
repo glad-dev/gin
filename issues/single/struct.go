@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"time"
 
-	"gn/issues/user"
+	"gn/remote"
 )
 
 type IssueDetails struct {
@@ -12,9 +12,9 @@ type IssueDetails struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Author      user.Details
+	Author      remote.User
 	BaseURL     url.URL
-	Assignees   []user.Details
+	Assignees   []remote.User
 	Labels      []Label
 	Discussion  []Comment
 }
@@ -25,11 +25,11 @@ type Label struct {
 }
 
 type Comment struct {
-	Author       user.Details
+	Author       remote.User
 	Body         string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
-	LastEditedBy user.Details
+	LastEditedBy remote.User
 	Comments     []Comment
 	Resolved     bool
 }
@@ -39,7 +39,7 @@ func (id *IssueDetails) UpdateUsername(ownUsername string) {
 		return
 	}
 
-	you := user.Details{
+	you := remote.User{
 		Name:     "you",
 		Username: "",
 	}

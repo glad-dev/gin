@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"gn/issues/user"
 	"gn/logger"
 	"gn/remote"
 	"gn/requests"
@@ -180,7 +179,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		Description: querySingle.Data.Repository.Issue.Body,
 		CreatedAt:   querySingle.Data.Repository.Issue.CreatedAt,
 		UpdatedAt:   querySingle.Data.Repository.Issue.UpdatedAt,
-		Author:      user.Details{Username: querySingle.Data.Repository.Issue.Author.Login},
+		Author:      remote.User{Username: querySingle.Data.Repository.Issue.Author.Login},
 		BaseURL:     match.URL,
 
 		Assignees:  nil,
@@ -190,9 +189,9 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 
 	// Flatten response
 	// Assignees
-	assignees := make([]user.Details, 0)
+	assignees := make([]remote.User, 0)
 	for _, assignee := range querySingle.Data.Repository.Issue.Assignees.Nodes {
-		assignees = append(assignees, user.Details{
+		assignees = append(assignees, remote.User{
 			Username: assignee.Login,
 		})
 	}
@@ -269,14 +268,14 @@ func parseComments(response []byte) ([]Comment, *pageInfo, error) {
 			}*/
 
 		comments[i] = Comment{
-			Author: user.Details{
+			Author: remote.User{
 				Username: node.Author.Login,
 			},
 			Body:         node.Body,
 			CreatedAt:    node.CreatedAt,
 			UpdatedAt:    node.UpdatedAt,
 			Resolved:     false,
-			LastEditedBy: user.Details{Username: "unknown"},
+			LastEditedBy: remote.User{Username: "unknown"},
 			Comments:     make([]Comment, 0),
 		}
 	}

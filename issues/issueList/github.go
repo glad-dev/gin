@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"gn/issues/user"
 	"gn/logger"
 	"gn/remote"
 	"gn/requests"
@@ -182,9 +181,9 @@ func parseResponse(response []byte, ownUsername string) ([]Issue, *pageInfo, err
 	var tmp Issue
 	issueList := make([]Issue, 0)
 	for _, issue := range queryAll.Data.Repository.Issues.Nodes {
-		assignees := make([]user.Details, len(issue.Assignees.Nodes))
+		assignees := make([]remote.User, len(issue.Assignees.Nodes))
 		for i := range issue.Assignees.Nodes {
-			assignees[i] = user.Details{Username: issue.Assignees.Nodes[i].Login}
+			assignees[i] = remote.User{Username: issue.Assignees.Nodes[i].Login}
 		}
 
 		tmp = Issue{
@@ -194,7 +193,7 @@ func parseResponse(response []byte, ownUsername string) ([]Issue, *pageInfo, err
 			Iid:       strconv.Itoa(issue.Number),
 			State:     issue.State,
 			Assignees: assignees,
-			Author:    user.Details{Username: issue.Author.Login},
+			Author:    remote.User{Username: issue.Author.Login},
 		}
 
 		tmp.UpdateUsername(ownUsername)

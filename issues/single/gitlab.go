@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"time"
 
-	"gn/issues/user"
 	"gn/logger"
 	"gn/remote"
 	"gn/requests"
@@ -17,13 +16,13 @@ type querySingleGitLabResponse struct {
 	Data struct {
 		Project struct {
 			Issue struct {
-				Title       string       `json:"title"`
-				Description string       `json:"description"`
-				CreatedAt   time.Time    `json:"createdAt"`
-				UpdatedAt   time.Time    `json:"updatedAt"`
-				Author      user.Details `json:"author"`
+				Title       string      `json:"title"`
+				Description string      `json:"description"`
+				CreatedAt   time.Time   `json:"createdAt"`
+				UpdatedAt   time.Time   `json:"updatedAt"`
+				Author      remote.User `json:"author"`
 				Assignees   struct {
-					Nodes []user.Details `json:"nodes"`
+					Nodes []remote.User `json:"nodes"`
 				} `json:"assignees"`
 				Labels struct {
 					Nodes []Label `json:"nodes"`
@@ -32,11 +31,11 @@ type querySingleGitLabResponse struct {
 					Nodes []struct {
 						Notes struct {
 							Nodes []struct {
-								Body         string       `json:"body"`
-								CreatedAt    time.Time    `json:"createdAt"`
-								UpdatedAt    time.Time    `json:"updatedAt"`
-								LastEditedBy user.Details `json:"lastEditedBy"`
-								user.Details `json:"author"`
+								Body         string      `json:"body"`
+								CreatedAt    time.Time   `json:"createdAt"`
+								UpdatedAt    time.Time   `json:"updatedAt"`
+								LastEditedBy remote.User `json:"lastEditedBy"`
+								remote.User  `json:"author"`
 								System       bool `json:"system"`
 								Resolved     bool `json:"resolved"`
 							} `json:"nodes"`
@@ -144,9 +143,9 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 
 	// Flatten response
 	// Assignees
-	assignees := make([]user.Details, 0)
+	assignees := make([]remote.User, 0)
 	for _, assignee := range querySingle.Data.Project.Issue.Assignees.Nodes {
-		assignees = append(assignees, user.Details{
+		assignees = append(assignees, remote.User{
 			Name:     assignee.Name,
 			Username: assignee.Username,
 		})
@@ -177,7 +176,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		}
 
 		comment := Comment{
-			Author: user.Details{
+			Author: remote.User{
 				Name:     inner[0].Name,
 				Username: inner[0].Username,
 			},
@@ -192,7 +191,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		// Get sub comments
 		for _, subComment := range inner[1:] {
 			comment.Comments = append(comment.Comments, Comment{
-				Author:       subComment.Details,
+				Author:       subComment.User,
 				Body:         subComment.Body,
 				CreatedAt:    subComment.CreatedAt,
 				UpdatedAt:    subComment.UpdatedAt,
