@@ -3,8 +3,10 @@ package config
 import (
 	"errors"
 
-	"gn/config/remote"
 	"gn/logger"
+	"gn/remote"
+	"gn/remote/github"
+	"gn/remote/gitlab"
 )
 
 var ErrUpdateSameValues = errors.New("called update config with existing values")
@@ -41,11 +43,11 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	var rd remote.Details
 	if u.Host == "github.com" {
-		rd = remote.GitHubDetails{
+		rd = github.Details{
 			Token: token,
 		}
 	} else {
-		rd = remote.GitLabDetails{
+		rd = gitlab.Details{
 			Token: token,
 		}
 	}

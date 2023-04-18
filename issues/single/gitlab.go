@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"reflect"
 	"time"
 
-	"gn/config/remote"
 	"gn/issues/user"
 	"gn/logger"
+	"gn/remote"
 	"gn/requests"
 )
 
@@ -105,7 +104,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		"issueID":     issueID,
 	}
 
-	tmp, err := requests.Project(&requests.GraphqlQuery{
+	response, err := requests.Project(&requests.GraphqlQuery{
 		Query:     querySingleGitLab,
 		Variables: variables,
 	}, match)
@@ -113,14 +112,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
-	response, err := io.ReadAll(tmp)
-	if err != nil {
-		logger.Log.Errorf("Failed to read response: %s", err)
-
-		return nil, fmt.Errorf("query single - failed to read request: %w", err)
-	}
-
-	if issueDoesNotExistGitLab(bytes.NewBuffer(response)) {
+	if issueDoesNotExistGitLab(response) {
 		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
@@ -218,7 +210,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 	return &issueDetails, nil
 }
 
-func issueDoesNotExistGitLab(response io.Reader) bool {
+func issueDoesNotExistGitLab(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project struct {
@@ -227,7 +219,7 @@ func issueDoesNotExistGitLab(response io.Reader) bool {
 		} `json:"data"`
 	}{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&emptyResponse)
 	if err != nil {

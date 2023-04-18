@@ -1,14 +1,14 @@
 package requests
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"reflect"
 	"strings"
 )
 
-func checkErrorGitLab(response io.Reader) error {
+func checkErrorGitLab(response []byte) error {
 	errorResponse := struct {
 		Errors []struct {
 			Extensions struct {
@@ -25,7 +25,7 @@ func checkErrorGitLab(response io.Reader) error {
 		} `json:"errors"`
 	}{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&errorResponse)
 	if err != nil {
@@ -47,19 +47,19 @@ func checkErrorGitLab(response io.Reader) error {
 	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
-func checkExistenceGitLab(response io.Reader) bool {
+func checkExistenceGitLab(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`
 		} `json:"data"`
 	}{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&emptyResponse)
 	if err != nil {
 		return false
 	}
 
-	return !reflect.ValueOf(emptyResponse.Data.Project).IsValid()
+	return emptyResponse.Data.Project != nil && !reflect.ValueOf(emptyResponse.Data.Project).IsValid()
 }

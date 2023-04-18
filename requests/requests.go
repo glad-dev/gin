@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"gn/logger"
+	"gn/remote"
 )
 
 var (
@@ -17,7 +18,22 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
-func GitHubComment(query *GitHubCommentQuery, config ConfigInterface) (*bytes.Buffer, error) {
+func Project(query interface{}, match *remote.Match) ([]byte, error) {
+	body, err := Do(query, match)
+	if err != nil {
+		return nil, err
+	}
+
+	if checkExistence(&match.URL, body) { // TODO: Why does this pass?
+		logger.Log.Error("Project does not exist", "body", body)
+
+		return nil, ErrProjectDoesNotExist
+	}
+
+	return body, nil
+}
+
+func Do(query interface{}, match *remote.Match) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
@@ -25,37 +41,19 @@ func GitHubComment(query *GitHubCommentQuery, config ConfigInterface) (*bytes.Bu
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	return makeRequest(requestBody, config)
+	return makeRequest(requestBody, match)
 }
 
-func Do(query *GraphqlQuery, config ConfigInterface) (*bytes.Buffer, error) {
-	requestBody, err := json.Marshal(query)
+func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
+	req, err := http.NewRequest("POST", match.GetApiURL(), bytes.NewBuffer(requestBody))
 	if err != nil {
-		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
-
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	return makeRequest(requestBody, config)
-}
-
-func makeRequest(requestBody []byte, config ConfigInterface) (*bytes.Buffer, error) {
-	u, err := url.Parse(config.GetURL())
-	if err != nil {
-		logger.Log.Error("Failed to parse url", "error", err, "url", config.GetURL())
-
-		return nil, fmt.Errorf("failed to parse url: %w", err)
-	}
-
-	req, err := http.NewRequest("POST", getGraphQLURL(u), bytes.NewBuffer(requestBody))
-	if err != nil {
-		logger.Log.Error("Failed to create HTTP request", "error", err, "url", u.String(), "body", string(requestBody))
+		logger.Log.Error("Failed to create HTTP request", "error", err, "url", match.URL.String(), "body", string(requestBody))
 
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.GetToken()))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", match.Token))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -90,44 +88,14 @@ func makeRequest(requestBody []byte, config ConfigInterface) (*bytes.Buffer, err
 		return nil, fmt.Errorf("request returned invalid status code %d", resp.StatusCode)
 	}
 
-	err = checkError(u, body)
+	err = checkError(&match.URL, body)
 	if err != nil {
 		logger.Log.Error("Request body contains an error", "error", err, "body", string(body))
 
 		return nil, err
 	}
 
-	return bytes.NewBuffer(body), nil
-}
-
-func Project(query *GraphqlQuery, config ConfigInterface) (io.Reader, error) {
-	body, err := Do(query, config)
-	if err != nil {
-		return nil, err
-	}
-
-	u, err := url.Parse(config.GetURL())
-	if err != nil {
-		logger.Log.Error("Failed to parse url", "error", err, "url", config.GetURL())
-
-		return nil, fmt.Errorf("failed to parse url: %w", err)
-	}
-
-	if checkExistence(u, body.Bytes()) {
-		logger.Log.Error("Project does not exist", "body", body)
-
-		return nil, ErrProjectDoesNotExist
-	}
-
 	return body, nil
-}
-
-func getGraphQLURL(u *url.URL) string {
-	if u.Host == "github.com" {
-		return "https://api.github.com/graphql"
-	}
-
-	return u.JoinPath("/api/graphql").String()
 }
 
 func checkError(u *url.URL, response []byte) error {
@@ -135,7 +103,7 @@ func checkError(u *url.URL, response []byte) error {
 		return checkErrorGitHub(response)
 	}
 
-	return checkErrorGitLab(bytes.NewBuffer(response))
+	return checkErrorGitLab(response)
 }
 
 func checkExistence(u *url.URL, response []byte) bool {
@@ -143,5 +111,5 @@ func checkExistence(u *url.URL, response []byte) bool {
 		return checkExistenceGitHub(response)
 	}
 
-	return checkExistenceGitLab(bytes.NewBuffer(response))
+	return checkExistenceGitLab(response)
 }

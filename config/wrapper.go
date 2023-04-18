@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"gn/config/remote"
 	"gn/constants"
 	"gn/logger"
+	"gn/remote"
 	"gn/repo"
 )
 

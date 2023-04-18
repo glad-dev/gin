@@ -7,9 +7,11 @@ import (
 	"os"
 
 	"gn/config/location"
-	"gn/config/remote"
 	"gn/constants"
 	"gn/logger"
+	"gn/remote"
+	"gn/remote/github"
+	"gn/remote/gitlab"
 	"gn/style"
 
 	"github.com/BurntSushi/toml"
@@ -83,7 +85,7 @@ func Load() (*Wrapper, error) {
 
 		for _, details := range r.Details {
 			if r.URL.Host == "github.com" {
-				toAdd.Details = append(toAdd.Details, remote.GitHubDetails{
+				toAdd.Details = append(toAdd.Details, github.Details{
 					Token:     details.Token,
 					TokenName: details.TokenName,
 					Username:  details.Username,
@@ -92,7 +94,7 @@ func Load() (*Wrapper, error) {
 				continue
 			}
 
-			toAdd.Details = append(toAdd.Details, remote.GitLabDetails{
+			toAdd.Details = append(toAdd.Details, gitlab.Details{
 				Token:     details.Token,
 				TokenName: details.TokenName,
 				Username:  details.Username,

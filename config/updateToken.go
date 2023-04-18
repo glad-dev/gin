@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"gn/config/remote"
 	"gn/logger"
+	"gn/remote"
 )
 
 func UpdateRemote() error {

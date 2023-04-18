@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"gn/config"
-	"gn/config/remote"
+	"gn/remote"
 	"gn/repo"
 )
 

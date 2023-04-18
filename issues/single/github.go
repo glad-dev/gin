@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strconv"
 	"strings"
 	"time"
 
-	"gn/config/remote"
 	"gn/issues/user"
 	"gn/logger"
+	"gn/remote"
 	"gn/requests"
 )
 
@@ -151,7 +150,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		"issueID": issueNumber,
 	}
 
-	responseReader, err := requests.GitHubComment(&requests.GitHubCommentQuery{
+	response, err := requests.Project(&requests.GitHubCommentQuery{
 		Query:     querySingleGitHubFirst,
 		Variables: variables,
 	}, match)
@@ -159,14 +158,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
-	response, err := io.ReadAll(responseReader)
-	if err != nil {
-		logger.Log.Errorf("Failed to read response: %s", err)
-
-		return nil, fmt.Errorf("query single - failed to read request: %w", err)
-	}
-
-	if issueDoesNotExistGitHub(bytes.NewBuffer(response)) {
+	if issueDoesNotExistGitHub(response) {
 		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
@@ -230,19 +222,12 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		for {
 			variables["cursor"] = endCursor
 
-			responseReader, err = requests.GitHubComment(&requests.GitHubCommentQuery{
+			response, err = requests.Project(&requests.GitHubCommentQuery{
 				Query:     querySingleGitHubFollowing,
 				Variables: variables,
 			}, match)
 			if err != nil {
 				return nil, fmt.Errorf("query single - request failed: %w", err)
-			}
-
-			response, err = io.ReadAll(responseReader)
-			if err != nil {
-				logger.Log.Errorf("Failed to read response: %s", err)
-
-				return nil, fmt.Errorf("query single - failed to read request: %w", err)
 			}
 
 			comments, info, err = parseComments(response)
@@ -299,14 +284,14 @@ func parseComments(response []byte) ([]Comment, *pageInfo, error) {
 	return comments, &querySingle.Data.Repository.Issue.Comments.PageInfo, nil
 }
 
-func issueDoesNotExistGitHub(response io.Reader) bool {
+func issueDoesNotExistGitHub(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Repository interface{} `json:"repository"`
 		} `json:"data"`
 	}{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&emptyResponse)
 	if err != nil {

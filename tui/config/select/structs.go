@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"gn/config/remote"
+	"gn/remote"
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"

@@ -1,34 +1,18 @@
-package remote
+package github
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
 
 	"gn/logger"
+	"gn/remote"
 	"gn/requests"
 )
 
-type GitHubDetails struct {
-	Token     string
-	TokenName string
-	Username  string
-}
-
-func (hub GitHubDetails) GetToken() string {
-	return hub.Token
-}
-
-func (hub GitHubDetails) GetTokenName() string {
-	return hub.TokenName
-}
-
-func (hub GitHubDetails) GetUsername() string {
-	return hub.Username
-}
-
-func (hub GitHubDetails) Init(u *url.URL) (Details, error) {
+func (hub Details) Init(u *url.URL) (remote.Details, error) {
 	if u.Host != "github.com" {
 		logger.Log.Errorf("Got GitHubDetails with invalid host: %s", u.Host)
 
@@ -54,7 +38,7 @@ func (hub GitHubDetails) Init(u *url.URL) (Details, error) {
 	return hub, nil
 }
 
-func (hub *GitHubDetails) getUsername(u *url.URL) error {
+func (hub *Details) getUsername(u *url.URL) error {
 	responseType := struct {
 		Data struct {
 			Viewer struct {
@@ -74,7 +58,7 @@ func (hub *GitHubDetails) getUsername(u *url.URL) error {
 	response, err := requests.Do(&requests.GraphqlQuery{
 		Query:     query,
 		Variables: nil,
-	}, &Match{
+	}, &remote.Match{
 		URL:   *u,
 		Token: hub.Token,
 	})
@@ -82,7 +66,7 @@ func (hub *GitHubDetails) getUsername(u *url.URL) error {
 		return err
 	}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&responseType)
 	if err != nil {
@@ -96,8 +80,4 @@ func (hub *GitHubDetails) getUsername(u *url.URL) error {
 	hub.Username = responseType.Data.Viewer.Login
 
 	return nil
-}
-
-func (hub GitHubDetails) CheckTokenScope(_ *url.URL) (string, error) { // TODO
-	return "GitHub token for account " + hub.Username, nil
 }

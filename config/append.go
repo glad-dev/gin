@@ -3,8 +3,10 @@ package config
 import (
 	"errors"
 
-	"gn/config/remote"
 	"gn/logger"
+	"gn/remote"
+	"gn/remote/github"
+	"gn/remote/gitlab"
 )
 
 func Append(urlStr string, token string) error {
@@ -40,11 +42,11 @@ func Append(urlStr string, token string) error {
 
 	var rd remote.Details
 	if u.Host == "github.com" {
-		rd = remote.GitHubDetails{
+		rd = github.Details{
 			Token: token,
 		}
 	} else {
-		rd = remote.GitLabDetails{
+		rd = gitlab.Details{
 			Token: token,
 		}
 	}

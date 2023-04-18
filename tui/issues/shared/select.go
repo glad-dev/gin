@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"gn/config"
-	"gn/config/remote"
+	"gn/remote"
 	"gn/repo"
 	selection "gn/tui/config/select"
 )

@@ -1,4 +1,4 @@
-package remote
+package gitlab
 
 import (
 	"bytes"
@@ -12,101 +12,9 @@ import (
 	"time"
 
 	"gn/constants"
-	"gn/logger"
-	"gn/requests"
 )
 
-type GitLabDetails struct {
-	Token     string
-	TokenName string
-	Username  string
-}
-
-func (lab GitLabDetails) GetToken() string {
-	return lab.Token
-}
-
-func (lab GitLabDetails) GetTokenName() string {
-	return lab.TokenName
-}
-
-func (lab GitLabDetails) GetUsername() string {
-	return lab.Username
-}
-
-func (lab GitLabDetails) Init(u *url.URL) (Details, error) {
-	if u.Host == "github.com" {
-		logger.Log.Errorf("Got GitLabDetails with invalid host: %s", u.Host)
-
-		return nil, errors.New("initializing GitLabDetails with a GitHub URL")
-	}
-
-	tokenName, err := lab.CheckTokenScope(u)
-	if err != nil {
-		logger.Log.Errorf("Failed to check scope: %s", err)
-
-		return nil, fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
-	}
-
-	err = lab.getUsername(u)
-	if err != nil {
-		logger.Log.Errorf("Failed to get username: %s", err)
-
-		return nil, fmt.Errorf("GitLabDetails.Init: Failed to get Username: %w", err)
-	}
-
-	lab.TokenName = tokenName
-
-	return lab, nil
-}
-
-func (lab *GitLabDetails) getUsername(u *url.URL) error {
-	type returnType struct {
-		Data struct {
-			CurrentUser struct {
-				Username string `json:"username"`
-			} `json:"currentUser"`
-		} `json:"data"`
-	}
-
-	query := `
-		query {
-		  currentUser {
-			username
-		  }
-		}
-	`
-
-	response, err := requests.Do(&requests.GraphqlQuery{
-		Query:     query,
-		Variables: nil,
-	}, &Match{
-		URL:   *u,
-		Token: lab.Token,
-	})
-	if err != nil {
-		return err
-	}
-
-	tmp := returnType{}
-
-	dec := json.NewDecoder(response)
-	dec.DisallowUnknownFields()
-	err = dec.Decode(&tmp)
-	if err != nil {
-		return fmt.Errorf("unmarshle of Username failed: %w", err)
-	}
-
-	if len(tmp.Data.CurrentUser.Username) == 0 {
-		return errors.New("empty Username: Check API key")
-	}
-
-	lab.Username = tmp.Data.CurrentUser.Username
-
-	return nil
-}
-
-func (lab GitLabDetails) CheckTokenScope(u *url.URL) (string, error) {
+func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`
 		LastUsedAt time.Time   `json:"last_used_at"`

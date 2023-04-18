@@ -1,17 +1,17 @@
-package all
+package issueList
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strconv"
 	"strings"
 	"time"
 
-	"gn/config/remote"
 	"gn/issues/user"
 	"gn/logger"
+	"gn/remote"
 	"gn/requests"
 )
 
@@ -107,7 +107,7 @@ var queryAllFollowing = `
 	}
 `
 
-func QueryAllGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Errorf("Project path is invalid: %s", projectPath)
@@ -166,10 +166,10 @@ func QueryAllGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	return issueList, nil
 }
 
-func parseResponse(response io.Reader, ownUsername string) ([]Issue, *pageInfo, error) {
+func parseResponse(response []byte, ownUsername string) ([]Issue, *pageInfo, error) {
 	queryAll := queryAllGitHubResponse{}
 
-	dec := json.NewDecoder(response)
+	dec := json.NewDecoder(bytes.NewBuffer(response))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&queryAll)
 	if err != nil {

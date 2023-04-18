@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"gn/config/remote"
 	"gn/logger"
+	"gn/remote"
 )
 
 type Remote struct {

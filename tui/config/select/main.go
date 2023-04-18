@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"gn/config"
-	"gn/config/remote"
+	"gn/remote"
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"

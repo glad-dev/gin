@@ -2,7 +2,7 @@ package edit
 
 import (
 	"gn/config"
-	"gn/config/remote"
+	"gn/remote"
 	"gn/style"
 	"gn/tui/config/shared"
 

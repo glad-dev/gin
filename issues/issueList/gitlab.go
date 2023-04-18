@@ -1,13 +1,14 @@
-package all
+package issueList
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
 
-	"gn/config/remote"
 	"gn/issues/user"
 	"gn/logger"
+	"gn/remote"
 	"gn/requests"
 )
 
@@ -65,7 +66,7 @@ const queryAllQuery = `
 		}
 	`
 
-func QueryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)
 	variables := map[string]string{
@@ -85,7 +86,7 @@ func QueryAllGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 
 		queryAll := queryAllGitLabResponse{}
 
-		dec := json.NewDecoder(response)
+		dec := json.NewDecoder(bytes.NewBuffer(response))
 		dec.DisallowUnknownFields()
 		err = dec.Decode(&queryAll)
 		if err != nil {
