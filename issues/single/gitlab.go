@@ -104,7 +104,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		"issueID":     issueID,
 	}
 
-	response, err := requests.Project(&requests.GraphqlQuery{
+	response, err := requests.Project(&requests.Query{
 		Query:     querySingleGitLab,
 		Variables: variables,
 	}, match)

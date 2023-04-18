@@ -120,7 +120,7 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		"name":  tmp[1],
 	}
 
-	response, err := requests.Project(&requests.GraphqlQuery{
+	response, err := requests.Project(&requests.Query{
 		Query:     queryAllFirstRequest,
 		Variables: variables,
 	}, match)
@@ -142,7 +142,7 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	for {
 		variables["cursor"] = endCursor
 
-		response, err = requests.Project(&requests.GraphqlQuery{
+		response, err = requests.Project(&requests.Query{
 			Query:     queryAllFollowing,
 			Variables: variables,
 		}, match)

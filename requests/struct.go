@@ -1,11 +1,11 @@
 package requests
 
-type GraphqlQuery struct {
+type Query struct {
 	Variables map[string]string `json:"variables"`
 	Query     string            `json:"query"`
 }
 
-type GitHubCommentQuery struct {
+type QueryInterface struct {
 	Variables map[string]interface{} `json:"variables"`
 	Query     string                 `json:"query"`
 }

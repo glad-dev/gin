@@ -150,7 +150,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		"issueID": issueNumber,
 	}
 
-	response, err := requests.Project(&requests.GitHubCommentQuery{
+	response, err := requests.Project(&requests.QueryInterface{
 		Query:     querySingleGitHubFirst,
 		Variables: variables,
 	}, match)
@@ -222,7 +222,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		for {
 			variables["cursor"] = endCursor
 
-			response, err = requests.Project(&requests.GitHubCommentQuery{
+			response, err = requests.Project(&requests.QueryInterface{
 				Query:     querySingleGitHubFollowing,
 				Variables: variables,
 			}, match)

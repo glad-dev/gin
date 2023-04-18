@@ -76,7 +76,7 @@ func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	for {
 		variables["cursor"] = endCursor
 
-		response, err := requests.Project(&requests.GraphqlQuery{
+		response, err := requests.Project(&requests.Query{
 			Query:     queryAllQuery,
 			Variables: variables,
 		}, match)

@@ -55,7 +55,7 @@ func (hub *Details) getUsername(u *url.URL) error {
 		}
 	`
 
-	response, err := requests.Do(&requests.GraphqlQuery{
+	response, err := requests.Do(&requests.Query{
 		Query:     query,
 		Variables: nil,
 	}, &remote.Match{
