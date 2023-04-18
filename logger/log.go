@@ -6,9 +6,8 @@ import (
 	"path"
 	"time"
 
-	"gn/config/location"
-
 	"github.com/charmbracelet/log"
+	"gn/config/location"
 )
 
 var Log *log.Logger

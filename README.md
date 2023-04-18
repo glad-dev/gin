@@ -1,6 +1,7 @@
 # To do
 ## v1
 - [ ] Issues view all => Fix filtering view
+- [ ] Move QueryAll, query single to Remote.Details interface
 
 ### Done
 - [x] Add GitHub support
