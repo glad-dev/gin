@@ -99,7 +99,7 @@ const querySingleGitLab = `
 	`
 
 func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) (*IssueDetails, error) {
-	variables := map[string]string{
+	variables := map[string]interface{}{
 		"projectPath": projectPath,
 		"issueID":     issueID,
 	}

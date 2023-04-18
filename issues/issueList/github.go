@@ -115,7 +115,7 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		return nil, errors.New("invalid project path")
 	}
 
-	variables := map[string]string{
+	variables := map[string]interface{}{
 		"owner": tmp[0],
 		"name":  tmp[1],
 	}
