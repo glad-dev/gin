@@ -49,9 +49,9 @@ func (lab *Details) getUsername(u *url.URL) error {
 
 	query := `
 		query {
-		  currentUser {
-			username
-		  }
+			currentUser {
+				username
+			}
 		}
 	`
 

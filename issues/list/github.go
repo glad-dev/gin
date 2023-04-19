@@ -1,4 +1,4 @@
-package issueList
+package list
 
 import (
 	"bytes"
@@ -46,63 +46,57 @@ type pageInfo struct {
 
 var queryAllFirstRequest = `
 	query($owner: String!, $name: String!) { 
-	  repository(owner:$owner, name:$name) {
-		issues(first: 100, orderBy:{field:CREATED_AT, direction:ASC}) {
-		  pageInfo {
-			endCursor
-			hasNextPage
-		  }
-		  
-		  nodes {
-			title
-			number
-			state
-			createdAt
-			updatedAt
-			author {
-			  login
-			  
+		repository(owner:$owner, name:$name) {
+			issues(first: 100, orderBy:{field:CREATED_AT, direction:ASC}) {
+				pageInfo {
+					endCursor
+					hasNextPage
+				}
+				nodes {
+					title
+					number
+					state
+					createdAt
+					updatedAt
+					author {
+						login
+					}
+					assignees(first:100) {
+						nodes {
+							login
+						}
+					}
+				}
 			}
-			
-			assignees(first:100) {
-			  nodes {
-				login
-			  }
-			}
-		  }
 		}
-	  }
 	}
 `
 
 var queryAllFollowing = `
 	query($owner: String!, $name: String!, $cursor: String!) { 
-	  repository(owner:$owner, name:$name) {
-		issues(first: 100, after: $cursor, orderBy:{field:CREATED_AT, direction:ASC}) {
-		  pageInfo {
-			endCursor
-			hasNextPage
-		  }
-		  
-		  nodes {
-			title
-			number
-			state
-			createdAt
-			updatedAt
-			author {
-			  login
-			  
+		repository(owner:$owner, name:$name) {
+			issues(first: 100, after: $cursor, orderBy:{field:CREATED_AT, direction:ASC}) {
+				pageInfo {
+					endCursor
+					hasNextPage
+				}
+				nodes {
+					title
+					number
+					state
+					createdAt
+					updatedAt
+					author {
+						login
+					}
+					assignees(first:100) {
+						nodes {
+							login
+						}
+					}
+				}
 			}
-			
-			assignees(first:100) {
-			  nodes {
-				login
-			  }
-			}
-		  }
 		}
-	  }
 	}
 `
 

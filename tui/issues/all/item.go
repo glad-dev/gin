@@ -3,12 +3,12 @@ package all
 import (
 	"fmt"
 
-	"gn/issues/issueList"
+	"gn/issues/list"
 )
 
-// itemWrapper is a wrapper for issues.Issue that implements all functions required by the list.Item interface.
+// itemWrapper is a wrapper for list.Issue that implements all functions required by the list.Item interface.
 type itemWrapper struct {
-	issue issueList.Issue
+	issue list.Issue
 }
 
 func (i itemWrapper) Title() string {

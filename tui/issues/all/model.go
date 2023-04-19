@@ -5,7 +5,7 @@ import (
 
 	"gn/config"
 	"gn/issues"
-	"gn/issues/single"
+	"gn/issues/issue"
 	"gn/style"
 	"gn/tui/issues/shared"
 
@@ -35,7 +35,7 @@ const (
 type model struct {
 	shared              *shared.Shared
 	conf                *config.Wrapper
-	viewedIssues        map[string]single.IssueDetails
+	viewedIssues        map[string]issue.Details
 	tabs                tabs
 	error               string
 	viewport            viewport.Model
@@ -54,7 +54,7 @@ type allIssuesUpdateMsg struct {
 }
 
 type singleIssueUpdateMsg struct {
-	details  *single.IssueDetails
+	details  *issue.Details
 	errorMsg string
 	issueID  string
 }
@@ -174,7 +174,7 @@ func (m model) View() string {
 
 func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
-		allIssues, err := issues.QueryAll(m.conf, m.shared.Details, m.shared.URL)
+		allIssues, err := issues.QueryList(m.conf, m.shared.Details, m.shared.URL)
 		if err != nil {
 			return allIssuesUpdateMsg{
 				items:    nil,

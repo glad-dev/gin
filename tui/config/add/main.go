@@ -28,8 +28,8 @@ func Config() {
 		style.PrintErrAndExit("Failed to start program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.state == exitFailure {
-		logger.Log.Errorf(strings.TrimSpace(m.text))
+	if r, ok := m.(model); ok && r.state == exitFailure {
+		logger.Log.Errorf(strings.TrimSpace(r.text))
 		os.Exit(1)
 	}
 }

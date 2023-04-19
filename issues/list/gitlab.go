@@ -1,4 +1,4 @@
-package issueList
+package list
 
 import (
 	"bytes"
@@ -36,34 +36,34 @@ type queryAllGitLabResponse struct {
 }
 
 const queryAllQuery = `
-		query($projectPath: ID!, $cursor: String) {
-		  project(fullPath: $projectPath) {
+	query($projectPath: ID!, $cursor: String) {
+		project(fullPath: $projectPath) {
 			issues(first: 100, after: $cursor, sort: CREATED_ASC) {
-			  pageInfo {
-			    endCursor
-			    hasNextPage
-			  }
-			  nodes {
-				title
-				createdAt
-				updatedAt
-				iid
-				state
-				author {
-				  name
-				  username
+				pageInfo {
+					endCursor
+					hasNextPage
 				}
-				assignees {
-				  nodes {
-					name
-					username
-				  }
+				nodes {
+					title
+					createdAt
+					updatedAt
+					iid
+					state
+					author {
+						name
+						username
+					}
+					assignees {
+						nodes {
+							name
+							username
+						}
+					}
 				}
-			  }
 			}
-		  }
 		}
-	`
+	}
+`
 
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""

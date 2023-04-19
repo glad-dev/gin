@@ -3,7 +3,7 @@ package single
 import (
 	"gn/config"
 	"gn/issues"
-	"gn/issues/single"
+	"gn/issues/issue"
 	"gn/style"
 	"gn/tui/issues/shared"
 
@@ -22,7 +22,7 @@ type model struct {
 }
 
 type updateMsg struct {
-	issue   *single.IssueDetails
+	issue   *issue.Details
 	errText string
 }
 

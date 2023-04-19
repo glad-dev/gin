@@ -1,4 +1,4 @@
-package single
+package issue
 
 import (
 	"bytes"
@@ -48,56 +48,56 @@ type querySingleGitLabResponse struct {
 }
 
 const querySingleGitLab = `
-		query($projectPath: ID!, $issueID: String!) {
-		  project(fullPath: $projectPath) {
+	query($projectPath: ID!, $issueID: String!) {
+		project(fullPath: $projectPath) {
 			issue(iid: $issueID) {
-			  title
-			  description
-			  createdAt
-			  updatedAt
-			  author {
-			    name
-			    username
-			  }
-			  assignees {
-				nodes {
-				  name
-				  username
+				title
+				description
+				createdAt
+				updatedAt
+				author {
+					name
+					username
 				}
-			  }
-			  labels {
-				nodes {
-				  title
-				  color	
-				}
-			  }
-			  discussions {
-				nodes {
-				  notes {
+				assignees {
 					nodes {
-					  system
-					  author {
 						name
 						username
-					  }
-					  body
-					  createdAt
-					  updatedAt
-					  resolved
-					  lastEditedBy {
-						name
-						username
-					  }
 					}
-				  }
 				}
-			  }
+				labels {
+					nodes {
+						title
+						color	
+					}
+				}
+				discussions {
+					nodes {
+						notes {
+							nodes {
+								system
+								author {
+									name
+									username
+								}
+								body
+								createdAt
+								updatedAt
+								resolved
+								lastEditedBy {
+								name
+								username
+								}
+							}
+						}
+					}
+				}
 			}
-		  }
 		}
-	`
+	}
+`
 
-func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) (*IssueDetails, error) {
+func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Details, error) {
 	variables := map[string]interface{}{
 		"projectPath": projectPath,
 		"issueID":     issueID,
@@ -128,7 +128,7 @@ func QuerySingleGitLab(match *remote.Match, projectPath string, issueID string) 
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}
 
-	issueDetails := IssueDetails{
+	issueDetails := Details{
 		Title:       querySingle.Data.Project.Issue.Title,
 		Description: querySingle.Data.Project.Issue.Description,
 		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,

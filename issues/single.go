@@ -4,12 +4,12 @@ import (
 	"net/url"
 
 	"gn/config"
-	"gn/issues/single"
+	"gn/issues/issue"
 	"gn/logger"
 	"gn/repo"
 )
 
-func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*single.IssueDetails, error) {
+func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*issue.Details, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
 		logger.Log.Errorf("Failed to get matching config: %s", err)
@@ -18,8 +18,8 @@ func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issue
 	}
 
 	if match.URL.Host == "github.com" {
-		return single.QuerySingleGitHub(match, projectPath, issueID)
+		return issue.QueryGitHub(match, projectPath, issueID)
 	}
 
-	return single.QuerySingleGitLab(match, projectPath, issueID)
+	return issue.QueryGitLab(match, projectPath, issueID)
 }

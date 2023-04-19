@@ -3,7 +3,7 @@ package all
 import (
 	"net/url"
 
-	"gn/issues/single"
+	"gn/issues/issue"
 	"gn/repo"
 	"gn/style"
 	"gn/tui/issues/shared"
@@ -43,7 +43,7 @@ func Show(details []repo.Details, u *url.URL) {
 			},
 			conf:                conf,
 			viewport:            viewport.New(0, 0),
-			viewedIssues:        make(map[string]single.IssueDetails),
+			viewedIssues:        make(map[string]issue.Details),
 			currentlyDisplaying: displayingInitialLoading,
 			state:               stateRunning,
 		},
@@ -56,7 +56,7 @@ func Show(details []repo.Details, u *url.URL) {
 		style.PrintErrAndExit("Error running program: " + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.state == exitFailure {
-		style.PrintErrAndExit(m.error)
+	if r, ok := m.(model); ok && r.state == exitFailure {
+		style.PrintErrAndExit(r.error)
 	}
 }

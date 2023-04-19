@@ -5,8 +5,8 @@ import tea "github.com/charmbracelet/bubbletea"
 func (m *model) updateViewport(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
-	if msg, ok := msg.(tea.KeyMsg); ok {
-		switch msg.String() {
+	if keyMsg, ok := msg.(tea.KeyMsg); ok {
+		switch keyMsg.String() {
 		case "esc", "backspace", "q":
 			m.currentlyDisplaying = displayingList
 

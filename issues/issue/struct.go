@@ -1,4 +1,4 @@
-package single
+package issue
 
 import (
 	"net/url"
@@ -7,7 +7,7 @@ import (
 	"gn/remote"
 )
 
-type IssueDetails struct {
+type Details struct {
 	Title       string
 	Description string
 	CreatedAt   time.Time
@@ -34,7 +34,7 @@ type Comment struct {
 	Resolved     bool
 }
 
-func (id *IssueDetails) UpdateUsername(ownUsername string) {
+func (id *Details) UpdateUsername(ownUsername string) {
 	if len(ownUsername) == 0 {
 		return
 	}

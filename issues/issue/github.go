@@ -1,4 +1,4 @@
-package single
+package issue
 
 import (
 	"bytes"
@@ -62,73 +62,71 @@ type pageInfo struct {
 
 const querySingleGitHubFirst = `
 	query($owner: String!, $name: String!, $issueID: Int!) {
-	  repository(owner: $owner, name: $name) {
-		issue(number: $issueID) {
-		  title
-		  body
-		  createdAt
-		  updatedAt
-		  author {
-			login
-		  }
-		  assignees(first: 100) {
-			nodes {
-			  login
+		repository(owner: $owner, name: $name) {
+			issue(number: $issueID) {
+				title
+				body
+				createdAt
+				updatedAt
+				author {
+					login
+				}
+				assignees(first: 100) {
+					nodes {
+						login
+					}
+				}
+				labels(first: 100) {
+					nodes {
+						color
+						name
+					}
+				}
+				comments(first: 100) {
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+					nodes {
+						author {
+							login
+						}
+						body
+						createdAt
+						updatedAt
+						lastEditedAt
+					}
+				}
 			}
-		  }
-		  labels(first: 100) {
-			nodes {
-			  color
-			  name
-			}
-		  }
-		  comments(first: 100) {
-			pageInfo {
-			  hasNextPage
-			  endCursor
-			}
-			nodes {
-			  
-			  author {
-				login
-			  }
-			  body
-			  createdAt
-			  updatedAt
-			  lastEditedAt
-			}
-		  }
 		}
-	  }
 	}
 `
 
 const querySingleGitHubFollowing = `
 	query($owner: String!, $name: String!, $cursor: String, $issueID: Int!) {
-	  repository(owner: $owner, name: $name) {
-		issue(number: $issueID) {
-		  comments(first: 100, after: $cursor) {
-			pageInfo {
-			  hasNextPage
-			  endCursor
+		repository(owner: $owner, name: $name) {
+			issue(number: $issueID) {
+				comments(first: 100, after: $cursor) {
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+					nodes {
+						author {
+							login
+						}
+						body
+						createdAt
+						updatedAt
+						lastEditedAt
+					}
+				}
 			}
-			nodes {
-			  
-			  author {
-				login
-			  }
-			  body
-			  createdAt
-			  updatedAt
-			  lastEditedAt
-			}
-		  }
 		}
-	  }
 	}
 `
 
-func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) (*IssueDetails, error) {
+func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Details, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Errorf("Project path is invalid: %s", projectPath)
@@ -174,7 +172,7 @@ func QuerySingleGitHub(match *remote.Match, projectPath string, issueID string) 
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}
 
-	issueDetails := IssueDetails{
+	issueDetails := Details{
 		Title:       querySingle.Data.Repository.Issue.Title,
 		Description: querySingle.Data.Repository.Issue.Body,
 		CreatedAt:   querySingle.Data.Repository.Issue.CreatedAt,

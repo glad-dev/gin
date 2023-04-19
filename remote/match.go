@@ -11,7 +11,7 @@ type Match struct {
 	TokenName string
 }
 
-func (l *Match) GetApiURL() string {
+func (l *Match) GetApiURL() string { //nolint:revive
 	if l.URL.Host == "github.com" {
 		return "https://api.github.com/graphql"
 	}

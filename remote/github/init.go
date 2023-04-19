@@ -49,9 +49,9 @@ func (hub *Details) getUsername(u *url.URL) error {
 
 	query := `
 		query {
-		  viewer {
-			login
-		  }
+			viewer {
+				login
+			}
 		}
 	`
 

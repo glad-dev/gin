@@ -37,7 +37,7 @@ func Show(details []repo.Details, u *url.URL, issueID string) {
 		style.PrintErrAndExit("could not run program:" + err.Error())
 	}
 
-	if m, ok := m.(model); ok && m.failure {
-		style.PrintErrAndExit(m.content)
+	if r, ok := m.(model); ok && r.failure {
+		style.PrintErrAndExit(r.content)
 	}
 }

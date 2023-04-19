@@ -1,4 +1,4 @@
-package issueList
+package list
 
 import (
 	"time"
