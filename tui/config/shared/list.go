@@ -4,7 +4,6 @@ import (
 	"gn/style"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func NewList(items []list.Item, delegate list.ItemDelegate, title string) list.Model {
@@ -20,16 +19,8 @@ func NewList(items []list.Item, delegate list.ItemDelegate, title string) list.M
 }
 
 func RenderList(list list.Model) string {
-	return lipgloss.Place(
-		list.Width(),
-		list.Height(),
-		lipgloss.Center,
-		lipgloss.Center,
+	cp := style.List.Copy()
+	cp.Width(list.Width())
 
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			"",
-			style.InputField.Render(list.View()),
-		),
-	)
+	return cp.Render(list.View())
 }

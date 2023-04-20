@@ -33,6 +33,11 @@ func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Ite
 	}
 
 	str := fmt.Sprintf("%d. %s", index+1, i.Remote.URL.String())
+	if len(str) > m.Width() && m.Width() > 3 {
+		width := m.Width() - style.List.GetHorizontalFrameSize() - style.ListDetails.GetHorizontalFrameSize() - 8 // TODO: Get correct value
+
+		str = str[:width] + "..."
+	}
 
 	fn := style.Item.Render
 	if index == m.Index() {

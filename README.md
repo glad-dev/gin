@@ -3,8 +3,14 @@
 ## v1
 
 - [ ] Issues view all => Fix filtering view
+
+## Known issues
+
 - All issues:
-	- [ ] Add max size for list items
+	- List items that are too wide, break the view
+	- Filtering does not show text since the UI would break otherwise
+- Single issue:
+	- List items that are too wide, look weird => Solution: Change placement, avoid lipgloss.Place
 
 ### Done
 

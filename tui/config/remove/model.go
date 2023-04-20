@@ -46,7 +46,7 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		h, v := style.InputField.GetFrameSize()
+		h, v := style.List.GetFrameSize()
 		m.remotes.SetSize(msg.Width-h, msg.Height-v)
 		m.details.SetSize(msg.Width-h, msg.Height-v)
 
