@@ -29,5 +29,5 @@ func (i itemWrapper) Description() string {
 }
 
 func (i itemWrapper) FilterValue() string {
-	return i.issue.Title
+	return i.Title() + "   " + i.Description()
 }
