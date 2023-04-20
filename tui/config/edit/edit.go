@@ -23,6 +23,7 @@ type editModel struct {
 func (m *editModel) init(match *remote.Match, listIndex int, detailsIndex int) {
 	// Set the new values
 	m.inputs[0].SetValue(match.URL.String())
+	m.inputs[0].SetCursor(0)
 	m.inputs[1].SetValue(match.Token)
 	m.listIndex = listIndex
 	m.detailsIndex = detailsIndex
