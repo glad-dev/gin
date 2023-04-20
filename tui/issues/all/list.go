@@ -83,7 +83,7 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 
 func (m *model) loadDetails() tea.Cmd {
 	return func() tea.Msg {
-		selected, ok := m.tabs.lists[m.tabs.activeTab].Items()[m.tabs.lists[m.tabs.activeTab].Index()].(itemWrapper)
+		selected, ok := m.tabs.lists[m.tabs.activeTab].SelectedItem().(itemWrapper)
 		if !ok {
 			return singleIssueUpdateMsg{
 				errorMsg: "Failed to convert selected item to itemWrapper",

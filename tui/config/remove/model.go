@@ -113,7 +113,7 @@ func (m model) View() string {
 }
 
 func submit(m *model) (string, bool) {
-	selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
+	selected, ok := m.remotes.SelectedItem().(shared.ListItem)
 	if !ok {
 		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}

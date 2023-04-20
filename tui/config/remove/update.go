@@ -21,7 +21,7 @@ func (m *model) updateRemoteList(msg tea.Msg) tea.Cmd {
 
 		case "enter":
 			// User selected a config
-			selected, ok := m.remotes.Items()[m.remotes.Index()].(shared.ListItem)
+			selected, ok := m.remotes.SelectedItem().(shared.ListItem)
 			if !ok {
 				m.text = style.FormatQuitText("Failed to cast selected item to list.Item")
 				m.state = exitFailure
