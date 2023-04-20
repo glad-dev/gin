@@ -61,7 +61,11 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 			return nil
 
 		case "esc":
-			return tea.Quit
+			// We only want to quit the program if we currently aren't filtering since it would be impossible to reset
+			// the filter otherwise.
+			if m.tabs.lists[m.tabs.activeTab].FilterState() == list.Unfiltered {
+				return tea.Quit
+			}
 
 		case "right", "tab":
 			m.tabs.activeTab = min(m.tabs.activeTab+1, len(m.tabs.lists)-1)
