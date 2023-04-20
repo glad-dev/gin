@@ -3,7 +3,11 @@
 ## v1
 
 - [ ] Issues view all => Fix filtering view
-- [ ] Move QueryAll, query single to Remote.Details interface
+- [ ] Check gitlab error checking code. Example url that should fail: https://gitlab.com/zerkc/whatsdesk/-/issues
+- All issues:
+	- [ ] Add max size for list items
+	- [ ] Change order, newest first
+- [ ] Github: What if ID passed that is not an issue?
 
 ### Done
 
