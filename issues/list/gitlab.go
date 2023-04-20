@@ -38,7 +38,7 @@ type queryAllGitLabResponse struct {
 const queryAllQuery = `
 	query($projectPath: ID!, $cursor: String) {
 		project(fullPath: $projectPath) {
-			issues(first: 100, after: $cursor, sort: CREATED_ASC) {
+			issues(first: 100, after: $cursor, sort: CREATED_DESC) {
 				pageInfo {
 					endCursor
 					hasNextPage

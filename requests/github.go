@@ -3,7 +3,6 @@ package requests
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -45,7 +44,7 @@ func checkErrorGitHub(response []byte) error {
 	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
-func checkExistenceGitHub(response []byte) bool {
+func projectExistsGitHub(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Repository interface{} `json:"repository"`
@@ -57,5 +56,5 @@ func checkExistenceGitHub(response []byte) bool {
 		return false
 	}
 
-	return !reflect.ValueOf(emptyResponse.Data.Repository).IsValid()
+	return emptyResponse.Data.Repository != nil
 }

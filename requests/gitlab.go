@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -47,7 +46,7 @@ func checkErrorGitLab(response []byte) error {
 	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
-func checkExistenceGitLab(response []byte) bool {
+func projectExistsGitLab(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`
@@ -61,5 +60,5 @@ func checkExistenceGitLab(response []byte) bool {
 		return false
 	}
 
-	return emptyResponse.Data.Project != nil && !reflect.ValueOf(emptyResponse.Data.Project).IsValid()
+	return emptyResponse.Data.Project != nil
 }

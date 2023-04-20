@@ -3,14 +3,15 @@
 ## v1
 
 - [ ] Issues view all => Fix filtering view
-- [ ] Check gitlab error checking code. Example url that should fail: https://gitlab.com/zerkc/whatsdesk/-/issues
 - All issues:
 	- [ ] Add max size for list items
-	- [ ] Change order, newest first
-- [ ] Github: What if ID passed that is not an issue?
 
 ### Done
 
+- All issues:
+	- [x] Change order, newest first
+- [x] GitHub: What if ID passed that is not an issue? => Query fails and returns NOT_FOUND
+- [x] Check gitlab error checking code. Example url that should fail: https://gitlab.com/zerkc/whatsdesk/-/issues
 - [x] Add GitHub support
 - [x] Add selection for when multiple configs match
 - [x] Color config

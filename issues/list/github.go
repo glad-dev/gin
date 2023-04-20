@@ -47,7 +47,7 @@ type pageInfo struct {
 var queryAllFirstRequest = `
 	query($owner: String!, $name: String!) { 
 		repository(owner:$owner, name:$name) {
-			issues(first: 100, orderBy:{field:CREATED_AT, direction:ASC}) {
+			issues(first: 100, orderBy:{field:CREATED_AT, direction:DESC}) {
 				pageInfo {
 					endCursor
 					hasNextPage
@@ -75,7 +75,7 @@ var queryAllFirstRequest = `
 var queryAllFollowing = `
 	query($owner: String!, $name: String!, $cursor: String!) { 
 		repository(owner:$owner, name:$name) {
-			issues(first: 100, after: $cursor, orderBy:{field:CREATED_AT, direction:ASC}) {
+			issues(first: 100, after: $cursor, orderBy:{field:CREATED_AT, direction:DESC}) {
 				pageInfo {
 					endCursor
 					hasNextPage

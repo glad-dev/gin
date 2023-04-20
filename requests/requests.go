@@ -24,7 +24,7 @@ func Project(query interface{}, match *remote.Match) ([]byte, error) {
 		return nil, err
 	}
 
-	if checkExistence(&match.URL, body) { // TODO: Why does this pass?
+	if !projectExists(&match.URL, body) {
 		logger.Log.Error("Project does not exist", "body", body)
 
 		return nil, ErrProjectDoesNotExist
@@ -106,10 +106,10 @@ func checkError(u *url.URL, response []byte) error {
 	return checkErrorGitLab(response)
 }
 
-func checkExistence(u *url.URL, response []byte) bool {
+func projectExists(u *url.URL, response []byte) bool {
 	if u.Host == "github.com" {
-		return checkExistenceGitHub(response)
+		return projectExistsGitHub(response)
 	}
 
-	return checkExistenceGitLab(response)
+	return projectExistsGitLab(response)
 }
