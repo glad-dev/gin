@@ -4,6 +4,7 @@ import (
 	"net/url"
 )
 
+// Match contains the information needed to request data from a remote.
 type Match struct {
 	URL       url.URL
 	Token     string
@@ -11,7 +12,8 @@ type Match struct {
 	TokenName string
 }
 
-func (l *Match) GetApiURL() string { //nolint:revive
+// ApiURL returns the API URL.
+func (l *Match) ApiURL() string { //nolint:revive
 	if l.URL.Host == "github.com" {
 		return "https://api.github.com/graphql"
 	}

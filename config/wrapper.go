@@ -10,14 +10,14 @@ import (
 	"gn/repo"
 )
 
+// Wrapper contains the Colors configurations, a Version number and a list of Remotes.
 type Wrapper struct {
 	Colors  Colors
 	Remotes []Remote
 	Version uint8
 }
 
-var ErrNoMatchingConfig = errors.New("no matching config was found")
-
+// CheckValidity checks if the wrapper is valid. It checks the wrapper's version number, colors, and remotes.
 func (config *Wrapper) CheckValidity() error {
 	if len(config.Remotes) == 0 {
 		logger.Log.Error("Config does not contain any remotes.")
@@ -53,6 +53,8 @@ func (config *Wrapper) CheckValidity() error {
 	return nil
 }
 
+// GetMatchingConfig searches the wrapper's Remotes and returns a remote.Match if a Remote has the same  URL as one of
+// the passed repo.Details.
 func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match, string, error) {
 	if len(details) == 0 {
 		logger.Log.Error("No details passed.")
@@ -73,5 +75,5 @@ func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match,
 		}
 	}
 
-	return nil, "", ErrNoMatchingConfig
+	return nil, "", errors.New("no matching config was found")
 }

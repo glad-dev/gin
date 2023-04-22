@@ -9,6 +9,7 @@ import (
 	"gn/remote"
 )
 
+// UpdateRemote loads the configuration file and updates the username and token name associated with each token.
 func UpdateRemote() error {
 	wrapper, err := Load()
 	if err != nil {

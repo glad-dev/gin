@@ -3,7 +3,7 @@ package single
 import (
 	"gn/config"
 	"gn/issues"
-	"gn/issues/issue"
+	"gn/issues/discussion"
 	"gn/style"
 	"gn/tui/issues/shared"
 
@@ -22,8 +22,8 @@ type model struct {
 }
 
 type updateMsg struct {
-	issue   *issue.Details
-	errText string
+	discussion *discussion.Details
+	errText    string
 }
 
 func (m model) Init() tea.Cmd {
@@ -63,8 +63,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-		// We got the issue loaded
-		m.content = shared.PrettyPrintIssue(msg.issue, m.viewport.Width, m.viewport.Height)
+		// We got the discussion loaded
+		m.content = shared.PrettyPrintIssue(msg.discussion, m.viewport.Width, m.viewport.Height)
 		m.viewport.SetContent(m.content)
 
 	default:
@@ -99,14 +99,14 @@ func getIssue(m *model) func() tea.Msg {
 		issue, err := issues.QuerySingle(m.conf, m.shared.Details, m.shared.URL, m.shared.IssueID)
 		if err != nil {
 			return updateMsg{
-				issue:   nil,
-				errText: style.FormatQuitText("Failed to query issue: " + err.Error()),
+				discussion: nil,
+				errText:    style.FormatQuitText("Failed to query discussion: " + err.Error()),
 			}
 		}
 
 		return updateMsg{
-			issue:   issue,
-			errText: "",
+			discussion: issue,
+			errText:    "",
 		}
 	}
 }

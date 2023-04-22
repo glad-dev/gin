@@ -1,4 +1,4 @@
-package issue
+package discussion
 
 import (
 	"bytes"
@@ -13,8 +13,6 @@ import (
 	"gn/remote"
 	"gn/requests"
 )
-
-var ErrIssueDoesNotExist = errors.New("issue with the given iid does not exist")
 
 type querySingleGitHubResponse struct {
 	Data struct {
@@ -126,6 +124,8 @@ const querySingleGitHubFollowing = `
 	}
 `
 
+// QueryGitHub returns the discussion associated with the passed issueID. If the requested issue does not exist, an
+// ErrIssueDoesNotExist is returned.
 func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Details, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
@@ -156,7 +156,7 @@ func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Deta
 	}
 
 	if issueDoesNotExistGitHub(response) {
-		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
+		logger.Log.Error("Requested discussion does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
 	}
@@ -167,7 +167,7 @@ func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Deta
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&querySingle)
 	if err != nil {
-		logger.Log.Error("Failed to decode issue.", "error", err, "response", string(response))
+		logger.Log.Error("Failed to decode discussion.", "error", err, "response", string(response))
 
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}
@@ -253,7 +253,7 @@ func parseComments(response []byte) ([]Comment, *pageInfo, error) {
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&querySingle)
 	if err != nil {
-		logger.Log.Error("Failed to decode issue.", "error", err, "response", string(response))
+		logger.Log.Error("Failed to decode discussion.", "error", err, "response", string(response))
 
 		return nil, nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}

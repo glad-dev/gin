@@ -18,7 +18,8 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
-func Project(query interface{}, match *remote.Match) ([]byte, error) {
+// Project makes a GraphQL query and checks if the returned value indicates that the requested project does not exist.
+func Project(query *Query, match *remote.Match) ([]byte, error) {
 	body, err := Do(query, match)
 	if err != nil {
 		return nil, err
@@ -33,7 +34,8 @@ func Project(query interface{}, match *remote.Match) ([]byte, error) {
 	return body, nil
 }
 
-func Do(query interface{}, match *remote.Match) ([]byte, error) {
+// Do makes a GraphQL query and returns the request's body.
+func Do(query *Query, match *remote.Match) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
@@ -45,7 +47,7 @@ func Do(query interface{}, match *remote.Match) ([]byte, error) {
 }
 
 func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
-	req, err := http.NewRequest("POST", match.GetApiURL(), bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", match.ApiURL(), bytes.NewBuffer(requestBody))
 	if err != nil {
 		logger.Log.Error("Failed to create HTTP request", "error", err, "url", match.URL.String(), "body", string(requestBody))
 

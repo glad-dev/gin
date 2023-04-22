@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//nolint:goconst
+// Execute parses the command line parameters and starts the program.
 func Execute() error {
 	rootCmd := &cobra.Command{
-		Use:     constants.ProgramName,
+		Use:     "gn",
 		Version: constants.Version,
 	}
 

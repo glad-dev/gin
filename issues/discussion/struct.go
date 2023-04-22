@@ -1,12 +1,17 @@
-package issue
+package discussion
 
 import (
+	"errors"
 	"net/url"
 	"time"
 
 	"gn/remote"
 )
 
+// ErrIssueDoesNotExist is returned if the requested discussion does not exist.
+var ErrIssueDoesNotExist = errors.New("discussion with the given iid does not exist")
+
+// Details contains the discussion of an issue.
 type Details struct {
 	Title       string
 	Description string
@@ -19,11 +24,13 @@ type Details struct {
 	Discussion  []Comment
 }
 
+// Label contains the title and color of a GitLab/GitHub label.
 type Label struct {
 	Title string
 	Color string
 }
 
+// Comment contains the comments on an issue. Comments has a max depth of one.
 type Comment struct {
 	Author       remote.User
 	Body         string
@@ -34,6 +41,7 @@ type Comment struct {
 	Resolved     bool
 }
 
+// UpdateUsername replaces the username of the user with "you".
 func (id *Details) UpdateUsername(ownUsername string) {
 	if len(ownUsername) == 0 {
 		return

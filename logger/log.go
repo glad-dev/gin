@@ -11,8 +11,10 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+// Log is the global charmbracelet logger.
 var Log *log.Logger
 
+// Init creates the log directory and file and initializes Log to use said file.
 func Init() {
 	err := location.CreateDir()
 	if err != nil {

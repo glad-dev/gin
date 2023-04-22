@@ -13,7 +13,12 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// Write checks if the passed config is valid and writes it to ~/.config/gn/gn.toml.
 func Write(config *Wrapper) error {
+	openConfig := func(fileLocation string) (*os.File, error) {
+		return os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+	}
+
 	config.Version = constants.ConfigVersion
 
 	err := config.CheckValidity()
@@ -34,7 +39,7 @@ func Write(config *Wrapper) error {
 		return err
 	}
 
-	f, err := os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+	f, err := openConfig(fileLocation)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			logger.Log.Errorf("Failed to open config file: %s", err)
@@ -51,7 +56,7 @@ func Write(config *Wrapper) error {
 		}
 
 		// Attempt to create the config file
-		f, err = os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+		f, err = openConfig(fileLocation)
 		if err != nil {
 			logger.Log.Errorf("Failed to open newly created config file: %s", err)
 

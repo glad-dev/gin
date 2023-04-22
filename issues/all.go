@@ -9,6 +9,7 @@ import (
 	"gn/repo"
 )
 
+// QueryList returns a list of issues associated with a repository.
 func QueryList(conf *config.Wrapper, details []repo.Details, u *url.URL) ([]list.Issue, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {

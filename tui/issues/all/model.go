@@ -5,7 +5,7 @@ import (
 
 	"gn/config"
 	"gn/issues"
-	"gn/issues/issue"
+	"gn/issues/discussion"
 	"gn/style"
 	"gn/tui/issues/shared"
 
@@ -35,7 +35,7 @@ const (
 type model struct {
 	shared              *shared.Shared
 	conf                *config.Wrapper
-	viewedIssues        map[string]issue.Details
+	viewedIssues        map[string]discussion.Details
 	tabs                tabs
 	error               string
 	viewport            viewport.Model
@@ -54,7 +54,7 @@ type allIssuesUpdateMsg struct {
 }
 
 type singleIssueUpdateMsg struct {
-	details  *issue.Details
+	details  *discussion.Details
 	errorMsg string
 	issueID  string
 }
@@ -97,7 +97,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-		// Store issue in map
+		// Store discussion in map
 		m.viewedIssues[m.shared.IssueID] = *msg.details
 
 		m.shared.IssueID = msg.issueID

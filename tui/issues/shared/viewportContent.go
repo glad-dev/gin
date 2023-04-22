@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gn/issues/issue"
+	"gn/issues/discussion"
 	"gn/logger"
 	"gn/style"
 
@@ -15,7 +15,7 @@ import (
 
 var issueTitleStyle = lipgloss.NewStyle().Bold(true).Underline(true)
 
-func PrettyPrintIssue(issue *issue.Details, width int, height int) string {
+func PrettyPrintIssue(details *discussion.Details, width int, height int) string {
 	_, w := style.Comment.GetFrameSize()
 	availableWidth := width - w
 
@@ -26,7 +26,7 @@ func PrettyPrintIssue(issue *issue.Details, width int, height int) string {
 		glamour.WithWordWrap(style.Comment.GetWidth() - 2),
 		glamour.WithAutoStyle(),
 		glamour.WithEmoji(),
-		glamour.WithBaseURL(issue.BaseURL.String()),
+		glamour.WithBaseURL(details.BaseURL.String()),
 	}
 
 	markdownOuter, err := glamour.NewTermRenderer(
@@ -51,36 +51,36 @@ func PrettyPrintIssue(issue *issue.Details, width int, height int) string {
 	}
 	defer markdownInner.Close()
 
-	desc, err := markdownOuter.Render(issue.Description)
+	desc, err := markdownOuter.Render(details.Description)
 	if err != nil {
-		logger.Log.Error("Failed to render description.", "error", err, "input", issue.Description)
+		logger.Log.Error("Failed to render description.", "error", err, "input", details.Description)
 
 		return style.FormatQuitText("Failed to render markdown: " + err.Error())
 	}
 
 	updatedAt := ""
-	if issue.CreatedAt != issue.UpdatedAt {
-		updatedAt = fmt.Sprintf("Updated on %s\n", issue.UpdatedAt.Format("2006-01-02 15:04"))
+	if details.CreatedAt != details.UpdatedAt {
+		updatedAt = fmt.Sprintf("Updated on %s\n", details.UpdatedAt.Format("2006-01-02 15:04"))
 	}
 
 	// Issue details
 	out := style.Comment.Render(fmt.Sprintf(
 		"%s\nCreated by %s on %s\n%s%s%s\n%s",
-		getTitle(issue, width),
-		issue.Author.String(),
-		issue.CreatedAt.Format("2006-01-02 15:04"),
+		getTitle(details, width),
+		details.Author.String(),
+		details.CreatedAt.Format("2006-01-02 15:04"),
 		updatedAt,
-		getAssignees(issue),
-		getLabels(issue),
+		getAssignees(details),
+		getLabels(details),
 		desc,
 	)) + "\n"
 
 	// Comments
 	var commentBody string
-	for _, comment := range issue.Discussion {
+	for _, comment := range details.Discussion {
 		commentBody, err = markdownOuter.Render(comment.Body)
 		if err != nil {
-			logger.Log.Error("Failed to render comment.", "error", err, "input", issue.Description)
+			logger.Log.Error("Failed to render comment.", "error", err, "input", details.Description)
 
 			return style.FormatQuitText("Failed to render markdown: " + err.Error())
 		}
@@ -100,7 +100,7 @@ func PrettyPrintIssue(issue *issue.Details, width int, height int) string {
 		for i, innerComment := range comment.Comments {
 			commentBody, err = markdownInner.Render(innerComment.Body)
 			if err != nil {
-				logger.Log.Error("Failed to render inner comment.", "error", err, "input", issue.Description)
+				logger.Log.Error("Failed to render inner comment.", "error", err, "input", details.Description)
 
 				return style.FormatQuitText("Failed to render markdown: " + err.Error())
 			}
@@ -140,34 +140,34 @@ func PrettyPrintIssue(issue *issue.Details, width int, height int) string {
 	)
 }
 
-func getTitle(issue *issue.Details, width int) string {
+func getTitle(details *discussion.Details, width int) string {
 	return lipgloss.PlaceHorizontal(
 		width-style.Comment.GetHorizontalFrameSize(),
 		lipgloss.Center,
-		issueTitleStyle.Render(issue.Title),
+		issueTitleStyle.Render(details.Title),
 	)
 }
 
-func getAssignees(issue *issue.Details) string {
-	if len(issue.Assignees) == 0 {
+func getAssignees(details *discussion.Details) string {
+	if len(details.Assignees) == 0 {
 		return ""
 	}
 
-	assignees := make([]string, len(issue.Assignees))
-	for i, assignee := range issue.Assignees {
+	assignees := make([]string, len(details.Assignees))
+	for i, assignee := range details.Assignees {
 		assignees[i] = assignee.String()
 	}
 
 	return fmt.Sprintf("Assigned to: %s\n", strings.Join(assignees, ", "))
 }
 
-func getLabels(issue *issue.Details) string {
-	if len(issue.Labels) == 0 {
+func getLabels(details *discussion.Details) string {
+	if len(details.Labels) == 0 {
 		return ""
 	}
 
-	labels := make([]string, len(issue.Labels))
-	for i, label := range issue.Labels {
+	labels := make([]string, len(details.Labels))
+	for i, label := range details.Labels {
 		labels[i] = lipgloss.NewStyle().
 			Background(lipgloss.Color(label.Color)).
 			Foreground(getInverseColor(label.Color)).

@@ -12,6 +12,7 @@ import (
 	"gn/requests"
 )
 
+// Init checks the token's scope and set's the username and token name associated with the token.
 func (lab Details) Init(u *url.URL) (remote.Details, error) {
 	if u.Host == "github.com" {
 		logger.Log.Errorf("Got GitLabDetails with invalid host: %s", u.Host)

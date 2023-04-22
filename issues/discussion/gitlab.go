@@ -1,4 +1,4 @@
-package issue
+package discussion
 
 import (
 	"bytes"
@@ -97,6 +97,8 @@ const querySingleGitLab = `
 	}
 `
 
+// QueryGitLab returns the discussion associated with the passed issueID. If the requested issue does not exist, an
+// ErrIssueDoesNotExist is returned.
 func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Details, error) {
 	variables := map[string]interface{}{
 		"projectPath": projectPath,
@@ -112,7 +114,7 @@ func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Deta
 	}
 
 	if issueDoesNotExistGitLab(response) {
-		logger.Log.Error("Requested issue does not exist.", "issueID", issueID, "response", string(response))
+		logger.Log.Error("Requested discussion does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
 	}
@@ -123,7 +125,7 @@ func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Deta
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&querySingle)
 	if err != nil {
-		logger.Log.Error("Failed to decode issue.", "error", err, "response", string(response))
+		logger.Log.Error("Failed to decode discussion.", "error", err, "response", string(response))
 
 		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
 	}

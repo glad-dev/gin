@@ -105,11 +105,11 @@ func (m *model) loadDetails() tea.Cmd {
 			}
 		}
 
-		// Request issue
+		// Request discussion
 		tmp, err := issues.QuerySingle(m.conf, m.shared.Details, m.shared.URL, selected.issue.Iid)
 		if err != nil {
 			return singleIssueUpdateMsg{
-				errorMsg: "Failed to query issue: " + err.Error(),
+				errorMsg: "Failed to query discussion: " + err.Error(),
 				issueID:  "",
 				details:  nil,
 			}

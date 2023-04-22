@@ -12,6 +12,7 @@ import (
 	"gn/requests"
 )
 
+// Init queries the username associated with the token and updates the token name as well.
 func (hub Details) Init(u *url.URL) (remote.Details, error) {
 	if u.Host != "github.com" {
 		logger.Log.Errorf("Got GitHubDetails with invalid host: %s", u.Host)

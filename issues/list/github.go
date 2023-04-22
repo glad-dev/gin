@@ -100,6 +100,7 @@ var queryAllFollowing = `
 	}
 `
 
+// QueryGitHub returns all issues, open and closed, of a given repository.
 func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {

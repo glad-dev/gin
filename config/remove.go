@@ -8,6 +8,7 @@ import (
 	"gn/logger"
 )
 
+// Remove removes the token/url combination at the passed indices.
 func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 	// Check if index is valid
 	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {

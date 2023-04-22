@@ -2,6 +2,7 @@ package remote
 
 import "fmt"
 
+// User contains the name and username of a GitLab/GitHub user.
 type User struct {
 	Name     string
 	Username string

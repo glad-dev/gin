@@ -13,6 +13,7 @@ type errorStruct struct {
 	tokenName string
 }
 
+// VerifyTokens loads the configuration file and checks if every token is valid.
 func VerifyTokens() error {
 	wrapper, err := Load()
 	if err != nil {

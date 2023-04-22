@@ -65,6 +65,7 @@ const queryAllQuery = `
 	}
 `
 
+// QueryGitLab returns all issues, open and closed, of a given repository.
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)

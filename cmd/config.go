@@ -49,7 +49,7 @@ func newCmdConfig() *cobra.Command {
 
 	cmdAdd := &cobra.Command{
 		Use:   "add",
-		Short: "Add remote",
+		Short: "Add a new remote",
 		Long:  addDesc,
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -60,7 +60,7 @@ func newCmdConfig() *cobra.Command {
 	cmdRemove := &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
-		Long:  "Long - Remove a remote and its API token",
+		Long:  "Remove a remote and its API token from the local storage",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			remove.Config()
@@ -70,7 +70,6 @@ func newCmdConfig() *cobra.Command {
 	cmdEdit := &cobra.Command{
 		Use:   "edit",
 		Short: "Edit the configuration of an existing remote",
-		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			edit.Config()
@@ -80,7 +79,6 @@ func newCmdConfig() *cobra.Command {
 	cmdVerify := &cobra.Command{
 		Use:   "verify",
 		Short: "Check the validity of all stored tokens",
-		Long:  "Check the validity of all stored tokens",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			err := config.VerifyTokens()
@@ -95,7 +93,7 @@ func newCmdConfig() *cobra.Command {
 	cmdUpdate := &cobra.Command{
 		Use:   "update",
 		Short: "Update the username and token names",
-		Long:  "Update the username and token names",
+		Long:  "Update the username and token names if they changed",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			err := config.UpdateRemote()

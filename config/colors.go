@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// Colors contains hex strings of colors for the different styles.
 type Colors struct {
 	Blurred string
 	Border  string
@@ -40,6 +41,7 @@ func (c *Colors) setColors() error {
 	return nil
 }
 
+// CheckValidity checks if the colors in the struct are valid hex strings. Empty strings are ignored.
 func (c *Colors) CheckValidity() error {
 	if len(c.Blurred) > 0 {
 		err := checkColor(c.Blurred)

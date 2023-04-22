@@ -9,13 +9,14 @@ import (
 	"gn/remote"
 )
 
+// Remote contains the remote's URL and a list of Details, containing the token, username and token name.
 type Remote struct {
 	URL     url.URL
 	Details []remote.Details
 }
 
-var ErrMultipleRepoDetails = errors.New("config contains multiple matching configs")
-
+// ToMatch casts the remote to a remote.Match if the remote contains one Details. An error is returned if there are none
+// or more than one Details.
 func (r *Remote) ToMatch() (*remote.Match, error) {
 	if len(r.Details) == 0 {
 		logger.Log.Error("Remote contains no details.")
@@ -36,9 +37,10 @@ func (r *Remote) ToMatch() (*remote.Match, error) {
 
 	return &remote.Match{
 		URL: r.URL,
-	}, ErrMultipleRepoDetails
+	}, errors.New("config contains multiple matching configs")
 }
 
+// ToMatchAtIndex casts the remote at index to a remote.Match.
 func (r *Remote) ToMatchAtIndex(index int) (*remote.Match, error) {
 	if index < 0 || index >= len(r.Details) {
 		logger.Log.Error("Invalid index.", "index", index, "len(details)", len(r.Details))

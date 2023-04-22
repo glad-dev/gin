@@ -7,6 +7,7 @@ import (
 	"path"
 )
 
+// Dir returns the path to the configuration directory.
 func Dir() (string, error) {
 	// Get the user's home directory
 	usr, err := user.Current()
@@ -17,6 +18,7 @@ func Dir() (string, error) {
 	return path.Join(usr.HomeDir, ".config", "gn"), nil
 }
 
+// CreateDir creates the configuration directory.
 func CreateDir() error {
 	dir, err := Dir()
 	if err != nil {
@@ -26,6 +28,7 @@ func CreateDir() error {
 	return os.MkdirAll(dir, 0o700)
 }
 
+// Get returns the path to the configuration file.
 func Get() (string, error) {
 	dir, err := Dir()
 	if err != nil {

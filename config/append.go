@@ -9,6 +9,8 @@ import (
 	"gn/remote/gitlab"
 )
 
+// Append adds the token to the corresponding host in the  configuration file.
+// If no configuration file exists, a new one will be created.
 func Append(urlStr string, token string) error {
 	// Load current config
 	wrapper, err := Load()

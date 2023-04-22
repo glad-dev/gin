@@ -7,6 +7,7 @@ import (
 	"gn/style"
 )
 
+// List prints all stored tokens.
 func List() error {
 	// Load config
 	wrapper, err := Load()

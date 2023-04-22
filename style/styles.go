@@ -27,6 +27,7 @@ var (
 	quitText lipgloss.Style
 )
 
+// Init initialized the styles with the global color variables.
 func Init() {
 	Title = lipgloss.NewStyle().MarginLeft(2)
 	Item = lipgloss.NewStyle().PaddingLeft(4)

@@ -9,8 +9,11 @@ import (
 	"gn/remote/gitlab"
 )
 
+// ErrUpdateSameValues is returned if Update was called with the same url and token that is already stored in the
+// configuration file.
 var ErrUpdateSameValues = errors.New("called update config with existing values")
 
+// Update updates the token/url and checks the token's validity.
 func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, token string) error {
 	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {
 		logger.Log.Error("Wrapper index is invalid.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))

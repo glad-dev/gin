@@ -6,6 +6,7 @@ import (
 	"gn/remote"
 )
 
+// Issue contains information about an issue.
 type Issue struct {
 	Title     string
 	CreatedAt time.Time
@@ -16,10 +17,7 @@ type Issue struct {
 	Assignees []remote.User
 }
 
-func (i *Issue) HasBeenUpdated() bool {
-	return i.CreatedAt != i.UpdatedAt
-}
-
+// UpdateUsername replaces the mentions of the user's username with "you".
 func (i *Issue) UpdateUsername(ownUsername string) {
 	if len(ownUsername) == 0 {
 		return

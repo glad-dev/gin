@@ -14,6 +14,7 @@ import (
 	"gn/constants"
 )
 
+// CheckTokenScope checks the scope of the token and returns the token name.
 func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
 	response := struct {
 		CreatedAt  time.Time   `json:"created_at"`

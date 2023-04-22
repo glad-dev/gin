@@ -3,7 +3,7 @@ package all
 import (
 	"net/url"
 
-	"gn/issues/issue"
+	"gn/issues/discussion"
 	"gn/repo"
 	"gn/style"
 	"gn/tui/issues/shared"
@@ -43,7 +43,7 @@ func Show(details []repo.Details, u *url.URL) {
 			},
 			conf:                conf,
 			viewport:            viewport.New(0, 0),
-			viewedIssues:        make(map[string]issue.Details),
+			viewedIssues:        make(map[string]discussion.Details),
 			currentlyDisplaying: displayingInitialLoading,
 			state:               stateRunning,
 		},

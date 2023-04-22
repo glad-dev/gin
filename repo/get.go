@@ -10,11 +10,13 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+// Details contains the remote's URL and project path.
 type Details struct {
 	URL         url.URL
 	ProjectPath string
 }
 
+// Get opens the git repository at the given path and returns its list of repo.Details.
 func Get(path string) ([]Details, error) {
 	r, err := git.PlainOpen(path)
 	if err != nil {

@@ -4,12 +4,13 @@ import (
 	"net/url"
 
 	"gn/config"
-	"gn/issues/issue"
+	"gn/issues/discussion"
 	"gn/logger"
 	"gn/repo"
 )
 
-func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*issue.Details, error) {
+// QuerySingle returns the discussion associated with the given issueID.
+func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*discussion.Details, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
 		logger.Log.Errorf("Failed to get matching config: %s", err)
@@ -18,8 +19,8 @@ func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issue
 	}
 
 	if match.URL.Host == "github.com" {
-		return issue.QueryGitHub(match, projectPath, issueID)
+		return discussion.QueryGitHub(match, projectPath, issueID)
 	}
 
-	return issue.QueryGitLab(match, projectPath, issueID)
+	return discussion.QueryGitLab(match, projectPath, issueID)
 }

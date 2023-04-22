@@ -54,7 +54,7 @@ func ViewportInitSize(msg *tea.WindowSizeMsg, issueID string) viewport.Model {
 }
 
 func viewportHeader(issueID string, width int) string {
-	title := titleStyle.Render("Details of issue #" + issueID)
+	title := titleStyle.Render("Discussion of issue #" + issueID)
 	line := strings.Repeat("─", max(0, width-lipgloss.Width(title)))
 
 	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
