@@ -1,12 +1,14 @@
 #!/bin/bash
 failure=0
 
+STAGED_GO_FILES=$(git diff --staged --name-only | grep "\.go$")
+
 # Check if the code builds
 go build -o gn
 if [ $? -ne 0 ]; then
 	echo "Failed to build!"
 	echo
-	
+
 	failure=1
 fi
 rm gn
@@ -49,6 +51,12 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+fi
+
+if [ $failure -eq 0 ]; then
+	for FILE in $STAGED_GO_FILES; do
+		git add "$FILE"
+	done
 fi
 
 exit $failure
