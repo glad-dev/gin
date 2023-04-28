@@ -1,104 +1,18 @@
 package list
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"gn/logger"
 	"gn/remote"
-	"gn/requests"
+
+	"github.com/google/go-github/v52/github"
+	"golang.org/x/oauth2"
 )
-
-type queryAllGitHubResponse struct {
-	Data struct {
-		Repository struct {
-			Issues struct {
-				PageInfo pageInfo `json:"pageInfo"`
-				Nodes    []struct {
-					CreatedAt time.Time `json:"createdAt"`
-					UpdatedAt time.Time `json:"updatedAt"`
-					Title     string    `json:"title"`
-					State     string    `json:"state"`
-					Author    struct {
-						Login string `json:"login"`
-					} `json:"author"`
-					Assignees struct {
-						Nodes []struct {
-							Login string `json:"login"`
-						} `json:"nodes"`
-					} `json:"assignees"`
-					Number int `json:"number"`
-				} `json:"nodes"`
-			} `json:"issues"`
-		} `json:"repository"`
-	} `json:"data"`
-}
-
-type pageInfo struct {
-	EndCursor   string `json:"endCursor"`
-	HasNextPage bool   `json:"hasNextPage"`
-}
-
-var queryAllFirstRequest = `
-	query($owner: String!, $name: String!) { 
-		repository(owner:$owner, name:$name) {
-			issues(first: 100, orderBy:{field:CREATED_AT, direction:DESC}) {
-				pageInfo {
-					endCursor
-					hasNextPage
-				}
-				nodes {
-					title
-					number
-					state
-					createdAt
-					updatedAt
-					author {
-						login
-					}
-					assignees(first:100) {
-						nodes {
-							login
-						}
-					}
-				}
-			}
-		}
-	}
-`
-
-var queryAllFollowing = `
-	query($owner: String!, $name: String!, $cursor: String!) { 
-		repository(owner:$owner, name:$name) {
-			issues(first: 100, after: $cursor, orderBy:{field:CREATED_AT, direction:DESC}) {
-				pageInfo {
-					endCursor
-					hasNextPage
-				}
-				nodes {
-					title
-					number
-					state
-					createdAt
-					updatedAt
-					author {
-						login
-					}
-					assignees(first:100) {
-						nodes {
-							login
-						}
-					}
-				}
-			}
-		}
-	}
-`
 
 // QueryGitHub returns all issues, open and closed, of a given repository.
 func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
@@ -109,92 +23,62 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		return nil, errors.New("invalid project path")
 	}
 
-	variables := map[string]interface{}{
-		"owner": tmp[0],
-		"name":  tmp[1],
-	}
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: match.Token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
 
-	response, err := requests.Project(&requests.Query{
-		Query:     queryAllFirstRequest,
-		Variables: variables,
-	}, match)
-	if err != nil {
-		return nil, fmt.Errorf("inital query failed: %w", err)
-	}
-
-	issueList, info, err := parseResponse(response, match.Username)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	if !info.HasNextPage {
-		return issueList, nil
-	}
-
-	endCursor := info.EndCursor
-	var newIssues []Issue
+	issueList := make([]Issue, 0)
+	page := 0
 	for {
-		variables["cursor"] = endCursor
-
-		response, err = requests.Project(&requests.Query{
-			Query:     queryAllFollowing,
-			Variables: variables,
-		}, match)
+		// owner is at tmp[0], repo name is at tmp[1]
+		issues, response, err := client.Issues.ListByRepo(context.Background(), tmp[0], tmp[1], &github.IssueListByRepoOptions{
+			State:     "all",
+			Sort:      "created",
+			Direction: "desc",
+			ListOptions: github.ListOptions{
+				Page:    page,
+				PerPage: 100,
+			},
+		})
 		if err != nil {
-			return nil, fmt.Errorf("subsequent query failed: %w", err)
+			return nil, fmt.Errorf("requesting issues: %w", err)
 		}
 
-		newIssues, info, err = parseResponse(response, match.Username)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse response: %w", err)
+		for _, issue := range issues {
+			if issue.IsPullRequest() {
+				continue
+			}
+
+			author := issue.GetUser()
+			assigned := issue.GetAssignee()
+
+			issueList = append(issueList, Issue{
+				Title:     issue.GetTitle(),
+				CreatedAt: issue.GetCreatedAt().Time,
+				UpdatedAt: issue.GetUpdatedAt().Time,
+				Iid:       strconv.Itoa(issue.GetNumber()),
+				State:     issue.GetState(),
+				Author: remote.User{
+					Name:     author.GetName(),
+					Username: author.GetLogin(),
+				},
+				Assignees: []remote.User{
+					{
+						Name:     assigned.GetName(),
+						Username: assigned.GetLogin(),
+					},
+				},
+			})
 		}
 
-		issueList = append(issueList, newIssues...)
-
-		endCursor = info.EndCursor
-		if !info.HasNextPage {
+		page = response.NextPage
+		if page == 0 {
 			break
 		}
 	}
 
 	return issueList, nil
-}
-
-func parseResponse(response []byte, ownUsername string) ([]Issue, *pageInfo, error) {
-	queryAll := queryAllGitHubResponse{}
-
-	dec := json.NewDecoder(bytes.NewBuffer(response))
-	dec.DisallowUnknownFields()
-	err := dec.Decode(&queryAll)
-	if err != nil {
-		logger.Log.Errorf("Failed to decode the response: %s", err)
-
-		return nil, nil, fmt.Errorf("unmarshle of issues failed: %w", err)
-	}
-
-	// Flatter the Graphql struct to an Issue struct
-	var tmp Issue
-	issueList := make([]Issue, 0)
-	for _, issue := range queryAll.Data.Repository.Issues.Nodes {
-		assignees := make([]remote.User, len(issue.Assignees.Nodes))
-		for i := range issue.Assignees.Nodes {
-			assignees[i] = remote.User{Username: issue.Assignees.Nodes[i].Login}
-		}
-
-		tmp = Issue{
-			Title:     issue.Title,
-			CreatedAt: issue.CreatedAt,
-			UpdatedAt: issue.UpdatedAt,
-			Iid:       strconv.Itoa(issue.Number),
-			State:     issue.State,
-			Assignees: assignees,
-			Author:    remote.User{Username: issue.Author.Login},
-		}
-
-		tmp.UpdateUsername(ownUsername)
-
-		issueList = append(issueList, tmp)
-	}
-
-	return issueList, &queryAll.Data.Repository.Issues.PageInfo, nil
 }
