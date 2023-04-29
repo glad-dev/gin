@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func checkErrorGitLab(response []byte) error {
+func checkError(response []byte) error {
 	errorResponse := struct {
 		Errors []struct {
 			Extensions struct {
@@ -46,7 +46,7 @@ func checkErrorGitLab(response []byte) error {
 	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
 }
 
-func projectExistsGitLab(response []byte) bool {
+func projectExists(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project interface{} `json:"project"`

@@ -10,6 +10,8 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+else
+	echo "Build successful"
 fi
 rm gn
 
@@ -21,6 +23,8 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+else
+	echo "Format successful"
 fi
 
 # Sort imports
@@ -31,6 +35,8 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+else
+	echo "Import sort successful"
 fi
 
 # Check struct alignment
@@ -41,6 +47,8 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+else
+	echo "No misaligned structs"
 fi
 
 # Run golangcli-lint
@@ -51,6 +59,8 @@ if [ $? -ne 0 ]; then
 	echo
 
 	failure=1
+else
+	echo "Linter found no issues"
 fi
 
 if [ $failure -eq 0 ]; then

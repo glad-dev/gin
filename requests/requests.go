@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 
 	"gn/logger"
 	"gn/remote"
@@ -18,14 +17,15 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
-// Project makes a GraphQL query and checks if the returned value indicates that the requested project does not exist.
+// Project makes a GraphQL query to a GitLab backend and checks if the returned value indicates that the requested
+// project does not exist.
 func Project(query *Query, match *remote.Match) ([]byte, error) {
 	body, err := Do(query, match)
 	if err != nil {
 		return nil, err
 	}
 
-	if !projectExists(&match.URL, body) {
+	if !projectExists(body) {
 		logger.Log.Error("Project does not exist", "body", body)
 
 		return nil, ErrProjectDoesNotExist
@@ -34,7 +34,7 @@ func Project(query *Query, match *remote.Match) ([]byte, error) {
 	return body, nil
 }
 
-// Do makes a GraphQL query and returns the request's body.
+// Do makes a GraphQL query to a GitLab backend and returns the request's body.
 func Do(query *Query, match *remote.Match) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
@@ -90,7 +90,7 @@ func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
 		return nil, fmt.Errorf("request returned invalid status code %d", resp.StatusCode)
 	}
 
-	err = checkError(&match.URL, body)
+	err = checkError(body)
 	if err != nil {
 		logger.Log.Error("Request body contains an error", "error", err, "body", string(body))
 
@@ -98,20 +98,4 @@ func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
 	}
 
 	return body, nil
-}
-
-func checkError(u *url.URL, response []byte) error {
-	if u.Host == "github.com" {
-		return checkErrorGitHub(response)
-	}
-
-	return checkErrorGitLab(response)
-}
-
-func projectExists(u *url.URL, response []byte) bool {
-	if u.Host == "github.com" {
-		return projectExistsGitHub(response)
-	}
-
-	return projectExistsGitLab(response)
 }

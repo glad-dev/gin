@@ -100,7 +100,7 @@ const querySingleGitLab = `
 // QueryGitLab returns the discussion associated with the passed issueID. If the requested issue does not exist, an
 // ErrIssueDoesNotExist is returned.
 func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Details, error) {
-	variables := map[string]interface{}{
+	variables := map[string]string{
 		"projectPath": projectPath,
 		"issueID":     issueID,
 	}

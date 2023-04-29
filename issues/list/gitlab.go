@@ -69,7 +69,7 @@ const queryAllQuery = `
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 	endCursor := ""
 	issueList := make([]Issue, 0)
-	variables := map[string]interface{}{
+	variables := map[string]string{
 		"projectPath": projectPath,
 	}
 
