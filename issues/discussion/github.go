@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -32,11 +33,13 @@ func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Deta
 		return nil, fmt.Errorf("failed to convert issueID to int: %w", err)
 	}
 
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: match.Token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	var tc *http.Client
+	if len(match.Token) > 0 {
+		ctx := context.Background()
+		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: match.Token},
+		))
+	}
 	client := github.NewClient(tc)
 
 	// Get issue details

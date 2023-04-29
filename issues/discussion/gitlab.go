@@ -113,7 +113,7 @@ func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Deta
 		return nil, fmt.Errorf("query single - request failed: %w", err)
 	}
 
-	if issueDoesNotExistGitLab(response) {
+	if issueDoesNotExist(response) {
 		logger.Log.Error("Requested discussion does not exist.", "issueID", issueID, "response", string(response))
 
 		return nil, ErrIssueDoesNotExist
@@ -211,7 +211,7 @@ func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Deta
 	return &issueDetails, nil
 }
 
-func issueDoesNotExistGitLab(response []byte) bool {
+func issueDoesNotExist(response []byte) bool {
 	emptyResponse := struct {
 		Data struct {
 			Project struct {

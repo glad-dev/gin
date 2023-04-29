@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -23,11 +24,13 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		return nil, errors.New("invalid project path")
 	}
 
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: match.Token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	var tc *http.Client
+	if len(match.Token) > 0 {
+		ctx := context.Background()
+		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: match.Token},
+		))
+	}
 	client := github.NewClient(tc)
 
 	issueList := make([]Issue, 0)
