@@ -1,15 +1,16 @@
 package github
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
 
+	"github.com/google/go-github/v52/github"
+	"golang.org/x/oauth2"
+
 	"gn/logger"
 	"gn/remote"
-	"gn/requests"
 )
 
 // Init queries the username associated with the token and updates the token name as well.
@@ -20,65 +21,31 @@ func (hub Details) Init(u *url.URL) (remote.Details, error) {
 		return nil, errors.New("initializing GitHubDetails with a non-GitHub URL")
 	}
 
-	err := hub.getUsername(u)
+	err := hub.getUsername()
 	if err != nil {
-		logger.Log.Error("Failed to get Username.", "error", err, "GitHubDetails", hub)
+		logger.Log.Error("Failed to get username.", "error", err, "GitHubDetails", hub)
 
 		return nil, fmt.Errorf("GitHubDetails.Init: Failed to get Username: %w", err)
 	}
 
-	tokenName, err := hub.CheckTokenScope(u)
-	if err != nil {
-		logger.Log.Error("Failed to check scope.", "error", err, "GitHubDetails", hub)
-
-		return nil, fmt.Errorf("GitHubDetails.Init: Failed to check scope: %w", err)
-	}
-
-	hub.TokenName = tokenName
+	hub.TokenName = "GitHub token for account " + hub.Username
 
 	return hub, nil
 }
 
-func (hub *Details) getUsername(u *url.URL) error {
-	responseType := struct {
-		Data struct {
-			Viewer struct {
-				Login string `json:"login"`
-			} `json:"viewer"`
-		} `json:"data"`
-	}{}
+func (hub *Details) getUsername() error {
+	ctx := context.Background()
+	tc := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: hub.Token},
+	))
 
-	query := `
-		query {
-			viewer {
-				login
-			}
-		}
-	`
-
-	response, err := requests.Do(&requests.Query{
-		Query:     query,
-		Variables: nil,
-	}, &remote.Match{
-		URL:   *u,
-		Token: hub.Token,
-	})
+	client := github.NewClient(tc)
+	user, _, err := client.Users.Get(context.Background(), "")
 	if err != nil {
-		return err
+		return fmt.Errorf("getting username: %w", err)
 	}
 
-	dec := json.NewDecoder(bytes.NewBuffer(response))
-	dec.DisallowUnknownFields()
-	err = dec.Decode(&responseType)
-	if err != nil {
-		return fmt.Errorf("unmarshle of Username failed: %w", err)
-	}
-
-	if len(responseType.Data.Viewer.Login) == 0 {
-		return errors.New("empty Username: Check API key")
-	}
-
-	hub.Username = responseType.Data.Viewer.Login
+	hub.Username = user.GetLogin()
 
 	return nil
 }
