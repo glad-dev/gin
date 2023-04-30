@@ -1,15 +1,14 @@
 package gitlab
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
 
 	"gn/logger"
 	"gn/remote"
-	"gn/requests"
+
+	"github.com/xanzy/go-gitlab"
 )
 
 // Init checks the token's scope and set's the username and token name associated with the token.
@@ -27,7 +26,7 @@ func (lab Details) Init(u *url.URL) (remote.Details, error) {
 		return nil, fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
 	}
 
-	err = lab.getUsername(u)
+	err = lab.setUsername(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to get username: %s", err)
 
@@ -39,48 +38,36 @@ func (lab Details) Init(u *url.URL) (remote.Details, error) {
 	return lab, nil
 }
 
-func (lab *Details) getUsername(u *url.URL) error {
-	type returnType struct {
-		Data struct {
-			CurrentUser struct {
-				Username string `json:"username"`
-			} `json:"currentUser"`
-		} `json:"data"`
-	}
+func (lab *Details) setUsername(u *url.URL) error {
+	api := ApiURL(u)
 
-	query := `
-		query {
-			currentUser {
-				username
-			}
-		}
-	`
-
-	response, err := requests.Do(&requests.Query{
-		Query:     query,
-		Variables: nil,
-	}, &remote.Match{
-		URL:   *u,
-		Token: lab.Token,
-	})
+	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(api))
 	if err != nil {
-		return err
+		logger.Log.Error("Creating gitlab client",
+			"error", err,
+			"API-URL", api,
+		)
+
+		return fmt.Errorf("creating gitlab client: %w", err)
 	}
 
-	tmp := returnType{}
+	client.PersonalAccessTokens.GetSinglePersonalAccessToken()
 
-	dec := json.NewDecoder(bytes.NewBuffer(response))
-	dec.DisallowUnknownFields()
-	err = dec.Decode(&tmp)
+	user, _, err := client.Users.CurrentUser()
 	if err != nil {
-		return fmt.Errorf("unmarshle of Username failed: %w", err)
+		logger.Log.Error("Requesting current user",
+			"error", err,
+			"API-URL", api,
+		)
+
+		return fmt.Errorf("requesting current user: %w", err)
 	}
 
-	if len(tmp.Data.CurrentUser.Username) == 0 {
-		return errors.New("empty Username: Check API key")
+	if len(user.Username) == 0 {
+		return fmt.Errorf("empty username")
 	}
 
-	lab.Username = tmp.Data.CurrentUser.Username
+	lab.Username = user.Username
 
 	return nil
 }

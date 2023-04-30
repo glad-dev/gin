@@ -1,75 +1,51 @@
 package gitlab
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	"gn/constants"
+	"gn/logger"
+
+	"github.com/xanzy/go-gitlab"
 )
 
 // CheckTokenScope checks the scope of the token and returns the token name.
 func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
-	response := struct {
-		CreatedAt  time.Time   `json:"created_at"`
-		LastUsedAt time.Time   `json:"last_used_at"`
-		ExpiresAt  interface{} `json:"expires_at"`
-		Name       string      `json:"name"`
-		Scopes     []string    `json:"scopes"`
-		ID         int         `json:"id"`
-		UserID     int         `json:"user_id"`
-		Revoked    bool        `json:"revoked"`
-		Active     bool        `json:"active"`
-	}{}
+	api := ApiURL(u)
 
-	req, err := http.NewRequest("GET", u.JoinPath("/api/v4/personal_access_tokens/self").String(), bytes.NewBufferString(""))
+	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(api))
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
+		logger.Log.Error("Creating gitlab client",
+			"error", err,
+			"API-URL", api,
+		)
+
+		return "", fmt.Errorf("creating gitlab client: %w", err)
 	}
 
-	req.Header.Set("PRIVATE-TOKEN", lab.Token)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	tokenDetails, _, err := client.PersonalAccessTokens.GetSinglePersonalAccessToken()
 	if err != nil {
-		return "", fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
+		logger.Log.Error("Requesting personal access token",
+			"error", err,
+			"API-URL", api,
+		)
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read body: %w", err)
-	}
-
-	if resp.StatusCode == 401 {
-		return "", errors.New("the provided URL or token are invalid")
+		return "", fmt.Errorf("requesting personal access token: %w", err)
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode > 399 {
-		return "", fmt.Errorf("the status code of %d indicates failure: %s", resp.StatusCode, body)
-	}
-
-	dec := json.NewDecoder(bytes.NewBuffer(body))
-	dec.DisallowUnknownFields()
-	err = dec.Decode(&response)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode response: %w - %s", err, body)
-	}
-
-	if response.Revoked {
+	// Check if the token has been revoked
+	if tokenDetails.Revoked {
 		return "", fmt.Errorf("token was revoked")
 	}
 
-	if response.ExpiresAt != nil {
-		date, ok := response.ExpiresAt.(time.Time)
-		if ok && time.Now().After(date) {
-			return "", fmt.Errorf("token expired: %s", response.ExpiresAt)
+	// Check if the token has expired
+	if tokenDetails.ExpiresAt != nil {
+		date := time.Time(*tokenDetails.ExpiresAt)
+		if time.Now().After(date) {
+			return "", fmt.Errorf("token expired: %s", date)
 		}
 	}
 
@@ -77,7 +53,7 @@ func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
 	required := make([]string, len(constants.RequiredGitLabScopes))
 	copy(required, constants.RequiredGitLabScopes)
 
-	for _, scope := range response.Scopes {
+	for _, scope := range tokenDetails.Scopes {
 		for i, s := range required {
 			if s == scope {
 				// Remove the matched scope
@@ -92,5 +68,5 @@ func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
 		return "", fmt.Errorf("some scopes are missing: %s", strings.Join(required, ", "))
 	}
 
-	return response.Name, nil
+	return tokenDetails.Name, nil
 }

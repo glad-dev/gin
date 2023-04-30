@@ -11,12 +11,3 @@ type Match struct {
 	Username  string
 	TokenName string
 }
-
-// ApiURL returns the API URL.
-func (l *Match) ApiURL() string { //nolint:revive
-	if l.URL.Host == "github.com" {
-		return "https://api.github.com/graphql"
-	}
-
-	return l.URL.JoinPath("/api/graphql").String()
-}
