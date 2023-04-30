@@ -18,5 +18,5 @@ func (l *Match) ApiURL() string { //nolint:revive
 		return "https://api.github.com/graphql"
 	}
 
-	return l.URL.JoinPath("/api/graphql").String()
+	return l.URL.JoinPath("/api/v4").String()
 }
