@@ -1,6 +1,7 @@
 package remote
 
 import (
+	"gn/logger"
 	"net/url"
 )
 
@@ -13,10 +14,12 @@ type Match struct {
 }
 
 // ApiURL returns the API URL.
-func (l *Match) ApiURL() string { //nolint:revive
-	if l.URL.Host == "github.com" {
+func (m *Match) ApiURL() string { //nolint:revive
+	if m.URL.Host == "github.com" {
+		logger.Log.Info("Called ApiURL with a github host")
+
 		return "https://api.github.com/graphql"
 	}
 
-	return l.URL.JoinPath("/api/v4").String()
+	return m.URL.JoinPath("/api/v4").String()
 }

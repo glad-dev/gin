@@ -9,7 +9,6 @@ import (
 
 	"gn/logger"
 	"gn/remote"
-	"gn/requests"
 )
 
 type querySingleGitLabResponse struct {
@@ -105,7 +104,7 @@ func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Deta
 		"issueID":     issueID,
 	}
 
-	response, err := requests.Project(&requests.Query{
+	response, err := graphQLRequest(&query{
 		Query:     querySingleGitLab,
 		Variables: variables,
 	}, match)

@@ -1,4 +1,4 @@
-package requests
+package discussion
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"gn/logger"
 	"gn/remote"
@@ -17,10 +18,22 @@ var (
 	ErrNotFound            = errors.New("received a 404 - not found when contacting API")
 )
 
-// Project makes a GraphQL query to a GitLab backend and checks if the returned value indicates that the requested
+type query struct {
+	Variables map[string]string `json:"variables"`
+	Query     string            `json:"query"`
+}
+
+// graphQLRequest makes a GraphQL query to a GitLab backend and checks if the returned value indicates that the requested
 // project does not exist.
-func Project(query *Query, match *remote.Match) ([]byte, error) {
-	body, err := Do(query, match)
+func graphQLRequest(query *query, match *remote.Match) ([]byte, error) {
+	requestBody, err := json.Marshal(query)
+	if err != nil {
+		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
+
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	body, err := makeRequest(requestBody, match)
 	if err != nil {
 		return nil, err
 	}
@@ -34,20 +47,8 @@ func Project(query *Query, match *remote.Match) ([]byte, error) {
 	return body, nil
 }
 
-// Do makes a GraphQL query to a GitLab backend and returns the request's body.
-func Do(query *Query, match *remote.Match) ([]byte, error) {
-	requestBody, err := json.Marshal(query)
-	if err != nil {
-		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
-
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	return makeRequest(requestBody, match)
-}
-
 func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
-	req, err := http.NewRequest("POST", match.ApiURL(), bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", match.URL.JoinPath("/api/graphql").String(), bytes.NewBuffer(requestBody))
 	if err != nil {
 		logger.Log.Error("Failed to create HTTP request", "error", err, "url", match.URL.String(), "body", string(requestBody))
 
@@ -98,4 +99,60 @@ func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func checkError(response []byte) error {
+	errorResponse := struct {
+		Errors []struct {
+			Extensions struct {
+				Code      string `json:"code"`
+				TypeName  string `json:"typeName"`
+				FieldName string `json:"fieldName"`
+			} `json:"extensions"`
+			Message   string `json:"message"`
+			Locations []struct {
+				Line   int `json:"line"`
+				Column int `json:"column"`
+			} `json:"locations"`
+			Path []string `json:"path"`
+		} `json:"errors"`
+	}{}
+
+	dec := json.NewDecoder(bytes.NewBuffer(response))
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&errorResponse)
+	if err != nil {
+		// If unmarshal fails, then the message is not an error, thus we return nil
+		return nil //nolint:nilerr
+	}
+
+	out := ""
+	for i, err := range errorResponse.Errors {
+		out += fmt.Sprintf(
+			"Error %d: %s at line %d, column %d\n",
+			i+1,
+			err.Message,
+			err.Locations[0].Line,
+			err.Locations[0].Column,
+		)
+	}
+
+	return fmt.Errorf(strings.TrimSuffix(out, "\n"))
+}
+
+func projectExists(response []byte) bool {
+	emptyResponse := struct {
+		Data struct {
+			Project interface{} `json:"project"`
+		} `json:"data"`
+	}{}
+
+	dec := json.NewDecoder(bytes.NewBuffer(response))
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&emptyResponse)
+	if err != nil {
+		return false
+	}
+
+	return emptyResponse.Data.Project != nil
 }
