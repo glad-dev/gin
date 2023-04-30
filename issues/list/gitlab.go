@@ -7,17 +7,20 @@ import (
 
 	"gn/logger"
 	"gn/remote"
+	lab "gn/remote/gitlab"
 
 	"github.com/xanzy/go-gitlab"
 )
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
-	client, err := gitlab.NewClient(match.Token, gitlab.WithBaseURL(match.ApiURL()))
+	api := lab.ApiURL(&match.URL)
+
+	client, err := gitlab.NewClient(match.Token, gitlab.WithBaseURL(api))
 	if err != nil {
 		logger.Log.Error("Creating gitlab client",
 			"error", err,
-			"API-URL", match.ApiURL(),
+			"API-URL", api,
 			"project-path", projectPath,
 		)
 
@@ -48,7 +51,7 @@ func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 
 			logger.Log.Error("Requesting issues",
 				"error", err,
-				"API-URL", match.ApiURL(),
+				"API-URL", api,
 				"project-path", projectPath,
 				"response-body", string(body),
 			)

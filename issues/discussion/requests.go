@@ -39,7 +39,7 @@ func graphQLRequest(query *query, match *remote.Match) ([]byte, error) {
 	}
 
 	if !projectExists(body) {
-		logger.Log.Error("Project does not exist", "body", body)
+		logger.Log.Error("Project does not exist", "body", string(body))
 
 		return nil, ErrProjectDoesNotExist
 	}

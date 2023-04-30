@@ -1,5 +1,7 @@
 package gitlab
 
+import "net/url"
+
 // Details implements the remote.Details interface for a GitLab remote.
 type Details struct {
 	Token     string
@@ -20,4 +22,8 @@ func (lab Details) GetTokenName() string {
 // GetUsername implements the remote.Details interface.
 func (lab Details) GetUsername() string {
 	return lab.Username
+}
+
+func ApiURL(u *url.URL) string {
+	return u.JoinPath("/api/v4").String()
 }

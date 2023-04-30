@@ -39,13 +39,13 @@ func (lab Details) Init(u *url.URL) (remote.Details, error) {
 }
 
 func (lab *Details) setUsername(u *url.URL) error {
-	match := remote.Match{URL: *u}
+	api := ApiURL(u)
 
-	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(match.ApiURL()))
+	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(api))
 	if err != nil {
 		logger.Log.Error("Creating gitlab client",
 			"error", err,
-			"API-URL", match.ApiURL(),
+			"API-URL", api,
 		)
 
 		return fmt.Errorf("creating gitlab client: %w", err)
@@ -57,7 +57,7 @@ func (lab *Details) setUsername(u *url.URL) error {
 	if err != nil {
 		logger.Log.Error("Requesting current user",
 			"error", err,
-			"API-URL", match.ApiURL(),
+			"API-URL", api,
 		)
 
 		return fmt.Errorf("requesting current user: %w", err)
