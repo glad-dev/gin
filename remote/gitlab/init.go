@@ -51,8 +51,6 @@ func (lab *Details) setUsername(u *url.URL) error {
 		return fmt.Errorf("creating gitlab client: %w", err)
 	}
 
-	client.PersonalAccessTokens.GetSinglePersonalAccessToken()
-
 	user, _, err := client.Users.CurrentUser()
 	if err != nil {
 		logger.Log.Error("Requesting current user",

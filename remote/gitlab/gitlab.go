@@ -24,6 +24,7 @@ func (lab Details) GetUsername() string {
 	return lab.Username
 }
 
-func ApiURL(u *url.URL) string {
+// ApiURL returns the REST API of a given GitLab host.
+func ApiURL(u *url.URL) string { //nolint:revive
 	return u.JoinPath("/api/v4").String()
 }

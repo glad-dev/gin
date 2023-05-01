@@ -15,7 +15,6 @@ require (
 	github.com/xanzy/go-gitlab v0.83.0
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/term v0.7.0
-
 )
 
 require (
