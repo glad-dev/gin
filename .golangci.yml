@@ -1,65 +1,64 @@
 run:
-    concurrency: 8
-    timeout: 2m
-    issues-exit-code: 1
-    tests: false
+  concurrency: 8
+  timeout: 2m
+  issues-exit-code: 1
+  tests: false
 
 linters-settings:
-    gofmt:
-        simplify: true
-    gosimple:
-        checks: [ "all" ]
-    govet:
-        check-shadowing: true
-        enable-all: true
-    staticcheck:
-        checks: [ "all" ]
-    stylecheck:
-        checks: [ "all" ]
+  gofmt:
+    simplify: true
+  gosimple:
+    checks: [ "all" ]
+  govet:
+    check-shadowing: true
+    enable-all: true
+  staticcheck:
+    checks: [ "all" ]
+  stylecheck:
+    checks: [ "all" ]
 
 linters:
-    disable-all: false
-    enable-all: false
-    enable:
-        - errcheck
-        - gosimple
-        - govet
-        - ineffassign
-        - typecheck
-        - unused
-        - asciicheck
-        - bidichk
-        - bodyclose
-        - decorder
-        - depguard
-        - dupl
-        - dupword
-        - durationcheck
-        - errname
-        - errorlint
-        - exhaustive
-        - exportloopref
-        - gochecknoinits
-        - goconst
-        - gocritic
-        - godot
-        - gofmt
-        - goimports
-        - goprintffuncname
-        - gosec
-        - nilerr
-        - nilnil
-        - nlreturn
-        - prealloc
-        - predeclared
-        - reassign
-        - revive
-        - unconvert
-        - unparam
-        - whitespace
-    fast: false
+  disable-all: false
+  enable-all: false
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - typecheck
+    - unused
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - decorder
+    - depguard
+    - dupl
+    - dupword
+    - durationcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - gochecknoinits
+    - gocritic
+    - godot
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - nilerr
+    - nilnil
+    - nlreturn
+    - prealloc
+    - predeclared
+    - reassign
+    - revive
+    - unconvert
+    - unparam
+    - whitespace
+  fast: false
 
 issues:
-    max-issues-per-linter: 0
-    max-same-issues: 0
-    fix: true
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  fix: true

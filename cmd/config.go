@@ -1,10 +1,17 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"os"
+	"strings"
 
 	"gn/config"
+	"gn/constants"
+	"gn/style"
+	"gn/tui/config/add"
+	"gn/tui/config/color"
+	"gn/tui/config/edit"
+	"gn/tui/config/remove"
 
 	"github.com/spf13/cobra"
 )
@@ -15,12 +22,9 @@ func newCmdConfig() *cobra.Command {
 		Short: "Interact with config",
 		Long:  "Long - edit config",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(os.Stderr, "Use commands like add|list|remove|update")
-		},
 	}
 
-	list := &cobra.Command{
+	cmdList := &cobra.Command{
 		Use:   "list",
 		Short: "List all remotes",
 		Long:  "View a list of all existing remotes",
@@ -28,55 +32,90 @@ func newCmdConfig() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := config.List()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
+				if errors.Is(err, config.ErrConfigDoesNotExist) {
+					style.PrintErrAndExit(config.ErrConfigDoesNotExistMsg)
+				}
+
+				style.PrintErrAndExit("An error occurred while attempting to list the configuration: " + err.Error())
 			}
 		},
 	}
 
-	edit := &cobra.Command{
+	addDesc := fmt.Sprintf(
+		"Add a new token.\nA GitLab token needs the following scopes: %s\nA GitHub token needs the following scopes: %s\n",
+		strings.Join(constants.RequiredGitLabScopes, ", "),
+		strings.Join(constants.RequiredGitHubScopes, ", "),
+	)
+
+	cmdAdd := &cobra.Command{
 		Use:   "add",
-		Short: "Add remote",
-		Long:  "Long - add remote",
+		Short: "Add a new remote",
+		Long:  addDesc,
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.Append()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
+			add.Config()
 		},
 	}
 
-	remove := &cobra.Command{
+	cmdRemove := &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a remote",
-		Long:  "Long - Remove a remote",
+		Long:  "Remove a remote and its API token from the local storage",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.Remove()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
-			}
+			remove.Config()
 		},
 	}
 
-	update := &cobra.Command{
+	cmdEdit := &cobra.Command{
+		Use:   "edit",
+		Short: "Edit the configuration of an existing remote",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			edit.Config()
+		},
+	}
+
+	cmdVerify := &cobra.Command{
+		Use:   "verify",
+		Short: "Check the validity of all stored tokens",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := config.VerifyTokens()
+			if err != nil {
+				style.PrintErrAndExit(err.Error())
+			}
+
+			fmt.Print(style.FormatQuitText("All tokens are valid."))
+		},
+	}
+
+	cmdUpdate := &cobra.Command{
 		Use:   "update",
-		Short: "Update the token of an existing remote",
-		Long:  "Long - update config",
+		Short: "Update the username and token names",
+		Long:  "Update the username and token names if they changed",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.UpdateToken()
+			err := config.UpdateRemote()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-				os.Exit(1)
+				style.PrintErrAndExit(err.Error())
 			}
+
+			fmt.Print(style.FormatQuitText("All tokens were successfully updated."))
 		},
 	}
 
-	root.AddCommand(edit, remove, list, update)
+	cmdColors := &cobra.Command{
+		Use:   "colors",
+		Short: "Update the colors",
+		Long:  "Update the colors. Delete the input field to revert back to the default color.",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			color.Config()
+		},
+	}
+
+	root.AddCommand(cmdList, cmdAdd, cmdRemove, cmdEdit, cmdVerify, cmdUpdate, cmdColors)
 
 	return root
 }

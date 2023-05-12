@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
-
 	"gn/cmd"
+	"gn/logger"
+	"gn/style"
 )
 
 func main() {
+	logger.Init()
+	style.Init()
+
 	err := cmd.Execute()
 	if err != nil {
-		fmt.Printf("Execute failed: %s", err)
+		style.PrintErrAndExit("Execute failed: " + err.Error())
 	}
 }

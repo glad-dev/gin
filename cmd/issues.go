@@ -1,114 +1,137 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"net/url"
 	"os"
 
-	"gn/config"
-	"gn/issues"
+	"gn/logger"
 	"gn/repo"
+	"gn/style"
+	allIssues "gn/tui/issues/all"
+	singleIssue "gn/tui/issues/single"
 
 	"github.com/spf13/cobra"
 )
 
 func newCmdAllIssues() *cobra.Command {
-	allIssues := &cobra.Command{
-		Use:   "issues",
-		Short: "View all issues of a repository",
-		Long:  "Long - Query all issues",
-		Args:  cobra.ExactArgs(0),
-		Run:   runAllIssues,
+	cmdAllIssues := &cobra.Command{
+		Use:               "issues",
+		Short:             "View all issues of a repository",
+		Args:              cobra.ExactArgs(0),
+		PersistentPreRunE: preRun,
+		Run:               runAllIssues,
 	}
 
-	allIssues.PersistentFlags().String("path", "", "Path to the repo")
+	cmdAllIssues.PersistentFlags().String("path", "", "Path to the repo")
+	cmdAllIssues.PersistentFlags().String("url", "", "URL of the repo")
 
-	return allIssues
+	return cmdAllIssues
 }
 
 func newCmdSingleIssue() *cobra.Command {
-	singleIssue := &cobra.Command{
-		Use:   "issue [iid]",
-		Short: "View the discussion of an issue",
-		Long:  "Long - Show single issue",
-		Args:  cobra.ExactArgs(1),
-		Run:   runSingleIssue,
+	cmdSingleIssue := &cobra.Command{
+		Use:               "issue [iid]",
+		Short:             "View the discussion of an issue",
+		Args:              cobra.ExactArgs(1),
+		PersistentPreRunE: preRun,
+		Run:               runSingleIssue,
 	}
 
-	singleIssue.PersistentFlags().String("path", "", "Path to the repo")
+	cmdSingleIssue.PersistentFlags().String("path", "", "Path to the repo")
+	cmdSingleIssue.PersistentFlags().String("url", "", "URL of the repo")
 
-	return singleIssue
+	return cmdSingleIssue
 }
 
 func runAllIssues(cmd *cobra.Command, _ []string) {
-	conf, err := config.Get()
+	details, u, err := getDetailsOrURL(cmd)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
+		style.PrintErrAndExit(err.Error())
 	}
 
-	details, err := getRepo(cmd)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	issueList, err := issues.QueryAll(conf, details)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
-	for _, issue := range issueList {
-		fmt.Printf("%s) %s [%s]\n", issue.Iid, issue.Title, issue.State)
-	}
+	allIssues.Show(details, u)
 }
 
 func runSingleIssue(cmd *cobra.Command, args []string) {
-	conf, err := config.Get()
+	details, u, err := getDetailsOrURL(cmd)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
+		style.PrintErrAndExit(err.Error())
 	}
 
-	details, err := getRepo(cmd)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	issue, err := issues.QuerySingle(conf, details, args[0])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failure: %s\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println(issue.Title)
-	fmt.Println(issue.Description)
-	fmt.Println()
-
-	for _, comment := range issue.Discussion {
-		fmt.Println(comment.Body)
-		fmt.Printf("- %s\n", comment.Author)
-		for _, subComments := range comment.Comments {
-			fmt.Printf("\t%s\n", subComments.Body)
-		}
-	}
+	singleIssue.Show(details, u, args[0])
 }
 
-func getRepo(cmd *cobra.Command) ([]repo.Details, error) {
-	// Get path flag
-	dir, err := cmd.Flags().GetString("path")
-	if err != nil {
-		return nil, err
+func preRun(cmd *cobra.Command, _ []string) error {
+	urlFlag := cmd.Flags().Lookup("url")
+	pathFlag := cmd.Flags().Lookup("path")
+
+	// Check if the flags were defined
+	if urlFlag == nil || pathFlag == nil {
+		logger.Log.Error("URL or path flag was not defined.", "urlFlag", urlFlag, "pathFlag", pathFlag)
+
+		return errors.New("flag --path or --url was not defined")
 	}
 
+	// Check if flags exists and if they were set
+	if urlFlag.Changed && pathFlag.Changed {
+		logger.Log.Error("User set both --path and --url.")
+
+		return errors.New("flags --path and --url are mutually exclusive")
+	}
+
+	return nil
+}
+
+func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
+	// Check if the flags are ok
+	dir, err := cmd.Flags().GetString("path")
+	if err != nil {
+		logger.Log.Errorf("Failed to get the path flag: %s", err)
+
+		return nil, nil, fmt.Errorf("failed to get the 'path' flag: %w", err)
+	}
+
+	urlStr, err := cmd.Flags().GetString("url")
+	if err != nil {
+		logger.Log.Errorf("Failed to get the url flag: %s", err)
+
+		return nil, nil, fmt.Errorf("failed to get the 'url' flag: %w", err)
+	}
+
+	// Due to our pre-run hook, we know that only one of the flags is set
+	if len(urlStr) > 0 {
+		// We were passed a URL flag
+		var u *url.URL
+		u, err = url.ParseRequestURI(urlStr)
+		if err != nil {
+			logger.Log.Error("Invalid url passed.", "error", err, "url", urlStr)
+
+			return nil, nil, fmt.Errorf("failed to parse given url: %w", err)
+		}
+
+		return nil, u, nil
+	}
+
+	// We were either passed a path flag or no flag
 	if len(dir) == 0 {
 		// Path flag was not set => Use current directory
 		dir, err = os.Getwd()
 		if err != nil {
-			return nil, err
+			logger.Log.Errorf("Failed to get current directory: %s", err)
+
+			return nil, nil, err
 		}
 	}
 
+	details, err := repo.Get(dir)
+	if err != nil {
+		logger.Log.Error("Failed to get repository details.", "error", err, "directory", dir)
+
+		return nil, nil, fmt.Errorf("failed to get repo details: %w", err)
+	}
+
 	// Get the git repository at the current directory
-	return repo.Get(dir)
+	return details, nil, err
 }

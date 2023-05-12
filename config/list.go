@@ -1,23 +1,40 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
 
+	"gn/config/location"
+	"gn/style"
+)
+
+// List prints all stored tokens.
 func List() error {
 	// Load config
-	generalConfig, err := loadConfig()
+	wrapper, err := Load()
 	if err != nil {
 		return err
 	}
 
-	configLocation, err := getConfigLocation()
+	configLocation, err := location.Get()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("The configuration file at '%s' contains data for the following URLs:\n", configLocation)
-	for i, config := range generalConfig.Configs {
-		fmt.Printf("%d) %s\n", i+1, config.URL.String())
+	fmt.Println()
+	fmt.Println(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
+	for i, config := range wrapper.Remotes {
+		fmt.Println(style.PrintOnlyList.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
+
+		for k, detail := range config.Details {
+			fmt.Println(style.ListDetails.Render(fmt.Sprintf(
+				"%d.%d) Username: '%s' - Token name: '%s'", // TODO: Improve output
+				i+1, k+1,
+				detail.GetUsername(),
+				detail.GetTokenName(),
+			)))
+		}
 	}
+	fmt.Print("\n")
 
 	return nil
 }

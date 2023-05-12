@@ -1,18 +1,30 @@
 #!/bin/bash
+failure=0
+
+STAGED_GO_FILES=$(git diff --staged --name-only | grep "\.go$")
+
 # Check if the code builds
 go build -o gn
 if [ $? -ne 0 ]; then
 	echo "Failed to build!"
-	exit 1
+	echo
+
+	failure=1
+else
+	echo "Build successful"
 fi
 rm gn
 
-# Run formater
-out=$(gofmt -w .)
+# Run formatter
+out=$(gofumpt -w .)
 if [ $? -ne 0 ]; then
-	echo "Formater failed!"
+	echo "Formatter failed!"
 	echo "$out"
-	exit 1
+	echo
+
+	failure=1
+else
+	echo "Format successful"
 fi
 
 # Sort imports
@@ -20,7 +32,23 @@ out=$(goimports -w *.go)
 if [ $? -ne 0 ]; then
 	echo "Sorting imports failed!"
 	echo "$out"
-	exit 1
+	echo
+
+	failure=1
+else
+	echo "Import sort successful"
+fi
+
+# Check struct alignment
+out=$(betteralign ./...)
+if [ $? -ne 0 ]; then
+	echo "There are misaligned structs!"
+	echo "$out"
+	echo
+
+	failure=1
+else
+	echo "No misaligned structs"
 fi
 
 # Run golangcli-lint
@@ -28,7 +56,17 @@ golangci-lint run
 if [ $? -ne 0 ]; then
 	echo
 	echo "golangcli has found some issues"
-	exit 1
+	echo
+
+	failure=1
+else
+	echo "Linter found no issues"
 fi
 
-exit 0
+if [ $failure -eq 0 ]; then
+	for FILE in $STAGED_GO_FILES; do
+		git add "$FILE"
+	done
+fi
+
+exit $failure
