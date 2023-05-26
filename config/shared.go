@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/url"
 
-	"gn/logger"
+	"github.com/glad-dev/gin/logger"
 )
 
 func checkURLStr(urlStr string) (*url.URL, error) {

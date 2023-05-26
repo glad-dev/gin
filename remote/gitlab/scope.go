@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"gn/constants"
-	"gn/logger"
+	"github.com/glad-dev/gin/constants"
+	"github.com/glad-dev/gin/logger"
 
 	"github.com/xanzy/go-gitlab"
 )

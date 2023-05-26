@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"gn/issues/discussion"
-	"gn/logger"
-	"gn/style"
+	"github.com/glad-dev/gin/issues/discussion"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"

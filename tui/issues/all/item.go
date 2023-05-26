@@ -3,7 +3,7 @@ package all
 import (
 	"fmt"
 
-	"gn/issues/list"
+	"github.com/glad-dev/gin/issues/list"
 )
 
 // itemWrapper is a wrapper for list.Issue that implements all functions required by the list.Item interface.

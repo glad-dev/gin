@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"strings"
 
-	"gn/config"
-	"gn/remote"
-	"gn/repo"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/repo"
 )
 
 func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL) (*remote.Match, string, error) {

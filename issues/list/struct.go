@@ -3,7 +3,7 @@ package list
 import (
 	"time"
 
-	"gn/remote"
+	"github.com/glad-dev/gin/remote"
 )
 
 // Issue contains information about an issue.

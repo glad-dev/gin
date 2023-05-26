@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"gn/logger"
-	"gn/style"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

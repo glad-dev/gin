@@ -3,10 +3,10 @@ package config
 import (
 	"errors"
 
-	"gn/logger"
-	"gn/remote"
-	"gn/remote/github"
-	"gn/remote/gitlab"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/github"
+	"github.com/glad-dev/gin/remote/gitlab"
 )
 
 // ErrUpdateSameValues is returned if Update was called with the same url and token that is already stored in the

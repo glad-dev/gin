@@ -1,4 +1,4 @@
-module gn
+module github.com/glad-dev/gin
 
 go 1.20
 

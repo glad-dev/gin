@@ -1,9 +1,9 @@
 package color
 
 import (
-	"gn/config"
+	"github.com/glad-dev/gin/config"
 
-	"gn/style"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/lipgloss"
 

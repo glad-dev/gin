@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gn/cmd"
-	"gn/logger"
-	"gn/style"
+	"github.com/glad-dev/gin/cmd"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
 )
 
 func main() {

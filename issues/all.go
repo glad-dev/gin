@@ -3,10 +3,10 @@ package issues
 import (
 	"net/url"
 
-	"gn/config"
-	"gn/issues/list"
-	"gn/logger"
-	"gn/repo"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/issues/list"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/repo"
 )
 
 // QueryList returns a list of issues associated with a repository.

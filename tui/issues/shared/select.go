@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/url"
 
-	"gn/config"
-	"gn/remote"
-	"gn/repo"
-	selection "gn/tui/config/select"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/repo"
+	selection "github.com/glad-dev/gin/tui/config/select"
 )
 
 func SelectConfig(details []repo.Details, u *url.URL) (*config.Wrapper, error) {

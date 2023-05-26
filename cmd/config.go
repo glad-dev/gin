@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"gn/config"
-	"gn/constants"
-	"gn/style"
-	"gn/tui/config/add"
-	"gn/tui/config/color"
-	"gn/tui/config/edit"
-	"gn/tui/config/remove"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/constants"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/config/add"
+	"github.com/glad-dev/gin/tui/config/color"
+	"github.com/glad-dev/gin/tui/config/edit"
+	"github.com/glad-dev/gin/tui/config/remove"
 
 	"github.com/spf13/cobra"
 )

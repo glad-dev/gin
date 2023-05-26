@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"gn/config"
-	"gn/remote"
-	"gn/style"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

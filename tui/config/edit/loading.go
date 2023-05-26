@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"gn/config"
-	"gn/style"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/style"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

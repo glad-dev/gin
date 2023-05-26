@@ -3,11 +3,11 @@ package all
 import (
 	"fmt"
 
-	"gn/config"
-	"gn/issues"
-	"gn/issues/discussion"
-	"gn/style"
-	"gn/tui/issues/shared"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/issues"
+	"github.com/glad-dev/gin/issues/discussion"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/issues/shared"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"

@@ -1,8 +1,8 @@
 package color
 
 import (
-	"gn/config"
-	"gn/style"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"

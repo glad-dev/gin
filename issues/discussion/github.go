@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"gn/logger"
-	"gn/remote"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
 
 	"github.com/google/go-github/v52/github"
 	"golang.org/x/oauth2"

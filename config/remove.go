@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"gn/config/location"
-	"gn/logger"
+	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/logger"
 )
 
 // Remove removes the token/url combination at the passed indices.

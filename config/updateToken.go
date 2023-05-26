@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"gn/logger"
-	"gn/remote"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
 )
 
 // UpdateRemote loads the configuration file and updates the username and token name associated with each token.

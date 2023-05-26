@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"gn/constants"
+	"github.com/glad-dev/gin/constants"
 
 	"github.com/spf13/cobra"
 )
@@ -9,7 +9,7 @@ import (
 // Execute parses the command line parameters and starts the program.
 func Execute() error {
 	rootCmd := &cobra.Command{
-		Use:     "gn",
+		Use:     "gin",
 		Version: constants.Version,
 	}
 

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"gn/constants"
-	"gn/logger"
-	"gn/remote"
-	"gn/repo"
+	"github.com/glad-dev/gin/constants"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/repo"
 )
 
 // Wrapper contains the Colors configurations, a Version number and a list of Remotes.

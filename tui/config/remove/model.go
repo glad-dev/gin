@@ -3,9 +3,9 @@ package remove
 import (
 	"fmt"
 
-	"gn/config"
-	"gn/style"
-	"gn/tui/config/shared"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/config/shared"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"gn/logger"
+	"github.com/glad-dev/gin/logger"
 
 	"github.com/go-git/go-git/v5"
 )

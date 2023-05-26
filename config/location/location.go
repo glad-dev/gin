@@ -15,7 +15,7 @@ func Dir() (string, error) {
 		log.Fatalf("Failed to get the user's home directory: %s", err)
 	}
 
-	return path.Join(usr.HomeDir, ".config", "gn"), nil
+	return path.Join(usr.HomeDir, ".config", "gin"), nil
 }
 
 // CreateDir creates the configuration directory.
@@ -35,5 +35,5 @@ func Get() (string, error) {
 		return "", err
 	}
 
-	return path.Join(dir, "gn.toml"), nil
+	return path.Join(dir, "config.toml"), nil
 }

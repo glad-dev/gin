@@ -6,13 +6,13 @@ import (
 	"net/url"
 	"os"
 
-	"gn/config/location"
-	"gn/constants"
-	"gn/logger"
-	"gn/remote"
-	"gn/remote/github"
-	"gn/remote/gitlab"
-	"gn/style"
+	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/constants"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/github"
+	"github.com/glad-dev/gin/remote/gitlab"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/BurntSushi/toml"
 )
@@ -36,9 +36,9 @@ type helperRemote struct {
 // ErrConfigDoesNotExist is returned by Load if no configuration file exists.
 var ErrConfigDoesNotExist = errors.New("config does not exist")
 
-const ErrConfigDoesNotExistMsg = "No configuration exists.\nRun `gn config add` to add remotes"
+const ErrConfigDoesNotExistMsg = "No configuration exists.\nRun `gin config add` to add remotes"
 
-// Load returns the config located at '~/.config/gn/gn.toml' if it exists. If it does not exist, function returns a
+// Load returns the config located at '~/.config/gin/config.toml' if it exists. If it does not exist, function returns a
 // ErrConfigDoesNotExist error and an initialized Wrapper config.
 func Load() (*Wrapper, error) {
 	fileLocation, err := location.Get()

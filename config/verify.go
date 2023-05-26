@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gn/logger"
+	"github.com/glad-dev/gin/logger"
 )
 
 type errorStruct struct {

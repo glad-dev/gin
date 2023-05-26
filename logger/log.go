@@ -6,7 +6,7 @@ import (
 	"path"
 	"time"
 
-	"gn/config/location"
+	"github.com/glad-dev/gin/config/location"
 
 	"github.com/charmbracelet/log"
 )

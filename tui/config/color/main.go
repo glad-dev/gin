@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	"gn/config"
-	"gn/logger"
-	"gn/style"
-	"gn/style/color"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/style/color"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"

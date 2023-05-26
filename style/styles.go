@@ -1,7 +1,7 @@
 package style
 
 import (
-	"gn/style/color"
+	"github.com/glad-dev/gin/style/color"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"

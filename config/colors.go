@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"gn/logger"
-	"gn/style"
-	"gn/style/color"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/style/color"
 
 	"github.com/charmbracelet/lipgloss"
 )

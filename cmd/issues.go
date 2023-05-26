@@ -6,11 +6,11 @@ import (
 	"net/url"
 	"os"
 
-	"gn/logger"
-	"gn/repo"
-	"gn/style"
-	allIssues "gn/tui/issues/all"
-	singleIssue "gn/tui/issues/single"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/style"
+	allIssues "github.com/glad-dev/gin/tui/issues/all"
+	singleIssue "github.com/glad-dev/gin/tui/issues/single"
 
 	"github.com/spf13/cobra"
 )

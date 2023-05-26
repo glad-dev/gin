@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 
-	"gn/config/location"
-	"gn/style"
+	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/style"
 )
 
 // List prints all stored tokens.

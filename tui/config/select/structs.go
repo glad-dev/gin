@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"gn/remote"
-	"gn/style"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

@@ -9,8 +9,8 @@ import (
 	"github.com/google/go-github/v52/github"
 	"golang.org/x/oauth2"
 
-	"gn/logger"
-	"gn/remote"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
 )
 
 // Init queries the username associated with the token and updates the token name as well.

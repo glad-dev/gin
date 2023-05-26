@@ -1,7 +1,7 @@
 package edit
 
 import (
-	"gn/style"
+	"github.com/glad-dev/gin/style"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

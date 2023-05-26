@@ -4,7 +4,7 @@ failure=0
 STAGED_GO_FILES=$(git diff --staged --name-only | grep "\.go$")
 
 # Check if the code builds
-go build -o gn
+go build -o gin
 if [ $? -ne 0 ]; then
 	echo "Failed to build!"
 	echo
@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
 else
 	echo "Build successful"
 fi
-rm gn
+rm gin
 
 # Run formatter
 out=$(gofumpt -w .)

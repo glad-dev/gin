@@ -3,7 +3,7 @@ package shared
 import (
 	"net/url"
 
-	"gn/repo"
+	"github.com/glad-dev/gin/repo"
 
 	"github.com/charmbracelet/bubbles/spinner"
 )

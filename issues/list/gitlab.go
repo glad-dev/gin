@@ -5,9 +5,9 @@ import (
 	"io"
 	"strconv"
 
-	"gn/logger"
-	"gn/remote"
-	lab "gn/remote/gitlab"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
+	lab "github.com/glad-dev/gin/remote/gitlab"
 
 	"github.com/xanzy/go-gitlab"
 )

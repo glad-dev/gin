@@ -1,8 +1,8 @@
 package add
 
 import (
-	"gn/style"
-	"gn/tui/config/shared"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/config/shared"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

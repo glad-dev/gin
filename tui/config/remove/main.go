@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"gn/config"
-	"gn/logger"
-	"gn/style"
-	"gn/tui/config/shared"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/config/shared"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"

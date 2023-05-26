@@ -3,10 +3,10 @@ package single
 import (
 	"net/url"
 
-	"gn/repo"
-	"gn/style"
-	"gn/tui/issues/shared"
-	"gn/tui/widgets"
+	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/issues/shared"
+	"github.com/glad-dev/gin/tui/widgets"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

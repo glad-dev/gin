@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"time"
 
-	"gn/logger"
-	"gn/remote"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
 )
 
 type querySingleGitLabResponse struct {

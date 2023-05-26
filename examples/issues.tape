@@ -8,17 +8,17 @@ Set FontSize 20
 Hide
 Type "cd .."
 Enter
-Type "go build -o gn"
+Type "go build -o gin"
 Enter
 Type "clear"
 Enter
 Show
 
-Type "./gn issues --url 'https://github.com/charmbracelet/bubbletea'"
+Type "./gin issues --url 'https://github.com/charmbracelet/bubbletea'"
 Sleep 500ms
 Enter
 
 Sleep 3s
 
 Hide
-Type "rm gn"
+Type "rm gin"

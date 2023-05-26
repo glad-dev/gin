@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"gn/logger"
-	"gn/remote"
+	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/remote"
 )
 
 // Remote contains the remote's URL and a list of Details, containing the token, username and token name.

@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"gn/remote"
+	"github.com/glad-dev/gin/remote"
 )
 
 // ErrIssueDoesNotExist is returned if the requested discussion does not exist.

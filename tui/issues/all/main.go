@@ -3,11 +3,11 @@ package all
 import (
 	"net/url"
 
-	"gn/issues/discussion"
-	"gn/repo"
-	"gn/style"
-	"gn/tui/issues/shared"
-	"gn/tui/widgets"
+	"github.com/glad-dev/gin/issues/discussion"
+	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/issues/shared"
+	"github.com/glad-dev/gin/tui/widgets"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"

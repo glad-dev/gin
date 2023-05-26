@@ -1,7 +1,7 @@
 package add
 
 import (
-	"gn/style"
+	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"

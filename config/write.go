@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"gn/config/location"
-	"gn/constants"
-	"gn/logger"
+	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/constants"
+	"github.com/glad-dev/gin/logger"
 
 	"github.com/BurntSushi/toml"
 )

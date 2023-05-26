@@ -1,10 +1,10 @@
 package edit
 
 import (
-	"gn/config"
-	"gn/remote"
-	"gn/style"
-	"gn/tui/config/shared"
+	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/style"
+	"github.com/glad-dev/gin/tui/config/shared"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"

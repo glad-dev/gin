@@ -3,8 +3,8 @@ package all
 import (
 	"strings"
 
-	"gn/issues"
-	"gn/logger"
+	"github.com/glad-dev/gin/issues"
+	"github.com/glad-dev/gin/logger"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
