@@ -37,13 +37,13 @@ type model struct {
 	state               state
 }
 
-func (m model) Init() tea.Cmd {
-	return m.spinner.Tick
-}
-
 type updateMsg struct {
 	str     string
 	success bool
+}
+
+func (m model) Init() tea.Cmd {
+	return m.spinner.Tick
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
