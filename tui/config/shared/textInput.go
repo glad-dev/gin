@@ -26,6 +26,7 @@ func initStyles() {
 	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
 }
 
+// GetTextInputs returns two textinput.Model. The first model is meant for a URL. The second model is meant for a token.
 func GetTextInputs() []textinput.Model {
 	initStyles()
 
@@ -53,6 +54,7 @@ func GetTextInputs() []textinput.Model {
 	return inputs
 }
 
+// RenderInputFields renders the input fields created by GetTextInputs.
 func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, height int) string {
 	button := &blurredButton
 	if focusIndex == len(inputs) {

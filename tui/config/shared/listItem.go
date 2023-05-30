@@ -13,17 +13,27 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// ListItem is a list.Item and contains a *config.Remote.
 type ListItem struct {
 	Remote *config.Remote
 }
 
+// FilterValue is required for ListItem to be a list.Item.
 func (i ListItem) FilterValue() string { return "" }
 
+// ItemDelegate is a list.ItemDelegate for ListItem.
 type ItemDelegate struct{}
 
-func (d ItemDelegate) Height() int                             { return 1 }
-func (d ItemDelegate) Spacing() int                            { return 0 }
+// Height is required for selectItemDelegate to be a list.ItemDelegate.
+func (d ItemDelegate) Height() int { return 1 }
+
+// Spacing is required for selectItemDelegate to be a list.ItemDelegate.
+func (d ItemDelegate) Spacing() int { return 0 }
+
+// Update is required for selectItemDelegate to be a list.ItemDelegate.
 func (d ItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+
+// Render is required for selectItemDelegate to be a list.ItemDelegate.
 func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	i, ok := item.(ListItem)
 	if !ok {

@@ -10,7 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) initList(msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
+func initList(m *model, msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	// Set lists
@@ -51,7 +51,7 @@ func (m *model) initList(msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) updateList(msg tea.Msg) tea.Cmd {
+func updateList(m *model, msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -85,7 +85,7 @@ func (m *model) updateList(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) loadDetails() tea.Cmd {
+func loadDetails(m *model) tea.Cmd {
 	return func() tea.Msg {
 		selected, ok := m.tabs.lists[m.tabs.activeTab].SelectedItem().(itemWrapper)
 		if !ok {

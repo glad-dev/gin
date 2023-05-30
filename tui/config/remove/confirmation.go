@@ -13,7 +13,7 @@ var (
 	buttonStyle = lipgloss.NewStyle().Width(10)
 )
 
-func (m *model) viewConfirmation() string {
+func viewConfirmation(m *model) string {
 	return lipgloss.Place(
 		m.remotes.Width(),
 		m.remotes.Height(),
@@ -41,17 +41,17 @@ func renderButtons(confirmPosition int) string {
 		confirmPosition = 0
 	}
 
-	btns := make([]string, len(buttons))
+	renderedButtons := make([]string, len(buttons))
 	for i := range buttons {
-		btns[i] = buttonStyle.Render(buttons[i])
+		renderedButtons[i] = buttonStyle.Render(buttons[i])
 
 		if i == confirmPosition {
-			btns[i] = style.Focused.Render(btns[i])
+			renderedButtons[i] = style.Focused.Render(renderedButtons[i])
 		}
 	}
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Center,
-		btns...,
+		renderedButtons...,
 	)
 }

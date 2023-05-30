@@ -36,10 +36,12 @@ type model struct {
 	state               state
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -57,12 +59,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch m.currentlyDisplaying {
 	case displayingColors:
-		cmd = m.updateColor(msg)
+		cmd = updateColor(&m, msg)
 
 		return m, cmd
 
 	case displayingError:
-		m.updateError(msg)
+		updateError(&m, msg)
 
 		return m, nil
 
@@ -74,6 +76,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
+// View is required for model to be a tea.Model.
 func (m model) View() string {
 	switch m.state {
 	case stateRunning:
@@ -88,10 +91,10 @@ func (m model) View() string {
 
 	switch m.currentlyDisplaying {
 	case displayingColors:
-		return m.viewAdd()
+		return viewAdd(&m)
 
 	case displayingError:
-		return m.viewError()
+		return viewError(&m)
 
 	default:
 		return "Invalid view state"

@@ -10,6 +10,7 @@ import (
 	selection "github.com/glad-dev/gin/tui/config/select"
 )
 
+// SelectConfig returns the config associated with the URL if a URL is passed. Otherwise, a remote.Details is returned.
 func SelectConfig(details []repo.Details, u *url.URL) (*config.Wrapper, error) {
 	if u != nil {
 		return selectConfigForURL(u)

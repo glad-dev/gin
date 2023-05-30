@@ -1,6 +1,7 @@
 package list
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -44,6 +45,10 @@ func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 			Sort:    &sort,
 		})
 		if err != nil {
+			if resp == nil {
+				return nil, errors.New("requesting issues: response is nil")
+			}
+
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				body = []byte("Failed to read body")

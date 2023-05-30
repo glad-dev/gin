@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (m *model) updateError(msg tea.Msg) {
+func updateError(m *model, msg tea.Msg) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -19,7 +19,7 @@ func (m *model) updateError(msg tea.Msg) {
 	}
 }
 
-func (m *model) viewError() string {
+func viewError(m *model) string {
 	return lipgloss.Place(
 		m.edit.width,
 		m.edit.height,

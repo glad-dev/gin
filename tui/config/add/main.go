@@ -13,6 +13,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Config is the entry point of this TUI, which allows to add new remotes.
 func Config() {
 	_, _ = config.Load() // To load the colors
 

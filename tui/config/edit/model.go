@@ -45,10 +45,12 @@ type updateMsg struct {
 	success bool
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -86,28 +88,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch m.currentlyDisplaying {
 	case displayingList:
-		cmds[1] = m.updateList(msg)
+		cmds[1] = updateList(&m, msg)
 
 		return m, tea.Batch(cmds...)
 
 	case displayingDetails:
-		cmds[1] = m.updateDetails(msg)
+		cmds[1] = updateDetails(&m, msg)
 
 		return m, tea.Batch(cmds...)
 
 	case displayingEdit:
-		cmds[1] = m.updateEdit(msg)
+		cmds[1] = updateEdit(&m, msg)
 
 		return m, tea.Batch(cmds...)
 
 	case displayingLoading:
 		return m, tea.Batch(
 			cmds[0],
-			m.updateLoading(),
+			updateLoading(&m),
 		)
 
 	case displayingError:
-		m.updateError(msg)
+		updateError(&m, msg)
 
 		return m, cmds[0]
 
@@ -119,6 +121,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
+// View required for model to be a tea.Model.
 func (m model) View() string {
 	switch m.state {
 	case stateRunning:
@@ -142,10 +145,10 @@ func (m model) View() string {
 		return m.edit.view()
 
 	case displayingLoading:
-		return m.viewLoading()
+		return viewLoading(&m)
 
 	case displayingError:
-		return m.viewError()
+		return viewError(&m)
 
 	default:
 		return "Unknown view"

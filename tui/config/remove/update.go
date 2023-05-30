@@ -8,7 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) updateRemoteList(msg tea.Msg) tea.Cmd {
+func updateRemoteList(m *model, msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) { //nolint:gocritic
@@ -59,7 +59,7 @@ func (m *model) updateRemoteList(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) updateDetailsList(msg tea.Msg) tea.Cmd {
+func updateDetailsList(m *model, msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) { //nolint:gocritic
@@ -84,7 +84,7 @@ func (m *model) updateDetailsList(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) updateConfirmation(msg tea.Msg) tea.Cmd {
+func updateConfirmation(m *model, msg tea.Msg) tea.Cmd {
 	goBack := func() {
 		if len(m.details.Items()) == 0 {
 			m.currentlyDisplaying = displayingList

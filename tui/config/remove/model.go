@@ -39,10 +39,12 @@ type model struct {
 	state               state
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -63,17 +65,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch m.currentlyDisplaying {
 	case displayingList:
-		cmd = m.updateRemoteList(msg)
+		cmd = updateRemoteList(&m, msg)
 
 		return m, cmd
 
 	case displayingDetails:
-		cmd = m.updateDetailsList(msg)
+		cmd = updateDetailsList(&m, msg)
 
 		return m, cmd
 
 	case displayingConfirmation:
-		cmd = m.updateConfirmation(msg)
+		cmd = updateConfirmation(&m, msg)
 
 		return m, cmd
 
@@ -85,6 +87,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
+// View required for model to be a tea.Model.
 func (m model) View() string {
 	switch m.state {
 	case stateRunning:
@@ -105,7 +108,7 @@ func (m model) View() string {
 		return shared.RenderList(m.details)
 
 	case displayingConfirmation:
-		return m.viewConfirmation()
+		return viewConfirmation(&m)
 
 	default:
 		return "Invalid state!"

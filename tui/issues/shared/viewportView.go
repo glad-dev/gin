@@ -25,6 +25,7 @@ var (
 	}()
 )
 
+// ViewportView renders the passed viewport.
 func ViewportView(vp *viewport.Model, issueID string) string {
 	return fmt.Sprintf(
 		"%s\n%s\n%s",
@@ -34,6 +35,7 @@ func ViewportView(vp *viewport.Model, issueID string) string {
 	)
 }
 
+// ViewportSetSize sets the size of the viewport with regard to its margins.
 func ViewportSetSize(vp *viewport.Model, msg *tea.WindowSizeMsg, issueID string) {
 	headerHeight := lipgloss.Height(viewportHeader(issueID, vp.Width))
 	footerHeight := lipgloss.Height(viewportFooter(vp))
@@ -43,6 +45,7 @@ func ViewportSetSize(vp *viewport.Model, msg *tea.WindowSizeMsg, issueID string)
 	vp.Height = msg.Height - verticalMarginHeight
 }
 
+// ViewportInitSize creates a viewport with the given size.
 func ViewportInitSize(msg *tea.WindowSizeMsg, issueID string) viewport.Model {
 	vp := viewport.New(0, 0)
 	headerHeight := lipgloss.Height(viewportHeader(issueID, vp.Width))

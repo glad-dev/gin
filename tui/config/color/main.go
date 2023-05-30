@@ -15,6 +15,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Config is the entry point of this TUI, which allows to configure the colors.
 func Config() {
 	wrapper, err := config.Load()
 	if err != nil {

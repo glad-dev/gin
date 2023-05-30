@@ -14,6 +14,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Show is the entry point of this TUI, which displays all issues of a given repository.
 func Show(details []repo.Details, u *url.URL) {
 	conf, err := shared.SelectConfig(details, u)
 	if err != nil {
@@ -24,15 +25,15 @@ func Show(details []repo.Details, u *url.URL) {
 	lst := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	lst.SetShowFilter(false) // TODO: Fix filtering bug
 
-	lsts := [3]list.Model{}
-	for i := range lsts {
-		lsts[i] = lst
+	lists := [3]list.Model{}
+	for i := range lists {
+		lists[i] = lst
 	}
 
 	p := tea.NewProgram(
 		model{
 			tabs: tabs{
-				lists:     lsts,
+				lists:     lists,
 				activeTab: 0,
 			},
 			shared: &shared.Shared{

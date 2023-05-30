@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Show is the entry point of this TUI, which displays a single issues of a given repository.
 func Show(details []repo.Details, u *url.URL, issueID string) {
 	conf, err := shared.SelectConfig(details, u)
 	if err != nil {

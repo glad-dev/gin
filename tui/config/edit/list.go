@@ -8,7 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) updateList(msg tea.Msg) tea.Cmd {
+func updateList(m *model, msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) { //nolint:gocritic

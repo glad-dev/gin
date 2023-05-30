@@ -59,6 +59,7 @@ type singleIssueUpdateMsg struct {
 	issueID  string
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return tea.Batch(
 		getIssues(&m),
@@ -66,6 +67,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -87,7 +89,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-		return m.initList(&msg)
+		return initList(&m, &msg)
 
 	case singleIssueUpdateMsg:
 		if len(msg.errorMsg) > 0 {
@@ -121,18 +123,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmds[0]
 
 	case displayingList:
-		cmds[1] = m.updateList(msg)
+		cmds[1] = updateList(&m, msg)
 
 		return m, tea.Batch(cmds...)
 
 	case displaySecondLoading:
 		return m, tea.Batch(
 			cmds[0],
-			m.loadDetails(),
+			loadDetails(&m),
 		)
 
 	case displayingDetails:
-		cmds[1] = m.updateViewport(msg)
+		cmds[1] = updateViewport(&m, msg)
 
 		return m, tea.Batch(cmds...)
 
@@ -144,6 +146,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
+// View required for model to be a tea.Model.
 func (m model) View() string {
 	if m.state == exitFailure {
 		// This isn't shown?

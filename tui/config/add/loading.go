@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (m *model) updateLoading() tea.Cmd {
+func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
 		err := config.Append(m.inputs[0].Value(), m.inputs[1].Value())
 		if err != nil {
@@ -27,7 +27,7 @@ func (m *model) updateLoading() tea.Cmd {
 	}
 }
 
-func (m *model) viewLoading() string {
+func viewLoading(m *model) string {
 	return lipgloss.Place(
 		m.width,
 		m.height,

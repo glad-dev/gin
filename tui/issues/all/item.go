@@ -6,11 +6,12 @@ import (
 	"github.com/glad-dev/gin/issues/list"
 )
 
-// itemWrapper is a wrapper for list.Issue that implements all functions required by the list.Item interface.
+// itemWrapper is a list.Item and contains a list.Issue.
 type itemWrapper struct {
 	issue list.Issue
 }
 
+// Title is required for itemWrapper to be a list.Item.
 func (i itemWrapper) Title() string {
 	return fmt.Sprintf(
 		"#%s %s",
@@ -19,6 +20,7 @@ func (i itemWrapper) Title() string {
 	)
 }
 
+// Description is required for itemWrapper to be a list.Item.
 func (i itemWrapper) Description() string {
 	// Use author and creation date as description
 	return fmt.Sprintf(
@@ -28,6 +30,7 @@ func (i itemWrapper) Description() string {
 	)
 }
 
+// FilterValue is required for itemWrapper to be a list.Item.
 func (i itemWrapper) FilterValue() string {
 	return i.Title() + "   " + i.Description()
 }

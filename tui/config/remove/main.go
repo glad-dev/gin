@@ -14,6 +14,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Config is the entry point of this TUI, which allows to remove remotes.
 func Config() {
 	// Load current config
 	wrapper, err := config.Load()

@@ -2,7 +2,7 @@ package all
 
 import tea "github.com/charmbracelet/bubbletea"
 
-func (m *model) updateViewport(msg tea.Msg) tea.Cmd {
+func updateViewport(m *model, msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {

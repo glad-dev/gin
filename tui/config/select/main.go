@@ -14,6 +14,7 @@ import (
 
 var ErrUserQuit = errors.New("user quit selection program")
 
+// Select is the entry point of this TUI, which allows the user to choose a remote if more than one exists.
 func Select(selectedRemote *config.Remote, title string) (*remote.Details, error) {
 	items := make([]list.Item, len(selectedRemote.Details))
 	for i := range selectedRemote.Details {

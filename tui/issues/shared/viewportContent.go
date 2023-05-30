@@ -15,6 +15,7 @@ import (
 
 var issueTitleStyle = lipgloss.NewStyle().Bold(true).Underline(true)
 
+// PrettyPrintIssue renders the passed discussion as markdown.
 func PrettyPrintIssue(details *discussion.Details, width int, height int) string {
 	_, w := style.Comment.GetFrameSize()
 	availableWidth := width - w
@@ -85,7 +86,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 			return style.FormatQuitText("Failed to render markdown: " + err.Error())
 		}
 
-		discussion := fmt.Sprintf(
+		currentDiscussion := fmt.Sprintf(
 			"Created by %s on %s\n\n%s\n",
 			comment.Author.String(),
 			comment.CreatedAt.Format("2006-01-02 15:04"),
@@ -93,7 +94,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		)
 
 		if len(comment.Comments) > 0 {
-			discussion += "\n"
+			currentDiscussion += "\n"
 		}
 
 		// comments on the comments
@@ -114,7 +115,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 				)
 			}
 
-			discussion += style.Discussion.Render(fmt.Sprintf(
+			currentDiscussion += style.Discussion.Render(fmt.Sprintf(
 				"Created by %s on %s\n%s\n%s",
 				innerComment.Author.String(),
 				innerComment.CreatedAt.Format("2006-01-02 15:04"),
@@ -123,11 +124,11 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 			))
 
 			if i < len(comment.Comments)-1 {
-				discussion += "\n"
+				currentDiscussion += "\n"
 			}
 		}
 
-		out += style.Comment.Render(discussion) + "\n"
+		out += style.Comment.Render(currentDiscussion) + "\n"
 	}
 
 	return lipgloss.Place(

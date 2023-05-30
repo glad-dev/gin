@@ -10,7 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) updateColor(msg tea.Msg) tea.Cmd {
+func updateColor(m *model, msg tea.Msg) tea.Cmd {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) { //nolint: gocritic
@@ -27,7 +27,7 @@ func (m *model) updateColor(msg tea.Msg) tea.Cmd {
 
 			// Did the user press enter while the submit button was focused?
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				return m.submit()
+				return submit(m)
 			}
 
 			// Cycle indexes
@@ -73,7 +73,7 @@ func (m *model) updateColor(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *model) viewAdd() string {
+func viewAdd(m *model) string {
 	button := &blurredButton
 	if m.focusIndex == len(m.inputs) {
 		button = &focusedButton
@@ -102,7 +102,7 @@ func (m *model) viewAdd() string {
 	)
 }
 
-func (m *model) submit() tea.Cmd {
+func submit(m *model) tea.Cmd {
 	c := config.Colors{
 		Blurred: m.inputs[0].Value(),
 		Border:  m.inputs[1].Value(),

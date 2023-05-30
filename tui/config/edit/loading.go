@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (m *model) updateLoading() tea.Cmd {
+func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
 		oldURL := m.edit.oldConfig.Remotes[m.edit.listIndex].URL.String()
 
@@ -37,7 +37,7 @@ func (m *model) updateLoading() tea.Cmd {
 	}
 }
 
-func (m *model) viewLoading() string {
+func viewLoading(m *model) string {
 	return lipgloss.Place(
 		m.edit.width,
 		m.edit.height,

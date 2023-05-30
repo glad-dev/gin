@@ -7,7 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
+func updateAdd(m *model, msg tea.Msg) tea.Cmd {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) { //nolint: gocritic
@@ -72,7 +72,7 @@ func (m *model) updateAdd(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *model) viewAdd() string {
+func viewAdd(m *model) string {
 	return shared.RenderInputFields(
 		m.inputs,
 		m.focusIndex,

@@ -21,10 +21,12 @@ type model struct {
 	state state
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -52,6 +54,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// View required for model to be a tea.Model.
 func (m model) View() string {
 	if m.state == stateRunning {
 		return shared.RenderList(m.list)

@@ -26,6 +26,7 @@ type updateMsg struct {
 	errText    string
 }
 
+// Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return tea.Batch(
 		getIssue(&m),
@@ -33,6 +34,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
+// Update is required for model to be a tea.Model.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
@@ -79,6 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
+// View required for model to be a tea.Model.
 func (m model) View() string {
 	if !m.ready || len(m.content) == 0 {
 		return lipgloss.Place(

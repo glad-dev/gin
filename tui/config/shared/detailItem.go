@@ -12,20 +12,30 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// DetailItem is a list.Item and contains the user and token name of a remote.
 type DetailItem struct {
 	Username  string
 	TokenName string
 }
 
+// FilterValue is required for DetailItem to be a list.Item.
 func (d DetailItem) FilterValue() string {
 	return ""
 }
 
+// DetailsItemDelegate is a list.ItemDelegate for DetailItem.
 type DetailsItemDelegate struct{}
 
-func (d DetailsItemDelegate) Height() int                             { return 1 }
-func (d DetailsItemDelegate) Spacing() int                            { return 0 }
+// Height is required for selectItemDelegate to be a list.ItemDelegate.
+func (d DetailsItemDelegate) Height() int { return 1 }
+
+// Spacing is required for selectItemDelegate to be a list.ItemDelegate.
+func (d DetailsItemDelegate) Spacing() int { return 0 }
+
+// Update is required for selectItemDelegate to be a list.ItemDelegate.
 func (d DetailsItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+
+// Render is required for selectItemDelegate to be a list.ItemDelegate.
 func (d DetailsItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	i, ok := item.(DetailItem)
 	if !ok {

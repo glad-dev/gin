@@ -33,7 +33,7 @@ func (m *editModel) init(match *remote.Match, listIndex int, detailsIndex int) {
 	m.updateFocus()
 }
 
-func (m *model) updateEdit(msg tea.Msg) tea.Cmd {
+func updateEdit(m *model, msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
 		switch s := msg.String(); s {
