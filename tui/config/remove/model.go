@@ -121,7 +121,7 @@ func submit(m *model) (string, bool) {
 		return style.FormatQuitText("Failed to convert list.Item to item"), true
 	}
 
-	tokenName := selected.Remote.Details[m.details.Index()].GetTokenName()
+	tokenName := selected.Remote.Details[m.details.Index()].TokenName
 
 	err := config.Remove(&m.oldConfig, m.remotes.Index(), m.details.Index())
 	if err != nil {

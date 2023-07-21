@@ -13,6 +13,7 @@ import (
 type Remote struct {
 	URL     url.URL
 	Details []remote.Details
+	Type    remote.Type
 }
 
 // ToMatch casts the remote to a remote.Match if the remote contains one Details. An error is returned if there are none
@@ -27,9 +28,10 @@ func (r *Remote) ToMatch() (*remote.Match, error) {
 	if len(r.Details) == 1 {
 		return &remote.Match{
 			URL:       r.URL,
-			Token:     r.Details[0].GetToken(),
-			Username:  r.Details[0].GetUsername(),
-			TokenName: r.Details[0].GetTokenName(),
+			Token:     r.Details[0].Token,
+			Username:  r.Details[0].Username,
+			TokenName: r.Details[0].TokenName,
+			Type:      r.Type,
 		}, nil
 	}
 
@@ -50,9 +52,9 @@ func (r *Remote) ToMatchAtIndex(index int) (*remote.Match, error) {
 
 	return &remote.Match{
 		URL:       r.URL,
-		Token:     r.Details[index].GetToken(),
-		Username:  r.Details[index].GetUsername(),
-		TokenName: r.Details[index].GetTokenName(),
+		Token:     r.Details[index].Token,
+		Username:  r.Details[index].Username,
+		TokenName: r.Details[index].TokenName,
 	}, nil
 }
 
@@ -68,16 +70,16 @@ func (r *Remote) checkSemantics() error {
 	}
 
 	for _, details := range r.Details {
-		if len(details.GetUsername()) == 0 {
+		if len(details.Username) == 0 {
 			return fmt.Errorf("config contains empty username")
 		}
 
 		// Check if token is semantically correct. The tokens validity is not checked.
-		if len(details.GetToken()) == 0 { // TODO: Get actual sizes
+		if len(details.Token) == 0 { // TODO: Get actual sizes
 			return fmt.Errorf("config contains empty token")
 		}
 
-		if len(details.GetTokenName()) == 0 {
+		if len(details.TokenName) == 0 {
 			return fmt.Errorf("config contains empty token name")
 		}
 	}

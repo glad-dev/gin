@@ -10,4 +10,5 @@ type Match struct {
 	Token     string
 	Username  string
 	TokenName string
+	Type      Type
 }

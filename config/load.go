@@ -3,35 +3,15 @@ package config
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"os"
 
 	"github.com/glad-dev/gin/config/location"
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/logger"
-	"github.com/glad-dev/gin/remote"
-	"github.com/glad-dev/gin/remote/github"
-	"github.com/glad-dev/gin/remote/gitlab"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/BurntSushi/toml"
 )
-
-// These are needed since the toml library is unable to decode not-empty interfaces.
-type helperWrapper struct {
-	Colors  Colors
-	Remotes []helperRemote
-	Version uint8
-}
-
-type helperRemote struct {
-	URL     url.URL
-	Details []struct {
-		Token     string
-		TokenName string
-		Username  string
-	}
-}
 
 // ErrConfigDoesNotExist is returned by Load if no configuration file exists.
 var ErrConfigDoesNotExist = errors.New("config does not exist")
@@ -47,8 +27,8 @@ func Load() (*Wrapper, error) {
 	}
 
 	// Load config
-	helper := &helperWrapper{}
-	metaData, err := toml.DecodeFile(fileLocation, helper)
+	wrap := &Wrapper{}
+	metaData, err := toml.DecodeFile(fileLocation, wrap)
 	if err != nil {
 		if os.IsNotExist(err) {
 			logger.Log.Infof("Found no configuration file at: %s", fileLocation)
@@ -69,40 +49,6 @@ func Load() (*Wrapper, error) {
 		logger.Log.Error("Config contains unexpected keys.", "invalidKeys", metaData.Undecoded())
 
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
-	}
-
-	wrap := &Wrapper{
-		Colors:  helper.Colors,
-		Version: helper.Version,
-		Remotes: make([]Remote, len(helper.Remotes)),
-	}
-
-	var toAdd Remote
-	for i, r := range helper.Remotes {
-		toAdd = Remote{
-			URL:     r.URL,
-			Details: make([]remote.Details, 0),
-		}
-
-		for _, details := range r.Details {
-			if r.URL.Host == "github.com" {
-				toAdd.Details = append(toAdd.Details, github.Details{
-					Token:     details.Token,
-					TokenName: details.TokenName,
-					Username:  details.Username,
-				})
-
-				continue
-			}
-
-			toAdd.Details = append(toAdd.Details, gitlab.Details{
-				Token:     details.Token,
-				TokenName: details.TokenName,
-				Username:  details.Username,
-			})
-		}
-
-		wrap.Remotes[i] = toAdd
 	}
 
 	err = wrap.CheckValidity()

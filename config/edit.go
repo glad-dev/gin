@@ -5,8 +5,6 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
-	"github.com/glad-dev/gin/remote/github"
-	"github.com/glad-dev/gin/remote/gitlab"
 )
 
 // ErrUpdateSameValues is returned if Update was called with the same url and token that is already stored in the
@@ -36,7 +34,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 	old := wrapper.Remotes[wrapperIndex]
 	if old.URL == *u {
 		for _, detail := range old.Details {
-			if detail.GetToken() == token {
+			if detail.Token == token {
 				logger.Log.Warn("Attempted to update the remote '%s' with the same token", u.String())
 
 				return ErrUpdateSameValues
@@ -44,18 +42,17 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 		}
 	}
 
-	var rd remote.Details
-	if u.Host == "github.com" {
-		rd = github.Details{
-			Token: token,
-		}
-	} else {
-		rd = gitlab.Details{
-			Token: token,
-		}
+	rd := remote.Details{
+		Token: token,
 	}
 
-	rd, err = rd.Init(u)
+	if u.Host == "github.com" {
+		rd.Type = remote.Github
+	} else {
+		rd.Type = remote.Gitlab
+	}
+
+	err = rd.Init(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize token: %s", err)
 

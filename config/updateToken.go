@@ -21,10 +21,11 @@ func UpdateRemote() error {
 	for i, config := range wrapper.Remotes {
 		for k, detail := range config.Details {
 			// Check token's scope and update the username
-			d, err = detail.Init(&config.URL)
+			d = detail
+			err = d.Init(&config.URL)
 			if err != nil {
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
-					tokenName: detail.GetTokenName(),
+					tokenName: d.TokenName,
 					err:       err,
 				})
 

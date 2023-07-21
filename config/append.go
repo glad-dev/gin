@@ -5,8 +5,6 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
-	"github.com/glad-dev/gin/remote/github"
-	"github.com/glad-dev/gin/remote/gitlab"
 )
 
 // Append adds the token to the corresponding host in the  configuration file.
@@ -35,7 +33,7 @@ func Append(urlStr string, token string) error {
 			configLocation = i
 
 			for _, detail := range config.Details {
-				if detail.GetToken() == token {
+				if detail.Token == token {
 					return errors.New("a configuration with the given URL and token already exists")
 				}
 			}
@@ -43,17 +41,13 @@ func Append(urlStr string, token string) error {
 	}
 
 	var rd remote.Details
-	if u.Host == "github.com" {
-		rd = github.Details{
-			Token: token,
-		}
+	if u.Host == "github.com" { // ToDo: Pass parameter for type
+		rd.Type = remote.Github
 	} else {
-		rd = gitlab.Details{
-			Token: token,
-		}
+		rd.Type = remote.Gitlab
 	}
 
-	rd, err = rd.Init(u)
+	err = rd.Init(u)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize token: %s", err)
 

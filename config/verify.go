@@ -28,7 +28,7 @@ func VerifyTokens() error {
 				logger.Log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
 
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
-					tokenName: detail.GetTokenName(),
+					tokenName: detail.TokenName,
 					err:       err,
 				})
 			}

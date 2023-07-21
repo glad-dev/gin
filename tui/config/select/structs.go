@@ -37,7 +37,7 @@ func (d selectItemDelegate) Render(w io.Writer, m list.Model, index int, item li
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s - %s", index+1, i.item.GetUsername(), i.item.GetTokenName())
+	str := fmt.Sprintf("%d. %s - %s", index+1, i.item.Username, i.item.TokenName)
 
 	fn := style.Item.Render
 	if index == m.Index() {

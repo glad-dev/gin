@@ -2,25 +2,21 @@ package gitlab
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/logger"
-
 	"github.com/xanzy/go-gitlab"
 )
 
 // CheckTokenScope checks the scope of the token and returns the token name.
-func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
-	api := ApiURL(u)
-
-	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(api))
+func CheckTokenScope(token string, apiURL string) (string, error) {
+	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(apiURL))
 	if err != nil {
 		logger.Log.Error("Creating gitlab client",
 			"error", err,
-			"API-URL", api,
+			"API-URL", apiURL,
 		)
 
 		return "", fmt.Errorf("creating gitlab client: %w", err)
@@ -30,7 +26,7 @@ func (lab Details) CheckTokenScope(u *url.URL) (string, error) {
 	if err != nil {
 		logger.Log.Error("Requesting personal access token",
 			"error", err,
-			"API-URL", api,
+			"API-URL", apiURL,
 		)
 
 		return "", fmt.Errorf("requesting personal access token: %w", err)

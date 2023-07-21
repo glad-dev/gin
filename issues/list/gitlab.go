@@ -8,14 +8,20 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
-	lab "github.com/glad-dev/gin/remote/gitlab"
-
 	"github.com/xanzy/go-gitlab"
 )
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
-	api := lab.ApiURL(&match.URL)
+	api, err := match.Type.ApiURL(&match.URL)
+	if err != nil {
+		logger.Log.Error("Retrieving API URL",
+			"error", err,
+			"URL", match.URL.String(),
+		)
+
+		return nil, fmt.Errorf("retrieving API URL: %w", err)
+	}
 
 	client, err := gitlab.NewClient(match.Token, gitlab.WithBaseURL(api))
 	if err != nil {

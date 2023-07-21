@@ -2,50 +2,39 @@ package github
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/url"
+
+	"github.com/glad-dev/gin/logger"
 
 	"github.com/google/go-github/v52/github"
 	"golang.org/x/oauth2"
-
-	"github.com/glad-dev/gin/logger"
-	"github.com/glad-dev/gin/remote"
 )
 
-// Init queries the username associated with the token and updates the token name as well.
-func (hub Details) Init(u *url.URL) (remote.Details, error) {
-	if u.Host != "github.com" {
-		logger.Log.Errorf("Got GitHubDetails with invalid host: %s", u.Host)
-
-		return nil, errors.New("initializing GitHubDetails with a non-GitHub URL")
-	}
-
-	err := hub.getUsername()
+// Init returns the username and token name associated with the token.
+func Init(token string) (string, string, error) {
+	username, err := getUsername(token)
 	if err != nil {
-		logger.Log.Error("Failed to get username.", "error", err, "GitHubDetails", hub)
+		logger.Log.Error("Failed to get username", "error", err)
 
-		return nil, fmt.Errorf("GitHubDetails.Init: Failed to get Username: %w", err)
+		return "", "", fmt.Errorf("GitHubDetails.Init: Failed to get Username: %w", err)
 	}
 
-	hub.TokenName = "GitHub token for account " + hub.Username
+	tokenName := "GitHub token for account " + username
 
-	return hub, nil
+	return username, tokenName, nil
 }
 
-func (hub *Details) getUsername() error {
+func getUsername(token string) (string, error) {
 	ctx := context.Background()
 	tc := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: hub.Token},
+		&oauth2.Token{AccessToken: token},
 	))
 
 	client := github.NewClient(tc)
 	user, _, err := client.Users.Get(context.Background(), "")
 	if err != nil {
-		return fmt.Errorf("getting username: %w", err)
+		return "", fmt.Errorf("getting username: %w", err)
 	}
 
-	hub.Username = user.GetLogin()
-
-	return nil
+	return user.GetLogin(), nil
 }

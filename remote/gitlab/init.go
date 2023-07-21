@@ -1,71 +1,55 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
-	"net/url"
 
 	"github.com/glad-dev/gin/logger"
-	"github.com/glad-dev/gin/remote"
-
 	"github.com/xanzy/go-gitlab"
 )
 
-// Init checks the token's scope and set's the username and token name associated with the token.
-func (lab Details) Init(u *url.URL) (remote.Details, error) {
-	if u.Host == "github.com" {
-		logger.Log.Errorf("Got GitLabDetails with invalid host: %s", u.Host)
-
-		return nil, errors.New("initializing GitLabDetails with a GitHub URL")
-	}
-
-	tokenName, err := lab.CheckTokenScope(u)
+// Init checks the token's scope and returns the username and token name associated with the token.
+func Init(token string, apiURL string) (string, string, error) {
+	tokenName, err := CheckTokenScope(token, apiURL)
 	if err != nil {
 		logger.Log.Errorf("Failed to check scope: %s", err)
 
-		return nil, fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
+		return "", "", fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
 	}
 
-	err = lab.setUsername(u)
+	username, err := getUsername(token, apiURL)
 	if err != nil {
 		logger.Log.Errorf("Failed to get username: %s", err)
 
-		return nil, fmt.Errorf("GitLabDetails.Init: Failed to get Username: %w", err)
+		return "", "", fmt.Errorf("GitLabDetails.Init: Failed to get Username: %w", err)
 	}
 
-	lab.TokenName = tokenName
-
-	return lab, nil
+	return username, tokenName, nil
 }
 
-func (lab *Details) setUsername(u *url.URL) error {
-	api := ApiURL(u)
-
-	client, err := gitlab.NewClient(lab.Token, gitlab.WithBaseURL(api))
+func getUsername(token string, apiURL string) (string, error) {
+	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(apiURL))
 	if err != nil {
 		logger.Log.Error("Creating gitlab client",
 			"error", err,
-			"API-URL", api,
+			"API-URL", apiURL,
 		)
 
-		return fmt.Errorf("creating gitlab client: %w", err)
+		return "", fmt.Errorf("creating gitlab client: %w", err)
 	}
 
 	user, _, err := client.Users.CurrentUser()
 	if err != nil {
 		logger.Log.Error("Requesting current user",
 			"error", err,
-			"API-URL", api,
+			"API-URL", apiURL,
 		)
 
-		return fmt.Errorf("requesting current user: %w", err)
+		return "", fmt.Errorf("requesting current user: %w", err)
 	}
 
 	if len(user.Username) == 0 {
-		return fmt.Errorf("empty username")
+		return "", fmt.Errorf("empty username")
 	}
 
-	lab.Username = user.Username
-
-	return nil
+	return user.Username, nil
 }
