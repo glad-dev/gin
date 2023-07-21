@@ -13,7 +13,6 @@ import (
 type Remote struct {
 	URL     url.URL
 	Details []remote.Details
-	Type    remote.Type
 }
 
 // ToMatch casts the remote to a remote.Match if the remote contains one Details. An error is returned if there are none
@@ -31,7 +30,7 @@ func (r *Remote) ToMatch() (*remote.Match, error) {
 			Token:     r.Details[0].Token,
 			Username:  r.Details[0].Username,
 			TokenName: r.Details[0].TokenName,
-			Type:      r.Type,
+			Type:      r.Details[0].Type,
 		}, nil
 	}
 
@@ -55,6 +54,7 @@ func (r *Remote) ToMatchAtIndex(index int) (*remote.Match, error) {
 		Token:     r.Details[index].Token,
 		Username:  r.Details[index].Username,
 		TokenName: r.Details[index].TokenName,
+		Type:      r.Details[index].Type,
 	}, nil
 }
 
