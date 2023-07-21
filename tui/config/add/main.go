@@ -1,7 +1,7 @@
 package add
 
 import (
-	"os"
+	"fmt"
 	"strings"
 
 	"github.com/glad-dev/gin/config"
@@ -20,17 +20,26 @@ func Config() {
 	p := tea.NewProgram(model{
 		inputs:              shared.GetTextInputs(),
 		spinner:             *widgets.GetSpinner(),
-		currentlyDisplaying: displayingAdd,
+		currentlyDisplaying: displayingType,
 		state:               stateRunning,
-	})
+	}, tea.WithAltScreen())
 
 	m, err := p.Run()
 	if err != nil {
 		style.PrintErrAndExit("Failed to start program: " + err.Error())
 	}
 
-	if r, ok := m.(model); ok && r.state == exitFailure {
+	r, ok := m.(model)
+	if !ok {
+		return
+	}
+
+	switch r.state { //nolint:exhaustive
+	case exitFailure:
 		logger.Log.Errorf(strings.TrimSpace(r.text))
-		os.Exit(1)
+		style.PrintErrAndExit(strings.TrimSpace(r.text))
+
+	case exitSuccess:
+		fmt.Print(style.FormatQuitText("Successfully added the remote"))
 	}
 }

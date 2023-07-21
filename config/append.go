@@ -9,7 +9,7 @@ import (
 
 // Append adds the token to the corresponding host in the  configuration file.
 // If no configuration file exists, a new one will be created.
-func Append(urlStr string, token string) error {
+func Append(urlStr string, token string, remoteType remote.Type) error {
 	// Load current config
 	wrapper, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
@@ -40,11 +40,9 @@ func Append(urlStr string, token string) error {
 		}
 	}
 
-	var rd remote.Details
-	if u.Host == "github.com" { // ToDo: Pass parameter for type
-		rd.Type = remote.Github
-	} else {
-		rd.Type = remote.Gitlab
+	rd := remote.Details{
+		Type:  remoteType,
+		Token: token,
 	}
 
 	err = rd.Init(u)

@@ -1,6 +1,7 @@
 package add
 
 import (
+	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -14,7 +15,8 @@ type (
 )
 
 const (
-	displayingAdd displaying = iota
+	displayingType displaying = iota
+	displayingAdd
 	displayingLoading
 	displayingError
 )
@@ -35,6 +37,7 @@ type model struct {
 	height              int
 	currentlyDisplaying displaying
 	state               state
+	remoteType          remote.Type
 }
 
 type updateMsg struct {
@@ -77,6 +80,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, 2)
 	m.spinner, cmds[0] = m.spinner.Update(msg)
 	switch m.currentlyDisplaying {
+	case displayingType:
+		cmds[1] = updateType(&m, msg)
+
+		return m, tea.Batch(cmds...)
+
 	case displayingAdd:
 		cmds[1] = updateAdd(&m, msg)
 
@@ -115,6 +123,9 @@ func (m model) View() string {
 	}
 
 	switch m.currentlyDisplaying {
+	case displayingType:
+		return viewType(&m)
+
 	case displayingAdd:
 		return viewAdd(&m)
 

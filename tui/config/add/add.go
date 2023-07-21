@@ -8,15 +8,16 @@ import (
 )
 
 func updateAdd(m *model, msg tea.Msg) tea.Cmd {
-	cmds := make([]tea.Cmd, len(m.inputs))
-
 	switch msg := msg.(type) { //nolint: gocritic
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			m.state = exitNoChange
+			m.currentlyDisplaying = displayingType
+			m.inputs[0].SetValue("")
+			m.inputs[1].SetValue("")
+			m.focusIndex = 0
 
-			return tea.Quit
+			return nil
 
 			// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
@@ -42,26 +43,11 @@ func updateAdd(m *model, msg tea.Msg) tea.Cmd {
 				m.focusIndex = len(m.inputs)
 			}
 
-			for i := 0; i < len(m.inputs); i++ {
-				if i == m.focusIndex {
-					// Set focused state
-					cmds[i] = m.inputs[i].Focus()
-					m.inputs[i].PromptStyle = style.Focused
-					m.inputs[i].TextStyle = style.Focused
-
-					continue
-				}
-
-				// Remove focused state
-				m.inputs[i].Blur()
-				m.inputs[i].PromptStyle = style.None
-				m.inputs[i].TextStyle = style.None
-			}
-
-			return tea.Batch(cmds...)
+			return updateInputs(m)
 		}
 	}
 
+	cmds := make([]tea.Cmd, len(m.inputs))
 	// Handle character input and blinking
 	// Only text inputs with Focus() set will respond, so it's safe to simply
 	// update all of them here without any further logic.
@@ -79,4 +65,26 @@ func viewAdd(m *model) string {
 		m.width,
 		m.height,
 	)
+}
+
+func updateInputs(m *model) tea.Cmd {
+	cmds := make([]tea.Cmd, len(m.inputs))
+
+	for i := 0; i < len(m.inputs); i++ {
+		if i == m.focusIndex {
+			// Set focused state
+			cmds[i] = m.inputs[i].Focus()
+			m.inputs[i].PromptStyle = style.Focused
+			m.inputs[i].TextStyle = style.Focused
+
+			continue
+		}
+
+		// Remove focused state
+		m.inputs[i].Blur()
+		m.inputs[i].PromptStyle = style.None
+		m.inputs[i].TextStyle = style.None
+	}
+
+	return tea.Batch(cmds...)
 }
