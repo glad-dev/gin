@@ -26,7 +26,7 @@ func Init() {
 		l.Fatalf("Failed to resolve config directory: %s", err)
 	}
 
-	file, err := os.OpenFile(path.Join(dir, "log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+	file, err := os.OpenFile(path.Join(dir, "gin.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
 	if err != nil {
 		l.Fatalf("Failed to open log file: %s", err)
 	}
