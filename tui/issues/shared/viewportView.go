@@ -69,11 +69,3 @@ func viewportFooter(vp *viewport.Model) string {
 
 	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
 }
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
-}
