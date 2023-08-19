@@ -75,5 +75,10 @@ func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match,
 		}
 	}
 
-	return nil, "", errors.New("no matching config was found")
+	// No match => Mock up a config
+	return &remote.Match{
+		URL:      details[0].URL,
+		Token:    "",
+		Username: "",
+	}, details[0].ProjectPath, nil
 }

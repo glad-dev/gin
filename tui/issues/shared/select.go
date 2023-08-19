@@ -43,6 +43,12 @@ func selectConfigForURL(u *url.URL) (*config.Wrapper, error) {
 func selectConfigForLocal(details []repo.Details) (*config.Wrapper, error) {
 	wrapper, err := config.Load() // To set the colors
 	if err != nil {
+		if errors.Is(err, config.ErrConfigDoesNotExist) {
+			return &config.Wrapper{
+				Remotes: []config.Remote{},
+			}, nil
+		}
+
 		return nil, err
 	}
 
