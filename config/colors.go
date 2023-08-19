@@ -46,7 +46,7 @@ func (c *Colors) CheckValidity() error {
 	if len(c.Blurred) > 0 {
 		err := checkColor(c.Blurred)
 		if err != nil {
-			logger.Log.Errorf("color 'Blurred' (%s) is invalid: %s", c.Blurred, err)
+			logger.Log.Error("color 'Blurred' is invalid", "color", c.Blurred, "error", err)
 
 			return fmt.Errorf("color 'Blurred' (%s) is invalid: %w", c.Blurred, err)
 		}
@@ -55,7 +55,7 @@ func (c *Colors) CheckValidity() error {
 	if len(c.Border) > 0 {
 		err := checkColor(c.Border)
 		if err != nil {
-			logger.Log.Errorf("color 'Border' (%s) is invalid: %s", c.Border, err)
+			logger.Log.Error("color 'Border' is invalid", "color", c.Border, "error", err)
 
 			return fmt.Errorf("color 'Border' (%s) is invalid: %w", c.Border, err)
 		}
@@ -64,7 +64,7 @@ func (c *Colors) CheckValidity() error {
 	if len(c.Focused) > 0 {
 		err := checkColor(c.Focused)
 		if err != nil {
-			logger.Log.Errorf("color 'Focused' (%s) is invalid: %s", c.Focused, err)
+			logger.Log.Error("color 'Focused' is invalid", "color", c.Focused, "error", err)
 
 			return fmt.Errorf("color 'Focused' (%s) is invalid: %w", c.Focused, err)
 		}

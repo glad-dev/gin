@@ -21,7 +21,7 @@ import (
 func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Details, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
-		logger.Log.Errorf("Project path is invalid: %s", projectPath)
+		logger.Log.Error("Project path is invalid", "path", projectPath)
 
 		return nil, errors.New("invalid project path")
 	}

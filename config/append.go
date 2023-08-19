@@ -14,7 +14,7 @@ func Append(urlStr string, token string, remoteType remote.Type) error {
 	wrapper, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
 		// Config exists, but there was some other error
-		logger.Log.Errorf("Failed to load config: %s", err)
+		logger.Log.Error("Failed to load config", "error", err)
 
 		return err
 	}
@@ -47,7 +47,7 @@ func Append(urlStr string, token string, remoteType remote.Type) error {
 
 	err = rd.Init(u)
 	if err != nil {
-		logger.Log.Errorf("Failed to initialize token: %s", err)
+		logger.Log.Error("Failed to initialize token", "error", err)
 
 		return err
 	}

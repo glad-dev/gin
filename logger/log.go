@@ -2,17 +2,15 @@ package logger
 
 import (
 	l "log"
+	"log/slog"
 	"os"
 	"path"
-	"time"
 
 	"github.com/glad-dev/gin/config/location"
-
-	"github.com/charmbracelet/log"
 )
 
 // Log is the global charmbracelet logger.
-var Log *log.Logger
+var Log *slog.Logger
 
 // Init creates the log directory and file and initializes Log to use said file.
 func Init() {
@@ -31,9 +29,8 @@ func Init() {
 		l.Fatalf("Failed to open log file: %s", err)
 	}
 
-	Log = log.NewWithOptions(file, log.Options{
-		ReportCaller:    true,
-		ReportTimestamp: true,
-		TimeFormat:      time.RFC3339,
-	})
+	Log = slog.New(slog.NewTextHandler(file, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	}))
 }

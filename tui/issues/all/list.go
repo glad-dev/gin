@@ -27,7 +27,7 @@ func initList(m *model, msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 			item.issue.Title = "[closed] " + item.issue.Title
 			all = append(all, item)
 		default:
-			logger.Log.Warnf("Got item with unknown state: %s", item.issue.State)
+			logger.Log.Warn("Got item with unknown state", "state", item.issue.State)
 			all = append(all, item)
 		}
 	}

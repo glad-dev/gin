@@ -36,7 +36,7 @@ func Config() {
 
 	switch r.state { //nolint:exhaustive
 	case exitFailure:
-		logger.Log.Errorf(strings.TrimSpace(r.text))
+		logger.Log.Error(strings.TrimSpace(r.text))
 		style.PrintErrAndExit(strings.TrimSpace(r.text))
 
 	case exitSuccess:

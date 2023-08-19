@@ -88,14 +88,14 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 	// Check if the flags are ok
 	dir, err := cmd.Flags().GetString("path")
 	if err != nil {
-		logger.Log.Errorf("Failed to get the path flag: %s", err)
+		logger.Log.Error("Failed to get the path flag", "error", err)
 
 		return nil, nil, fmt.Errorf("failed to get the 'path' flag: %w", err)
 	}
 
 	urlStr, err := cmd.Flags().GetString("url")
 	if err != nil {
-		logger.Log.Errorf("Failed to get the url flag: %s", err)
+		logger.Log.Error("Failed to get the url flag", "error", err)
 
 		return nil, nil, fmt.Errorf("failed to get the 'url' flag: %w", err)
 	}
@@ -119,7 +119,7 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 		// Path flag was not set => Use current directory
 		dir, err = os.Getwd()
 		if err != nil {
-			logger.Log.Errorf("Failed to get current directory: %s", err)
+			logger.Log.Error("Failed to get current directory", "error", err)
 
 			return nil, nil, err
 		}

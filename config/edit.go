@@ -54,7 +54,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	err = rd.Init(u)
 	if err != nil {
-		logger.Log.Errorf("Failed to initialize token: %s", err)
+		logger.Log.Error("Failed to initialize token", "error", err)
 
 		return err
 	}

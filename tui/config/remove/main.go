@@ -45,7 +45,7 @@ func Config() {
 	}
 
 	if r, ok := m.(model); ok && r.state == exitFailure {
-		logger.Log.Errorf(strings.TrimSpace(r.text))
+		logger.Log.Error(strings.TrimSpace(r.text))
 		os.Exit(1)
 	}
 }

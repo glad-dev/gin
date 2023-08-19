@@ -34,7 +34,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		markdownOptions...,
 	)
 	if err != nil {
-		logger.Log.Errorf("Failed to create markdown renderer: %s", err.Error())
+		logger.Log.Error("Failed to create markdown renderer", "error", err.Error())
 
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
@@ -46,7 +46,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		markdownOptions...,
 	)
 	if err != nil {
-		logger.Log.Errorf("Failed to create markdown renderer: %s", err.Error())
+		logger.Log.Error("Failed to create markdown renderer", "error", err.Error())
 
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}

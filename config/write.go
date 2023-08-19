@@ -29,7 +29,7 @@ func Write(config *Wrapper) error {
 	buf := new(bytes.Buffer)
 	err = toml.NewEncoder(buf).Encode(config)
 	if err != nil {
-		logger.Log.Errorf("Failed to encode config: %s", err)
+		logger.Log.Error("Failed to encode config", "error", err)
 
 		return fmt.Errorf("could not encode config: %w", err)
 	}
@@ -42,7 +42,7 @@ func Write(config *Wrapper) error {
 	f, err := openConfig(fileLocation)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			logger.Log.Errorf("Failed to open config file: %s", err)
+			logger.Log.Error("Failed to open config file", "error", err)
 
 			return fmt.Errorf("could not open config file: %w", err)
 		}
@@ -50,7 +50,7 @@ func Write(config *Wrapper) error {
 		// Create config directory
 		err = location.CreateDir()
 		if err != nil {
-			logger.Log.Errorf("Failed to create config directory: %s", err)
+			logger.Log.Error("Failed to create config directory", "error", err)
 
 			return fmt.Errorf("could not create config directory: %w", err)
 		}
@@ -58,7 +58,7 @@ func Write(config *Wrapper) error {
 		// Attempt to create the config file
 		f, err = openConfig(fileLocation)
 		if err != nil {
-			logger.Log.Errorf("Failed to open newly created config file: %s", err)
+			logger.Log.Error("Failed to open newly created config file", "error", err)
 
 			return fmt.Errorf("could not open config file: %w", err)
 		}
@@ -66,7 +66,7 @@ func Write(config *Wrapper) error {
 
 	_, err = f.Write(buf.Bytes())
 	if err != nil {
-		logger.Log.Errorf("Failed to write config to file: %s", err)
+		logger.Log.Error("Failed to write config to file", "error", err)
 
 		return fmt.Errorf("could not write config file: %w", err)
 	}

@@ -31,7 +31,7 @@ func Load() (*Wrapper, error) {
 	metaData, err := toml.DecodeFile(fileLocation, wrap)
 	if err != nil {
 		if os.IsNotExist(err) {
-			logger.Log.Infof("Found no configuration file at: %s", fileLocation)
+			logger.Log.Info("Found no configuration file", "location", fileLocation)
 
 			return &Wrapper{
 				Remotes: []Remote{},
@@ -39,7 +39,7 @@ func Load() (*Wrapper, error) {
 			}, ErrConfigDoesNotExist
 		}
 
-		logger.Log.Errorf("toml decode failed: %s", err)
+		logger.Log.Error("toml decode failed", "error", err)
 
 		return nil, fmt.Errorf("could not decode config: %w", err)
 	}

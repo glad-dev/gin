@@ -11,14 +11,14 @@ import (
 func Init(token string, apiURL string) (string, string, error) {
 	tokenName, err := CheckTokenScope(token, apiURL)
 	if err != nil {
-		logger.Log.Errorf("Failed to check scope: %s", err)
+		logger.Log.Error("Failed to check scope", "error", err)
 
 		return "", "", fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
 	}
 
 	username, err := getUsername(token, apiURL)
 	if err != nil {
-		logger.Log.Errorf("Failed to get username: %s", err)
+		logger.Log.Error("Failed to get username", "error", err)
 
 		return "", "", fmt.Errorf("GitLabDetails.Init: Failed to get Username: %w", err)
 	}
