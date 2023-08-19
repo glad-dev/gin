@@ -7,13 +7,51 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
 
-	"github.com/google/go-github/v52/github"
+	"github.com/shurcooL/graphql"
 	"golang.org/x/oauth2"
 )
+
+const githubTimeFormat = "2006-01-02T15:04:05Z"
+
+type issuesStruct struct {
+	PageInfo struct {
+		EndCursor   graphql.String
+		HasNextPage graphql.Boolean
+	}
+
+	Nodes []struct {
+		Title     graphql.String
+		State     graphql.String
+		CreatedAt graphql.String
+		UpdatedAt graphql.String
+		Author    struct {
+			Login graphql.String
+		}
+		Assignees struct {
+			Nodes []struct {
+				Login graphql.String
+			}
+		} `graphql:"assignees(first: 100)"`
+		Number graphql.Int
+	}
+}
+
+type firstQuery struct {
+	Repository struct {
+		Issues issuesStruct `graphql:"issues(first: 100, orderBy: {field: CREATED_AT, direction: DESC})"`
+	} `graphql:"repository(owner: $owner, name: $name)"`
+}
+
+type followingQuery struct { // Needed since GitHub considers an empty "after" to be invalid
+	Repository struct {
+		Issues issuesStruct `graphql:"issues(first: 100, after: $after, orderBy: {field: CREATED_AT, direction: DESC})"`
+	} `graphql:"repository(owner: $owner, name: $name)"`
+}
 
 // QueryGitHub returns all issues, open and closed, of a given repository.
 func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
@@ -31,57 +69,86 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 			&oauth2.Token{AccessToken: match.Token},
 		))
 	}
-	client := github.NewClient(tc)
+
+	client := graphql.NewClient("https://api.github.com/graphql", tc)
+
+	fq := &firstQuery{}
+	err := client.Query(context.Background(), fq, map[string]any{
+		"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
+		"name":  graphql.String(tmp[1]),
+	})
+	if err != nil {
+		logger.Log.Error("First GitHub query failed", "error", err)
+
+		return nil, fmt.Errorf("query failed: %w", err)
+	}
+
+	lst := flatten(fq.Repository.Issues)
+	if !fq.Repository.Issues.PageInfo.HasNextPage {
+		return lst, nil
+	}
 
 	issueList := make([]Issue, 0)
-	page := 0
+	issueList = append(issueList, lst...)
+
+	cursor := fq.Repository.Issues.PageInfo.EndCursor
+	query := &followingQuery{}
 	for {
-		// owner is at tmp[0], repo name is at tmp[1]
-		issues, response, err := client.Issues.ListByRepo(context.Background(), tmp[0], tmp[1], &github.IssueListByRepoOptions{
-			State:     "all",
-			Sort:      "created",
-			Direction: "desc",
-			ListOptions: github.ListOptions{
-				Page:    page,
-				PerPage: 100,
-			},
+		err = client.Query(context.Background(), query, map[string]any{
+			"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
+			"name":  graphql.String(tmp[1]),
+			"after": cursor,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("requesting issues: %w", err)
+			logger.Log.Error("GitHub query failed", "error", err)
+
+			return nil, fmt.Errorf("query failed: %w", err)
 		}
 
-		for _, issue := range issues {
-			if issue.IsPullRequest() {
-				continue
-			}
+		issueList = append(issueList, flatten(query.Repository.Issues)...)
 
-			author := issue.GetUser()
-			assigned := issue.GetAssignee()
-
-			issueList = append(issueList, Issue{
-				Title:     issue.GetTitle(),
-				CreatedAt: issue.GetCreatedAt().Time,
-				UpdatedAt: issue.GetUpdatedAt().Time,
-				Iid:       strconv.Itoa(issue.GetNumber()),
-				State:     issue.GetState(),
-				Author: remote.User{
-					Name:     author.GetName(),
-					Username: author.GetLogin(),
-				},
-				Assignees: []remote.User{
-					{
-						Name:     assigned.GetName(),
-						Username: assigned.GetLogin(),
-					},
-				},
-			})
-		}
-
-		page = response.NextPage
-		if page == 0 {
+		cursor = query.Repository.Issues.PageInfo.EndCursor
+		if !query.Repository.Issues.PageInfo.HasNextPage {
 			break
 		}
 	}
 
 	return issueList, nil
+}
+
+func flatten(issues issuesStruct) []Issue {
+	lst := make([]Issue, 0)
+
+	for _, issue := range issues.Nodes {
+		assignees := make([]remote.User, len(issue.Assignees.Nodes))
+		for i, u := range issue.Assignees.Nodes {
+			assignees[i] = remote.User{
+				Username: string(u.Login),
+			}
+		}
+
+		creationTime, err := time.Parse(githubTimeFormat, string(issue.CreatedAt))
+		if err != nil {
+			logger.Log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
+		}
+
+		updateTime, err := time.Parse(githubTimeFormat, string(issue.UpdatedAt))
+		if err != nil {
+			logger.Log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
+		}
+
+		lst = append(lst, Issue{
+			Title:     string(issue.Title),
+			CreatedAt: creationTime,
+			UpdatedAt: updateTime,
+			Iid:       strconv.Itoa(int(issue.Number)),
+			State:     string(issue.State),
+			Author: remote.User{
+				Username: string(issue.Author.Login),
+			},
+			Assignees: assignees,
+		})
+	}
+
+	return lst
 }

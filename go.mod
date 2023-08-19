@@ -10,6 +10,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/go-git/go-git/v5 v5.8.1
 	github.com/google/go-github/v52 v52.0.0
+	github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466
 	github.com/spf13/cobra v1.7.0
 	github.com/xanzy/go-gitlab v0.90.0
 	golang.org/x/oauth2 v0.11.0
