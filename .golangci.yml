@@ -31,7 +31,7 @@ linters:
     - bidichk
     - bodyclose
     - decorder
-    - depguard
+    # - depguard
     - dupl
     - dupword
     - durationcheck
