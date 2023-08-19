@@ -35,7 +35,7 @@ func GetTextInputs() []textinput.Model {
 	var t textinput.Model
 	for i := range inputs {
 		t = textinput.New()
-		t.CursorStyle = cursorStyle
+		t.Cursor.Style = cursorStyle
 		t.CharLimit = 64
 
 		switch i {
