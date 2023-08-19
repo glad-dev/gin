@@ -49,10 +49,9 @@ func Get(path string) ([]Details, error) {
 				return nil, errors.New("origin does have 'git@' prefix")
 			}
 
-			if !strings.HasSuffix(origin, ".git") {
-				logger.Log.Error("Origin does not have '.git' suffix.", "origin", origin)
-
-				return nil, errors.New("origin does not end with '.git'")
+			suffixLength := 0
+			if strings.HasSuffix(origin, ".git") {
+				suffixLength = len(".git")
 			}
 
 			if strings.Count(origin, ":") != 1 {
@@ -61,7 +60,7 @@ func Get(path string) ([]Details, error) {
 				return nil, errors.New("origin contains an invalid amount of ':'")
 			}
 
-			u, err := url.Parse(origin[len("git@") : len(origin)-len(".git")])
+			u, err := url.Parse(origin[len("git@") : len(origin)-suffixLength])
 			if err != nil {
 				logger.Log.Error("Failed to parse the git URL.", "error", err, "url", origin[len("git@"):len(origin)-len(".git")])
 
