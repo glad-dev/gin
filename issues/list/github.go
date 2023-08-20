@@ -97,9 +97,9 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 	issueList = append(issueList, lst...)
 
 	cursor := fq.Repository.Issues.PageInfo.EndCursor
-	query := &followingQuery{}
+	q := &followingQuery{}
 	for {
-		err = client.Query(context.Background(), query, map[string]any{
+		err = client.Query(context.Background(), q, map[string]any{
 			"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
 			"name":  graphql.String(tmp[1]),
 			"after": cursor,
@@ -110,10 +110,10 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 			return nil, fmt.Errorf("query failed: %w", err)
 		}
 
-		issueList = append(issueList, flatten(query.Repository.Issues)...)
+		issueList = append(issueList, flatten(q.Repository.Issues)...)
 
-		cursor = query.Repository.Issues.PageInfo.EndCursor
-		if !query.Repository.Issues.PageInfo.HasNextPage {
+		cursor = q.Repository.Issues.PageInfo.EndCursor
+		if !q.Repository.Issues.PageInfo.HasNextPage {
 			break
 		}
 	}
