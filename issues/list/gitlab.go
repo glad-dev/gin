@@ -1,19 +1,50 @@
 package list
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"io"
-	"strconv"
+	"net/http"
+	"time"
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
-	"github.com/xanzy/go-gitlab"
+
+	"github.com/shurcooL/graphql"
+	"golang.org/x/oauth2"
 )
+
+type query struct {
+	Project struct {
+		Issues struct {
+			PageInfo struct {
+				EndCursor   graphql.String
+				HasNextPage graphql.Boolean
+			}
+
+			Nodes []struct {
+				Title     graphql.String
+				CreatedAt graphql.String
+				UpdatedAt graphql.String
+				Iid       graphql.String
+				State     graphql.String
+				Author    struct {
+					Name     graphql.String
+					Username graphql.String
+				}
+				Assignees struct {
+					Nodes []struct {
+						Name     graphql.String
+						Username graphql.String
+					}
+				} `graphql:"assignees (first: 100)"`
+			}
+		} `graphql:"issues(first: 100, after: $cursor, sort:CREATED_DESC)"`
+	} `graphql:"project(fullPath: $path)"`
+}
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
-	api, err := match.Type.ApiURL(&match.URL)
+	api, err := match.Type.ApiURL2(&match.URL)
 	if err != nil {
 		logger.Log.Error("Retrieving API URL",
 			"error", err,
@@ -23,78 +54,65 @@ func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
 		return nil, fmt.Errorf("retrieving API URL: %w", err)
 	}
 
-	client, err := gitlab.NewClient(match.Token, gitlab.WithBaseURL(api))
-	if err != nil {
-		logger.Log.Error("Creating gitlab client",
-			"error", err,
-			"API-URL", api,
-			"project-path", projectPath,
-		)
-
-		return nil, fmt.Errorf("creating gitlab client: %w", err)
+	var tc *http.Client
+	if len(match.Token) > 0 {
+		ctx := context.Background()
+		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: match.Token},
+		))
 	}
 
-	state := "all"
-	orderBy := "created_at"
-	sort := "desc"
+	client := graphql.NewClient(api, tc)
 
-	page := 0
+	var cursor graphql.String
+	q := &query{}
 	issueList := make([]Issue, 0)
 	for {
-		issues, resp, err := client.Issues.ListProjectIssues(projectPath, &gitlab.ListProjectIssuesOptions{
-			ListOptions: gitlab.ListOptions{
-				Page:    page,
-				PerPage: 100,
-			},
-			State:   &state,
-			OrderBy: &orderBy,
-			Sort:    &sort,
+		err = client.Query(context.Background(), q, map[string]any{
+			"path":   projectPath,
+			"cursor": cursor,
 		})
 		if err != nil {
-			if resp == nil {
-				return nil, errors.New("requesting issues: response is nil")
-			}
-
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				body = []byte("Failed to read body")
-			}
-
-			logger.Log.Error("Requesting issues",
-				"error", err,
-				"API-URL", api,
-				"project-path", projectPath,
-				"response-body", string(body),
-			)
+			logger.Log.Error("Requesting issues", "error", err, "projectPath", projectPath)
 
 			return nil, fmt.Errorf("requesting issues: %w", err)
 		}
 
-		for _, issue := range issues {
-			assignees := make([]remote.User, len(issue.Assignees))
-			for i, assignee := range issue.Assignees {
+		for _, issue := range q.Project.Issues.Nodes {
+			assignees := make([]remote.User, len(issue.Assignees.Nodes))
+			for i, assignee := range issue.Assignees.Nodes {
 				assignees[i] = remote.User{
-					Name:     assignee.Name,
-					Username: assignee.Username,
+					Name:     string(assignee.Name),
+					Username: string(assignee.Username),
 				}
 			}
 
+			creationTime, err := time.Parse(timeLayout, string(issue.CreatedAt))
+			if err != nil {
+				logger.Log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
+			}
+
+			updateTime, err := time.Parse(timeLayout, string(issue.UpdatedAt))
+			if err != nil {
+				logger.Log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
+			}
+
 			issueList = append(issueList, Issue{
-				Title:     issue.Title,
-				CreatedAt: *issue.CreatedAt,
-				UpdatedAt: *issue.UpdatedAt,
-				Iid:       strconv.Itoa(issue.IID),
-				State:     issue.State,
+				Title:     string(issue.Title),
+				CreatedAt: creationTime,
+				UpdatedAt: updateTime,
+				Iid:       string(issue.Iid),
+				State:     string(issue.State),
 				Author: remote.User{
-					Name:     issue.Author.Name,
-					Username: issue.Author.Username,
+					Name:     string(issue.Author.Name),
+					Username: string(issue.Author.Username),
 				},
 				Assignees: assignees,
 			})
 		}
 
-		page = resp.NextPage
-		if page == 0 {
+		cursor = q.Project.Issues.PageInfo.EndCursor
+		if !q.Project.Issues.PageInfo.HasNextPage {
 			break
 		}
 	}
