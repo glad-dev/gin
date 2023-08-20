@@ -16,8 +16,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const githubTimeFormat = "2006-01-02T15:04:05Z"
-
 type issuesStruct struct {
 	PageInfo struct {
 		EndCursor   graphql.String
@@ -70,10 +68,17 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		))
 	}
 
-	client := graphql.NewClient("https://api.github.com/graphql", tc)
+	apiURL, err := match.Type.ApiURL(&match.URL)
+	if err != nil {
+		logger.Log.Error("Failed to get API URL", "error", err, "match-url", match.URL.String())
+
+		return nil, fmt.Errorf("invalid API url: %w", err)
+	}
+
+	client := graphql.NewClient(apiURL, tc)
 
 	fq := &firstQuery{}
-	err := client.Query(context.Background(), fq, map[string]any{
+	err = client.Query(context.Background(), fq, map[string]any{
 		"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
 		"name":  graphql.String(tmp[1]),
 	})
@@ -127,12 +132,12 @@ func flatten(issues issuesStruct) []Issue {
 			}
 		}
 
-		creationTime, err := time.Parse(githubTimeFormat, string(issue.CreatedAt))
+		creationTime, err := time.Parse(timeLayout, string(issue.CreatedAt))
 		if err != nil {
 			logger.Log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
 		}
 
-		updateTime, err := time.Parse(githubTimeFormat, string(issue.UpdatedAt))
+		updateTime, err := time.Parse(timeLayout, string(issue.UpdatedAt))
 		if err != nil {
 			logger.Log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
 		}

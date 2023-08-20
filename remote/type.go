@@ -14,12 +14,15 @@ const (
 )
 
 func (t Type) ApiURL(u *url.URL) (string, error) { //nolint:revive
+	if u == nil {
+		return "", errors.New("nil url passed to ApiURL")
+	}
+
 	switch t {
 	case Github:
-		// GitHub can't be self-hosted, thus the library we use doesn't require an API URL.
-		return "", nil
+		return "https://api.github.com/graphql", nil
 	case Gitlab:
-		return u.JoinPath("/api/v4").String(), nil
+		return u.JoinPath("/api/graphql").String(), nil
 	case Bitbucket:
 		return "", errors.New("bitbucket is not yet implemented")
 	}
