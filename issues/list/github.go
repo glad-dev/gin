@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +12,6 @@ import (
 	"github.com/glad-dev/gin/remote"
 
 	"github.com/shurcooL/graphql"
-	"golang.org/x/oauth2"
 )
 
 type issuesStruct struct {
@@ -60,22 +58,11 @@ func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
 		return nil, errors.New("invalid project path")
 	}
 
-	var tc *http.Client
-	if len(match.Token) > 0 {
-		ctx := context.Background()
-		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: match.Token},
-		))
-	}
-
-	apiURL, err := match.Type.ApiURL(&match.URL)
+	client, err := match.GraphqlClient()
 	if err != nil {
-		logger.Log.Error("Failed to get API URL", "error", err, "match-url", match.URL.String())
-
-		return nil, fmt.Errorf("invalid API url: %w", err)
+		// No need to log, since match.GraphqlClient() already logs the error
+		return nil, err
 	}
-
-	client := graphql.NewClient(apiURL, tc)
 
 	fq := &firstQuery{}
 	err = client.Query(context.Background(), fq, map[string]any{

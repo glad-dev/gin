@@ -3,14 +3,12 @@ package list
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
 
 	"github.com/shurcooL/graphql"
-	"golang.org/x/oauth2"
 )
 
 type query struct {
@@ -44,25 +42,11 @@ type query struct {
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
 func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
-	api, err := match.Type.ApiURL2(&match.URL)
+	client, err := match.GraphqlClient()
 	if err != nil {
-		logger.Log.Error("Retrieving API URL",
-			"error", err,
-			"URL", match.URL.String(),
-		)
-
-		return nil, fmt.Errorf("retrieving API URL: %w", err)
+		// No need to log, since match.GraphqlClient() already logs the error
+		return nil, err
 	}
-
-	var tc *http.Client
-	if len(match.Token) > 0 {
-		ctx := context.Background()
-		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: match.Token},
-		))
-	}
-
-	client := graphql.NewClient(api, tc)
 
 	var cursor graphql.String
 	q := &query{}
