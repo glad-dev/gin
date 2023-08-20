@@ -70,7 +70,7 @@ func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, heig
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 
-			"URL",
+			"Base URL",
 			style.InputField.Render(inputs[0].View()),
 			"\n",
 			"API Key",
