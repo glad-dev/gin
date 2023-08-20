@@ -1,4 +1,4 @@
-package remote
+package remotetype
 
 import (
 	"errors"
@@ -13,24 +13,7 @@ const (
 	Bitbucket
 )
 
-func (t Type) ApiURL(u *url.URL) (string, error) { //nolint:revive
-	if u == nil {
-		return "", errors.New("nil url passed to ApiURL")
-	}
-
-	switch t {
-	case Github:
-		return "https://api.github.com/graphql", nil
-	case Gitlab:
-		return u.JoinPath("/api/v4").String(), nil
-	case Bitbucket:
-		return "", errors.New("bitbucket is not yet implemented")
-	}
-
-	return "", errors.New("invalid type")
-}
-
-func (t Type) ApiURL2(u *url.URL) (string, error) { //nolint:revive
+func (t Type) GraphqlAPIURL(u *url.URL) (string, error) { //nolint:revive
 	if u == nil {
 		return "", errors.New("nil url passed to ApiURL")
 	}
@@ -40,6 +23,23 @@ func (t Type) ApiURL2(u *url.URL) (string, error) { //nolint:revive
 		return "https://api.github.com/graphql", nil
 	case Gitlab:
 		return u.JoinPath("/api/graphql").String(), nil
+	case Bitbucket:
+		return "", errors.New("bitbucket is not yet implemented")
+	}
+
+	return "", errors.New("invalid type")
+}
+
+func (t Type) RestAPIURL(u *url.URL) (string, error) {
+	if u == nil {
+		return "", errors.New("nil url passed to ApiURL")
+	}
+
+	switch t {
+	case Github:
+		return "https://api.github.com/", nil
+	case Gitlab:
+		return u.JoinPath("/api/v4").String(), nil
 	case Bitbucket:
 		return "", errors.New("bitbucket is not yet implemented")
 	}

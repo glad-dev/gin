@@ -7,6 +7,7 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 
 	"github.com/shurcooL/graphql"
 )
@@ -41,7 +42,7 @@ type query struct {
 }
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
-func QueryGitLab(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryGitLab(match *match.Match, projectPath string) ([]Issue, error) {
 	client, err := match.GraphqlClient()
 	if err != nil {
 		// No need to log, since match.GraphqlClient() already logs the error

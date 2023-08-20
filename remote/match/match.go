@@ -1,4 +1,4 @@
-package remote
+package match
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"net/url"
 
 	"github.com/glad-dev/gin/logger"
+	remotetype "github.com/glad-dev/gin/remote/type"
+
 	"github.com/shurcooL/graphql"
 	"golang.org/x/oauth2"
 )
@@ -17,7 +19,7 @@ type Match struct {
 	Token     string
 	Username  string
 	TokenName string
-	Type      Type
+	Type      remotetype.Type
 }
 
 func (m *Match) GraphqlClient() (*graphql.Client, error) {
@@ -29,7 +31,7 @@ func (m *Match) GraphqlClient() (*graphql.Client, error) {
 		))
 	}
 
-	apiURL, err := m.Type.ApiURL(&m.URL)
+	apiURL, err := m.Type.GraphqlAPIURL(&m.URL)
 	if err != nil {
 		logger.Log.Error("Failed to get API URL", "error", err, "match-url", m.URL.String())
 

@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/glad-dev/gin/remote/match"
+
 	"github.com/glad-dev/gin/logger"
-	"github.com/glad-dev/gin/remote"
 )
 
 var (
@@ -25,7 +26,7 @@ type query struct {
 
 // graphQLRequest makes a GraphQL query to a GitLab backend and checks if the returned value indicates that the requested
 // project does not exist.
-func graphQLRequest(query *query, match *remote.Match) ([]byte, error) {
+func graphQLRequest(query *query, match *match.Match) ([]byte, error) {
 	requestBody, err := json.Marshal(query)
 	if err != nil {
 		logger.Log.Error("Failed to marshal query", "error", err, "query", query)
@@ -47,7 +48,7 @@ func graphQLRequest(query *query, match *remote.Match) ([]byte, error) {
 	return body, nil
 }
 
-func makeRequest(requestBody []byte, match *remote.Match) ([]byte, error) {
+func makeRequest(requestBody []byte, match *match.Match) ([]byte, error) {
 	req, err := http.NewRequest("POST", match.URL.JoinPath("/api/graphql").String(), bytes.NewBuffer(requestBody))
 	if err != nil {
 		logger.Log.Error("Failed to create HTTP request", "error", err, "url", match.URL.String(), "body", string(requestBody))

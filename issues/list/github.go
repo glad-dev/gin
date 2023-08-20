@@ -10,6 +10,7 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 
 	"github.com/shurcooL/graphql"
 )
@@ -50,7 +51,7 @@ type followingQuery struct { // Needed since GitHub considers an empty "after" t
 }
 
 // QueryGitHub returns all issues, open and closed, of a given repository.
-func QueryGitHub(match *remote.Match, projectPath string) ([]Issue, error) {
+func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Error("Project path is invalid", "path", projectPath)

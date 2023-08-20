@@ -7,6 +7,7 @@ import (
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 )
 
 // Remote contains the remote's URL and a list of Details, containing the token, username and token name.
@@ -17,7 +18,7 @@ type Remote struct {
 
 // ToMatch casts the remote to a remote.Match if the remote contains one Details. An error is returned if there are none
 // or more than one Details.
-func (r *Remote) ToMatch() (*remote.Match, error) {
+func (r *Remote) ToMatch() (*match.Match, error) {
 	if len(r.Details) == 0 {
 		logger.Log.Error("Remote contains no details.")
 
@@ -25,7 +26,7 @@ func (r *Remote) ToMatch() (*remote.Match, error) {
 	}
 
 	if len(r.Details) == 1 {
-		return &remote.Match{
+		return &match.Match{
 			URL:       r.URL,
 			Token:     r.Details[0].Token,
 			Username:  r.Details[0].Username,
@@ -36,20 +37,20 @@ func (r *Remote) ToMatch() (*remote.Match, error) {
 
 	logger.Log.Info("Got a remote with multiple details.")
 
-	return &remote.Match{
+	return &match.Match{
 		URL: r.URL,
 	}, errors.New("config contains multiple matching configs")
 }
 
 // ToMatchAtIndex casts the remote at index to a remote.Match.
-func (r *Remote) ToMatchAtIndex(index int) (*remote.Match, error) {
+func (r *Remote) ToMatchAtIndex(index int) (*match.Match, error) {
 	if index < 0 || index >= len(r.Details) {
 		logger.Log.Error("Invalid index.", "index", index, "len(details)", len(r.Details))
 
 		return nil, errors.New("ToMatchAtIndex: invalid index")
 	}
 
-	return &remote.Match{
+	return &match.Match{
 		URL:       r.URL,
 		Token:     r.Details[index].Token,
 		Username:  r.Details[index].Username,

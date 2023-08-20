@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/config"
-	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/repo"
 )
 
-func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL) (*remote.Match, string, error) {
+func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL) (*match.Match, string, error) {
 	if u != nil {
 		lab, projectPath := getURLConfig(conf, u)
 
@@ -19,7 +19,7 @@ func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL)
 	return conf.GetMatchingConfig(details)
 }
 
-func getURLConfig(conf *config.Wrapper, u *url.URL) (*remote.Match, string) {
+func getURLConfig(conf *config.Wrapper, u *url.URL) (*match.Match, string) {
 	// Get project path
 	projectPath := u.EscapedPath()
 	projectPath = strings.TrimPrefix(projectPath, "/")
@@ -38,7 +38,7 @@ func getURLConfig(conf *config.Wrapper, u *url.URL) (*remote.Match, string) {
 	}
 
 	// We found no match => Mock up a config
-	return &remote.Match{
+	return &match.Match{
 		URL: url.URL{
 			Scheme: u.Scheme,
 			Host:   u.Hostname(),

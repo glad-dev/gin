@@ -2,7 +2,7 @@ package edit
 
 import (
 	"github.com/glad-dev/gin/config"
-	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
 
@@ -20,7 +20,7 @@ type editModel struct {
 	height       int
 }
 
-func (m *editModel) init(match *remote.Match, listIndex int, detailsIndex int) {
+func (m *editModel) init(match *match.Match, listIndex int, detailsIndex int) {
 	// Set the new values
 	m.inputs[0].SetValue(match.URL.String())
 	m.inputs[0].SetCursor(0)

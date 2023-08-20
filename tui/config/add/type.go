@@ -3,7 +3,8 @@ package add
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/glad-dev/gin/remote"
+
+	remotetype "github.com/glad-dev/gin/remote/type"
 	"github.com/glad-dev/gin/style"
 )
 
@@ -33,18 +34,18 @@ func updateType(m *model, msg tea.Msg) tea.Cmd {
 				switch m.focusIndex {
 				case 0:
 					m.focusIndex = 1
-					m.remoteType = remote.Github
+					m.remoteType = remotetype.Github
 					m.inputs[0].Placeholder = "https://github.com"
 					m.inputs[0].SetValue("https://github.com")
 
 				case 1:
 					m.focusIndex = 0
-					m.remoteType = remote.Gitlab
+					m.remoteType = remotetype.Gitlab
 					m.inputs[0].Placeholder = "https://gitlab.com"
 
 				case 2:
 					m.focusIndex = 0
-					m.remoteType = remote.Bitbucket
+					m.remoteType = remotetype.Bitbucket
 					m.inputs[0].Placeholder = "https://bitbucket.com"
 				}
 
@@ -79,7 +80,7 @@ func viewType(m *model) string {
 		m.width,
 		m.height,
 		lipgloss.Center,
-		lipgloss.Center,
+		0.6,
 
 		lipgloss.JoinVertical(
 			lipgloss.Center,

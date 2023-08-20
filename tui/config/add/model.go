@@ -1,7 +1,7 @@
 package add
 
 import (
-	"github.com/glad-dev/gin/remote"
+	remotetype "github.com/glad-dev/gin/remote/type"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -37,7 +37,7 @@ type model struct {
 	height              int
 	currentlyDisplaying displaying
 	state               state
-	remoteType          remote.Type
+	remoteType          remotetype.Type
 }
 
 type updateMsg struct {

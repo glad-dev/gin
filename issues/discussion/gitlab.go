@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/glad-dev/gin/remote/match"
+
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
 )
@@ -98,7 +100,7 @@ const querySingleGitLab = `
 
 // QueryGitLab returns the discussion associated with the passed issueID. If the requested issue does not exist, an
 // ErrIssueDoesNotExist is returned.
-func QueryGitLab(match *remote.Match, projectPath string, issueID string) (*Details, error) {
+func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Details, error) {
 	variables := map[string]string{
 		"projectPath": projectPath,
 		"issueID":     issueID,

@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/glad-dev/gin/remote/match"
+
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
 
@@ -18,7 +20,7 @@ import (
 
 // QueryGitHub returns the discussion associated with the passed issueID. If the requested issue does not exist, an
 // ErrIssueDoesNotExist is returned.
-func QueryGitHub(match *remote.Match, projectPath string, issueID string) (*Details, error) {
+func QueryGitHub(match *match.Match, projectPath string, issueID string) (*Details, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		logger.Log.Error("Project path is invalid", "path", projectPath)

@@ -6,7 +6,7 @@ import (
 
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/logger"
-	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/repo"
 )
 
@@ -55,7 +55,7 @@ func (config *Wrapper) CheckValidity() error {
 
 // GetMatchingConfig searches the wrapper's Remotes and returns a remote.Match if a Remote has the same  URL as one of
 // the passed repo.Details.
-func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match, string, error) {
+func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*match.Match, string, error) {
 	if len(details) == 0 {
 		logger.Log.Error("No details passed.")
 
@@ -65,18 +65,18 @@ func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*remote.Match,
 	for _, detail := range details {
 		for _, conf := range config.Remotes {
 			if conf.URL.Host == detail.URL.Host {
-				match, err := conf.ToMatch()
+				m, err := conf.ToMatch()
 				if err != nil {
 					return nil, "", err
 				}
 
-				return match, detail.ProjectPath, nil
+				return m, detail.ProjectPath, nil
 			}
 		}
 	}
 
 	// No match => Mock up a config
-	return &remote.Match{
+	return &match.Match{
 		URL:      details[0].URL,
 		Token:    "",
 		Username: "",

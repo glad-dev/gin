@@ -2,21 +2,29 @@ package gitlab
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/glad-dev/gin/logger"
-	"github.com/xanzy/go-gitlab"
+	remotetype "github.com/glad-dev/gin/remote/type"
 )
 
 // Init checks the token's scope and returns the username and token name associated with the token.
-func Init(token string, apiURL string) (string, string, error) {
-	tokenName, err := CheckTokenScope(token, apiURL)
+func Init(token string, t remotetype.Type, u *url.URL) (string, string, error) {
+	restAPIUrl, err := t.RestAPIURL(u)
+	if err != nil {
+		logger.Log.Error("Failed to get REST API URL", "error", err, "URL", u.String())
+
+		return "", "", fmt.Errorf("getting REST API: %w", err)
+	}
+
+	tokenName, err := CheckTokenScope(token, restAPIUrl)
 	if err != nil {
 		logger.Log.Error("Failed to check scope", "error", err)
 
 		return "", "", fmt.Errorf("GitLabDetails.Init: Failed to check scope: %w", err)
 	}
 
-	username, err := getUsername(token, apiURL)
+	username, err := getUsername(token, u)
 	if err != nil {
 		logger.Log.Error("Failed to get username", "error", err)
 
@@ -24,32 +32,4 @@ func Init(token string, apiURL string) (string, string, error) {
 	}
 
 	return username, tokenName, nil
-}
-
-func getUsername(token string, apiURL string) (string, error) {
-	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(apiURL))
-	if err != nil {
-		logger.Log.Error("Creating gitlab client",
-			"error", err,
-			"API-URL", apiURL,
-		)
-
-		return "", fmt.Errorf("creating gitlab client: %w", err)
-	}
-
-	user, _, err := client.Users.CurrentUser()
-	if err != nil {
-		logger.Log.Error("Requesting current user",
-			"error", err,
-			"API-URL", apiURL,
-		)
-
-		return "", fmt.Errorf("requesting current user: %w", err)
-	}
-
-	if len(user.Username) == 0 {
-		return "", fmt.Errorf("empty username")
-	}
-
-	return user.Username, nil
 }
