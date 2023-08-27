@@ -4,14 +4,62 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/shurcooL/graphql"
 	"reflect"
 	"time"
 
-	"github.com/glad-dev/gin/remote/match"
-
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 )
+
+type queryGitlab struct {
+	Project struct {
+		Issue struct {
+			Title       graphql.String
+			Description graphql.String
+			CreatedAt   graphql.String
+			UpdatedAt   graphql.String
+			Author      struct {
+				Name     graphql.String
+				Username graphql.String
+			}
+			Assignees struct {
+				Nodes []struct {
+					Name     graphql.String
+					Username graphql.String
+				}
+			}
+			Labels struct {
+				Nodes []struct {
+					Title graphql.String
+					Color graphql.String
+				}
+			}
+			Discussions struct {
+				Nodes []struct {
+					Notes struct {
+						Nodes []struct {
+							Body      graphql.String
+							CreatedAt graphql.String
+							UpdatedAt graphql.String
+							System    graphql.Boolean
+							Resolved  graphql.Boolean
+							Author    struct {
+								Name     graphql.String
+								Username graphql.String
+							}
+							LastEditedBy struct {
+								Name     graphql.String
+								Username graphql.String
+							}
+						}
+					}
+				}
+			}
+		} `graphql:"issue(iid: $issueID)"`
+	} `graphql:"project(fullPath: $projectPath)"`
+}
 
 type querySingleGitLabResponse struct {
 	Data struct {
@@ -95,7 +143,6 @@ const querySingleGitLab = `
 				}
 			}
 		}
-	}
 `
 
 // QueryGitLab returns the discussion associated with the passed issueID. If the requested issue does not exist, an
