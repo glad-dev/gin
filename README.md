@@ -2,6 +2,8 @@
 
 View the issues foa given repository on your command line.
 
+![Gif showing gin's functionality](examples/issues.gif)
+
 ## Known issues
 
 - All issues:
