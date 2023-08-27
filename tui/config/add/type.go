@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	btnGithub    = "[ GitHub ]"
-	btnGitLab    = "[ GitLab ]"
-	btnBitbucket = "[ Bitbucket ]"
+	btnGithub = "[ GitHub ]"
+	btnGitLab = "[ GitLab ]"
 )
 
 func updateType(m *model, msg tea.Msg) tea.Cmd {
@@ -42,11 +41,6 @@ func updateType(m *model, msg tea.Msg) tea.Cmd {
 					m.focusIndex = 0
 					m.remoteType = remotetype.Gitlab
 					m.inputs[0].Placeholder = "https://gitlab.com"
-
-				case 2:
-					m.focusIndex = 0
-					m.remoteType = remotetype.Bitbucket
-					m.inputs[0].Placeholder = "https://bitbucket.com"
 				}
 
 				return updateInputs(m)
@@ -59,10 +53,10 @@ func updateType(m *model, msg tea.Msg) tea.Cmd {
 				m.focusIndex++
 			}
 
-			if m.focusIndex > len(m.inputs) {
+			if m.focusIndex > 1 {
 				m.focusIndex = 0
 			} else if m.focusIndex < 0 {
-				m.focusIndex = len(m.inputs)
+				m.focusIndex = 1
 			}
 
 			return nil
@@ -73,7 +67,7 @@ func updateType(m *model, msg tea.Msg) tea.Cmd {
 }
 
 func viewType(m *model) string {
-	btns := [3]string{btnGithub, btnGitLab, btnBitbucket}
+	btns := [2]string{btnGithub, btnGitLab}
 	btns[m.focusIndex] = style.Focused.Render(btns[m.focusIndex])
 
 	return lipgloss.Place(
@@ -89,8 +83,6 @@ func viewType(m *model) string {
 			btns[0],
 			"\n",
 			btns[1],
-			"\n",
-			btns[2],
 		),
 	)
 }

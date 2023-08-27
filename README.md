@@ -17,7 +17,6 @@ View the issues foa given repository on your command line.
 ## v2
 
 - [ ] Add support for PR
-- [ ] Add support for Bitbucket, ...
 
 # Acknowledgements
 

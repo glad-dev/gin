@@ -40,9 +40,6 @@ func (d *Details) Init(u *url.URL) error {
 		d.TokenName = tokenName
 
 		return nil
-
-	case remotetype.Bitbucket:
-		return errors.New("bitbucket is yet to be implemented")
 	}
 
 	return errors.New("invalid type passed to Details.Init")
@@ -60,9 +57,6 @@ func (d *Details) CheckTokenScope(u *url.URL) (string, error) {
 
 	case remotetype.Gitlab:
 		return gitlab.CheckTokenScope(d.Token, apiURL)
-
-	case remotetype.Bitbucket:
-		return "", errors.New("bitbucket is not yet implemented")
 	}
 
 	return "", errors.New("Details.CheckTokenScope - invalid type")
