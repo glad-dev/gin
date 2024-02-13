@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"github.com/glad-dev/gin/log"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/issues/shared"
 	"github.com/glad-dev/gin/tui/widgets"
@@ -13,7 +13,7 @@ import (
 )
 
 // Show is the entry point of this TUI, which displays a single issues of a given repository.
-func Show(details []repo.Details, u *url.URL, issueID string) {
+func Show(details []repository.Details, u *url.URL, issueID string) {
 	conf, err := shared.SelectConfig(details, u)
 	if err != nil {
 		log.Error("Failed to select config", "error", err)

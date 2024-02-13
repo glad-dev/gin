@@ -6,10 +6,10 @@ import (
 
 	"github.com/glad-dev/gin/config"
 	"github.com/glad-dev/gin/remote/match"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 )
 
-func getMatchingConfig(conf *config.Wrapper, details []repo.Details, u *url.URL) (*match.Match, string, error) {
+func getMatchingConfig(conf *config.Wrapper, details []repository.Details, u *url.URL) (*match.Match, string, error) {
 	if u != nil {
 		lab, projectPath := getURLConfig(conf, u)
 

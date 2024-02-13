@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/glad-dev/gin/log"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 	"github.com/glad-dev/gin/style"
 	allIssues "github.com/glad-dev/gin/tui/issues/all"
 	singleIssue "github.com/glad-dev/gin/tui/issues/single"
@@ -24,8 +24,8 @@ func newCmdAllIssues() *cobra.Command {
 		Run:               runAllIssues,
 	}
 
-	cmdAllIssues.PersistentFlags().String("path", "", "Path to the repo")
-	cmdAllIssues.PersistentFlags().String("url", "", "URL of the repo")
+	cmdAllIssues.PersistentFlags().String("path", "", "Path to the git repository")
+	cmdAllIssues.PersistentFlags().String("url", "", "URL of the git repository")
 
 	return cmdAllIssues
 }
@@ -39,8 +39,8 @@ func newCmdSingleIssue() *cobra.Command {
 		Run:               runSingleIssue,
 	}
 
-	cmdSingleIssue.PersistentFlags().String("path", "", "Path to the repo")
-	cmdSingleIssue.PersistentFlags().String("url", "", "URL of the repo")
+	cmdSingleIssue.PersistentFlags().String("path", "", "Path to the git repository")
+	cmdSingleIssue.PersistentFlags().String("url", "", "URL of the git repository")
 
 	return cmdSingleIssue
 }
@@ -84,7 +84,7 @@ func preRun(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
+func getDetailsOrURL(cmd *cobra.Command) ([]repository.Details, *url.URL, error) {
 	// Check if the flags are ok
 	dir, err := cmd.Flags().GetString("path")
 	if err != nil {
@@ -125,11 +125,11 @@ func getDetailsOrURL(cmd *cobra.Command) ([]repo.Details, *url.URL, error) {
 		}
 	}
 
-	details, err := repo.Get(dir)
+	details, err := repository.Get(dir)
 	if err != nil {
 		log.Error("Failed to get repository details.", "error", err, "directory", dir)
 
-		return nil, nil, fmt.Errorf("failed to get repo details: %w", err)
+		return nil, nil, fmt.Errorf("failed to get repository details: %w", err)
 	}
 
 	// Get the git repository at the current directory

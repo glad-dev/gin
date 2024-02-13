@@ -67,7 +67,7 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 
 	fq := &firstQuery{}
 	err = client.Query(context.Background(), fq, map[string]any{
-		"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
+		"owner": graphql.String(tmp[0]), // owner is at tmp[0], repository name is at tmp[1]
 		"name":  graphql.String(tmp[1]),
 	})
 	if err != nil {
@@ -88,7 +88,7 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 	q := &followingQuery{}
 	for {
 		err = client.Query(context.Background(), q, map[string]any{
-			"owner": graphql.String(tmp[0]), // owner is at tmp[0], repo name is at tmp[1]
+			"owner": graphql.String(tmp[0]), // owner is at tmp[0], repository name is at tmp[1]
 			"name":  graphql.String(tmp[1]),
 			"after": cursor,
 		})

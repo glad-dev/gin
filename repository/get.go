@@ -1,4 +1,4 @@
-package repo
+package repository
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ type Details struct {
 	ProjectPath string
 }
 
-// Get opens the git repository at the given path and returns its list of repo.Details.
+// Get opens the git repository at the given path and returns its list of repository.Details.
 func Get(path string) ([]Details, error) {
 	r, err := git.PlainOpen(path)
 	if err != nil {

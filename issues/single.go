@@ -6,11 +6,11 @@ import (
 	"github.com/glad-dev/gin/config"
 	"github.com/glad-dev/gin/issues/discussion"
 	"github.com/glad-dev/gin/log"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 )
 
 // QuerySingle returns the discussion associated with the given issueID.
-func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*discussion.Details, error) {
+func QuerySingle(conf *config.Wrapper, details []repository.Details, u *url.URL, issueID string) (*discussion.Details, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
 		log.Error("Failed to get matching config", "error", err)

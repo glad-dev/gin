@@ -3,7 +3,7 @@ package shared
 import (
 	"net/url"
 
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 
 	"github.com/charmbracelet/bubbles/spinner"
 )
@@ -12,6 +12,6 @@ import (
 type Shared struct {
 	IssueID string
 	URL     *url.URL
-	Details []repo.Details
+	Details []repository.Details
 	Spinner spinner.Model
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote/match"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 )
 
 // Wrapper contains the Colors configurations, a Version number and a list of Remotes.
@@ -54,8 +54,8 @@ func (config *Wrapper) CheckValidity() error {
 }
 
 // GetMatchingConfig searches the wrapper's Remotes and returns a remote.Match if a Remote has the same  URL as one of
-// the passed repo.Details.
-func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*match.Match, string, error) {
+// the passed repository.Details.
+func (config *Wrapper) GetMatchingConfig(details []repository.Details) (*match.Match, string, error) {
 	if len(details) == 0 {
 		log.Error("No details passed.")
 

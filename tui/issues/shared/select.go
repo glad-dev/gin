@@ -7,12 +7,12 @@ import (
 	"github.com/glad-dev/gin/config"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
-	"github.com/glad-dev/gin/repo"
+	"github.com/glad-dev/gin/repository"
 	selection "github.com/glad-dev/gin/tui/config/select"
 )
 
 // SelectConfig returns the config associated with the URL if a URL is passed. Otherwise, a remote.Details is returned.
-func SelectConfig(details []repo.Details, u *url.URL) (*config.Wrapper, error) {
+func SelectConfig(details []repository.Details, u *url.URL) (*config.Wrapper, error) {
 	if u != nil {
 		return selectConfigForURL(u)
 	}
@@ -45,7 +45,7 @@ func selectConfigForURL(u *url.URL) (*config.Wrapper, error) {
 	}, nil
 }
 
-func selectConfigForLocal(details []repo.Details) (*config.Wrapper, error) {
+func selectConfigForLocal(details []repository.Details) (*config.Wrapper, error) {
 	wrapper, err := config.Load() // To set the colors
 	if err != nil {
 		if errors.Is(err, config.ErrConfigDoesNotExist) {
