@@ -117,9 +117,7 @@ func submit(m *model) tea.Cmd {
 		return nil
 	}
 
-	m.wrapper.Colors = c
-
-	err = config.Write(m.wrapper)
+	err = config.UpdateColors(c, m.wrapper)
 	if err != nil {
 		m.text = style.FormatQuitText("Failed to write config: " + err.Error())
 		m.text = err.Error()

@@ -13,8 +13,8 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Write checks if the passed config is valid and writes it to ~/.config/gn/gn.toml.
-func Write(config *Wrapper) error {
+// write checks if the passed config is valid and writes it to ~/.config/gn/gn.toml.
+func write(config *Config) error {
 	openConfig := func(fileLocation string) (*os.File, error) {
 		return os.OpenFile(fileLocation, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 	}

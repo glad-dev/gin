@@ -39,6 +39,6 @@ func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 		return os.Remove(loc)
 	}
 
-	// Write back the updated config
-	return Write(wrapper)
+	// write back the updated config
+	return write(wrapper)
 }

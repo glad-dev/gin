@@ -38,13 +38,13 @@ func UpdateRemote() error {
 		wrapper.Remotes[i] = config
 	}
 
-	err = Write(wrapper)
+	err = write(wrapper)
 	if err != nil {
 		return fmt.Errorf("failed to write config: %w", err)
 	}
 
 	if len(invalid) == 0 {
-		// Write was successful and there were no issues updating the usernames
+		// write was successful and there were no issues updating the usernames
 		return nil
 	}
 

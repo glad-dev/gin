@@ -62,5 +62,5 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	wrapper.Remotes[wrapperIndex].Details[detailsIndex] = rd
 
-	return Write(wrapper)
+	return write(wrapper)
 }

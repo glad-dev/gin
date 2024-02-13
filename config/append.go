@@ -65,6 +65,6 @@ func Append(urlStr string, token string, remoteType remotetype.Type) error {
 		wrapper.Remotes[configLocation].Details = append(wrapper.Remotes[configLocation].Details, rd)
 	}
 
-	// Write back
-	return Write(wrapper)
+	// write back
+	return write(wrapper)
 }

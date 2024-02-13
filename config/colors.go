@@ -18,6 +18,11 @@ type Colors struct {
 	Focused string
 }
 
+func UpdateColors(c Colors, wrap *Config) error {
+	wrap.Colors = c
+	return write(wrap)
+}
+
 func (c *Colors) setColors() error {
 	err := c.CheckValidity()
 	if err != nil {
@@ -80,7 +85,7 @@ func checkColor(colorStr string) error {
 
 	r := regexp.MustCompile("#[0-9a-fA-F]{6}")
 	if !r.MatchString(colorStr) {
-		return fmt.Errorf("color contains invalid chars")
+		return fmt.Errorf("color contains invalid chars. Expected hex code, got %s", colorStr)
 	}
 
 	return nil
