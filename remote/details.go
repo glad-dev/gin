@@ -6,20 +6,20 @@ import (
 
 	"github.com/glad-dev/gin/remote/github"
 	"github.com/glad-dev/gin/remote/gitlab"
-	remotetype "github.com/glad-dev/gin/remote/type"
+	rt "github.com/glad-dev/gin/remote/type"
 )
 
 type Details struct {
 	Token     string
 	TokenName string
 	Username  string
-	Type      remotetype.Type
+	Type      rt.Type
 }
 
 // Init checks the token's scope and sets the username and token name associated with the token.
 func (d *Details) Init(u *url.URL) error {
 	switch d.Type {
-	case remotetype.Github:
+	case rt.Github:
 		username, tokenName, err := github.Init(d.Token)
 		if err != nil {
 			return err
@@ -30,7 +30,7 @@ func (d *Details) Init(u *url.URL) error {
 
 		return nil
 
-	case remotetype.Gitlab:
+	case rt.Gitlab:
 		username, tokenName, err := gitlab.Init(d.Token, d.Type, u)
 		if err != nil {
 			return err
@@ -52,10 +52,10 @@ func (d *Details) CheckTokenScope(u *url.URL) (string, error) {
 	}
 
 	switch d.Type {
-	case remotetype.Github:
+	case rt.Github:
 		return "", nil // Not implemented
 
-	case remotetype.Gitlab:
+	case rt.Gitlab:
 		return gitlab.CheckTokenScope(d.Token, apiURL)
 	}
 

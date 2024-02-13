@@ -1,12 +1,12 @@
 package issues
 
 import (
-	remotetype "github.com/glad-dev/gin/remote/type"
 	"net/url"
 
 	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/issues/discussion"
 	"github.com/glad-dev/gin/log"
+	rt "github.com/glad-dev/gin/remote/type"
 	"github.com/glad-dev/gin/repository"
 )
 
@@ -19,7 +19,7 @@ func QuerySingle(conf *configuration.Config, details []repository.Details, u *ur
 		return nil, err
 	}
 
-	if match.Type == remotetype.Github {
+	if match.Type == rt.Github {
 		return discussion.QueryGitHub(match, projectPath, issueID)
 	}
 

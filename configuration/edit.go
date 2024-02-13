@@ -5,7 +5,7 @@ import (
 
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
-	remotetype "github.com/glad-dev/gin/remote/type"
+	rt "github.com/glad-dev/gin/remote/type"
 )
 
 // ErrUpdateSameValues is returned if Update was called with the same url and token that is already stored in the
@@ -48,9 +48,9 @@ func Update(config *Config, configIndex int, detailsIndex int, url string, token
 	}
 
 	if u.Host == "github.com" {
-		rd.Type = remotetype.Github
+		rd.Type = rt.Github
 	} else {
-		rd.Type = remotetype.Gitlab
+		rd.Type = rt.Gitlab
 	}
 
 	err = rd.Init(u)

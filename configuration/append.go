@@ -5,12 +5,12 @@ import (
 
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
-	remotetype "github.com/glad-dev/gin/remote/type"
+	rt "github.com/glad-dev/gin/remote/type"
 )
 
 // Append adds the token to the corresponding host in the  configuration file.
 // If no configuration file exists, a new one will be created.
-func Append(urlStr string, token string, remoteType remotetype.Type) error {
+func Append(urlStr string, token string, remoteType rt.Type) error {
 	// Load current config
 	config, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {

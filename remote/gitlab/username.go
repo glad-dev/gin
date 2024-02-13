@@ -8,7 +8,7 @@ import (
 
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote/match"
-	remotetype "github.com/glad-dev/gin/remote/type"
+	rt "github.com/glad-dev/gin/remote/type"
 
 	"github.com/shurcooL/graphql"
 )
@@ -23,7 +23,7 @@ func getUsername(token string, u *url.URL) (string, error) {
 	m := match.Match{
 		Token: token,
 		URL:   *u,
-		Type:  remotetype.Gitlab,
+		Type:  rt.Gitlab,
 	}
 
 	client, err := m.GraphqlClient()

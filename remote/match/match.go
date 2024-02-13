@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/glad-dev/gin/log"
-	remotetype "github.com/glad-dev/gin/remote/type"
+	rt "github.com/glad-dev/gin/remote/type"
 
 	"github.com/shurcooL/graphql"
 	"golang.org/x/oauth2"
@@ -19,7 +19,7 @@ type Match struct {
 	Token     string
 	Username  string
 	TokenName string
-	Type      remotetype.Type
+	Type      rt.Type
 }
 
 func (m *Match) GraphqlClient() (*graphql.Client, error) {

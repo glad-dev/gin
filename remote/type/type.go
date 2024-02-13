@@ -1,4 +1,4 @@
-package remotetype
+package rt
 
 import (
 	"errors"

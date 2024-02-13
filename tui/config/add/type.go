@@ -1,11 +1,11 @@
 package add
 
 import (
+	rt "github.com/glad-dev/gin/remote/type"
+	"github.com/glad-dev/gin/style"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-
-	remotetype "github.com/glad-dev/gin/remote/type"
-	"github.com/glad-dev/gin/style"
 )
 
 const (
@@ -33,13 +33,13 @@ func updateType(m *model, msg tea.Msg) tea.Cmd {
 				switch m.focusIndex {
 				case 0:
 					m.focusIndex = 1
-					m.remoteType = remotetype.Github
+					m.remoteType = rt.Github
 					m.inputs[0].Placeholder = "https://github.com"
 					m.inputs[0].SetValue("https://github.com")
 
 				case 1:
 					m.focusIndex = 0
-					m.remoteType = remotetype.Gitlab
+					m.remoteType = rt.Gitlab
 					m.inputs[0].Placeholder = "https://gitlab.com"
 				}
 
