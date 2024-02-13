@@ -6,6 +6,7 @@ import (
 
 	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/remote/match"
+	rt "github.com/glad-dev/gin/remote/type"
 	"github.com/glad-dev/gin/repository"
 )
 
@@ -28,22 +29,28 @@ func getURLConfig(conf *configuration.Config, u *url.URL) (*match.Match, string)
 	// Check if we have a token
 	for _, r := range conf.Remotes {
 		if r.URL.Hostname() == u.Hostname() {
-			match, err := r.ToMatch()
+			m, err := r.ToMatch()
 			if err != nil {
 				break
 			}
 
-			return match, projectPath
+			return m, projectPath
 		}
 	}
 
 	// We found no match => Mock up a config
+	t := rt.Gitlab
+	if u.Host == "github.com" {
+		t = rt.Github
+	}
+
 	return &match.Match{
 		URL: url.URL{
 			Scheme: u.Scheme,
 			Host:   u.Hostname(),
 		},
 		Token:    "",
+		Type:     t,
 		Username: "",
 	}, projectPath
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote/match"
+	rt "github.com/glad-dev/gin/remote/type"
 	"github.com/glad-dev/gin/repository"
 )
 
@@ -73,12 +74,19 @@ func (config *Config) GetMatchingConfig(details []repository.Details) (*match.Ma
 				return m, detail.ProjectPath, nil
 			}
 		}
+
 	}
 
 	// No match => Mock up a config
+	t := rt.Gitlab
+	if details[0].URL.Host == "github.com" {
+		t = rt.Github
+	}
+
 	return &match.Match{
 		URL:      details[0].URL,
 		Token:    "",
+		Type:     t,
 		Username: "",
 	}, details[0].ProjectPath, nil
 }
