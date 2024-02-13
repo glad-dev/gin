@@ -22,7 +22,8 @@ func UpdateRemote() error {
 		for k, detail := range remote.Details {
 			// Check token's scope and update the username
 			d = detail
-			err = d.Init(&remote.URL)
+			// We can ignore the gosec linter since go 1.22 creates a new variable for each for-loop iteration.
+			err = d.Init(&remote.URL) // nolint: gosec
 			if err != nil {
 				invalid[remote.URL.String()] = append(invalid[remote.URL.String()], errorStruct{
 					tokenName: d.TokenName,

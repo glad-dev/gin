@@ -23,7 +23,8 @@ func VerifyTokens() error {
 	invalid := make(map[string][]errorStruct)
 	for _, remote := range config.Remotes {
 		for _, detail := range remote.Details {
-			_, err = detail.CheckTokenScope(&remote.URL)
+			// We can ignore the gosec linter since go 1.22 creates a new variable for each for-loop iteration.
+			_, err = detail.CheckTokenScope(&remote.URL) // nolint: gosec
 			if err != nil {
 				log.Error("Failed to check token scope.", "error", err, "URL", remote.URL.String())
 
