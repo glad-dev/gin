@@ -20,6 +20,7 @@ type Colors struct {
 
 func UpdateColors(c Colors, wrap *Config) error {
 	wrap.Colors = c
+
 	return write(wrap)
 }
 
