@@ -1,6 +1,7 @@
 package issues
 
 import (
+	remotetype "github.com/glad-dev/gin/remote/type"
 	"net/url"
 
 	"github.com/glad-dev/gin/configuration"
@@ -18,7 +19,7 @@ func QuerySingle(conf *configuration.Config, details []repository.Details, u *ur
 		return nil, err
 	}
 
-	if match.URL.Host == "github.com" {
+	if match.Type == remotetype.Github {
 		return discussion.QueryGitHub(match, projectPath, issueID)
 	}
 

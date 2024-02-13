@@ -1,6 +1,7 @@
 package issues
 
 import (
+	remotetype "github.com/glad-dev/gin/remote/type"
 	"net/url"
 
 	"github.com/glad-dev/gin/configuration"
@@ -19,7 +20,7 @@ func QueryList(conf *configuration.Config, details []repository.Details, u *url.
 		return nil, err
 	}
 
-	if match.URL.Host == "github.com" {
+	if match.Type == remotetype.Github {
 		return list.QueryGitHub(match, projectPath)
 	}
 
