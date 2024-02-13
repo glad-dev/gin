@@ -8,7 +8,7 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/configuration/location"
 )
 
 var logger *slog.Logger

@@ -4,12 +4,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/repository"
 )
 
-func getMatchingConfig(conf *config.Wrapper, details []repository.Details, u *url.URL) (*match.Match, string, error) {
+func getMatchingConfig(conf *configuration.Config, details []repository.Details, u *url.URL) (*match.Match, string, error) {
 	if u != nil {
 		lab, projectPath := getURLConfig(conf, u)
 
@@ -19,7 +19,7 @@ func getMatchingConfig(conf *config.Wrapper, details []repository.Details, u *ur
 	return conf.GetMatchingConfig(details)
 }
 
-func getURLConfig(conf *config.Wrapper, u *url.URL) (*match.Match, string) {
+func getURLConfig(conf *configuration.Config, u *url.URL) (*match.Match, string) {
 	// Get project path
 	projectPath := u.EscapedPath()
 	projectPath = strings.TrimPrefix(projectPath, "/")

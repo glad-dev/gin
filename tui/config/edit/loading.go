@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/style"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,11 +13,11 @@ import (
 
 func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
-		oldURL := m.edit.oldConfig.Remotes[m.edit.listIndex].URL.String()
+		oldURL := m.edit.originalConfig.Remotes[m.edit.listIndex].URL.String()
 
-		err := config.Update(m.edit.oldConfig, m.edit.listIndex, m.edit.detailsIndex, m.edit.inputs[0].Value(), m.edit.inputs[1].Value())
+		err := configuration.Update(m.edit.originalConfig, m.edit.listIndex, m.edit.detailsIndex, m.edit.inputs[0].Value(), m.edit.inputs[1].Value())
 		if err != nil {
-			if errors.Is(err, config.ErrUpdateSameValues) {
+			if errors.Is(err, configuration.ErrUpdateSameValues) {
 				return updateMsg{
 					str:     style.FormatQuitText("No need to update the config: No changes were made."),
 					success: true,

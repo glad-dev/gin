@@ -1,11 +1,11 @@
-package config
+package configuration
 
 import (
 	"errors"
 	"fmt"
 	"os"
 
-	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/configuration/location"
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
@@ -19,21 +19,21 @@ var ErrConfigDoesNotExist = errors.New("config does not exist")
 const ErrConfigDoesNotExistMsg = "No configuration exists.\nRun `gin config add` to add remotes"
 
 // Load returns the config located at '~/.config/gin/config.toml' if it exists. If it does not exist, function returns a
-// ErrConfigDoesNotExist error and an initialized Wrapper config.
-func Load() (*Wrapper, error) {
+// ErrConfigDoesNotExist error and an initialized Config.
+func Load() (*Config, error) {
 	fileLocation, err := location.Get()
 	if err != nil {
 		return nil, err
 	}
 
 	// Load config
-	wrap := &Wrapper{}
+	wrap := &Config{}
 	metaData, err := toml.DecodeFile(fileLocation, wrap)
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Info("Found no configuration file", "location", fileLocation)
 
-			return &Wrapper{
+			return &Config{
 				Remotes: []Remote{},
 				Version: constants.ConfigVersion,
 			}, ErrConfigDoesNotExist

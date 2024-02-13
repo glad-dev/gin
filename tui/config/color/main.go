@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/style/color"
@@ -17,7 +17,7 @@ import (
 
 // Config is the entry point of this TUI, which allows to configure the colors.
 func Config() {
-	wrapper, err := config.Load()
+	config, err := configuration.Load()
 	if err != nil {
 		style.PrintErrAndExit("Failed to load config: " + err.Error())
 	}
@@ -26,7 +26,7 @@ func Config() {
 
 	p := tea.NewProgram(model{
 		inputs:              getInputs(),
-		wrapper:             wrapper,
+		config:              config,
 		currentlyDisplaying: displayingColors,
 		state:               stateRunning,
 	})

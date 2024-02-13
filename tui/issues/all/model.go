@@ -3,7 +3,7 @@ package all
 import (
 	"fmt"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/issues"
 	"github.com/glad-dev/gin/issues/discussion"
 	"github.com/glad-dev/gin/style"
@@ -34,7 +34,7 @@ const (
 
 type model struct {
 	shared              *shared.Shared
-	conf                *config.Wrapper
+	conf                *configuration.Config
 	viewedIssues        map[string]discussion.Details
 	tabs                tabs
 	error               string

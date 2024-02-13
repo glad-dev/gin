@@ -3,7 +3,7 @@ package add
 import (
 	"fmt"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/style"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,7 +12,7 @@ import (
 
 func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
-		err := config.Append(m.inputs[0].Value(), m.inputs[1].Value(), m.remoteType)
+		err := configuration.Append(m.inputs[0].Value(), m.inputs[1].Value(), m.remoteType)
 		if err != nil {
 			return updateMsg{
 				str:     fmt.Sprintf("Could not add config: %s", err),

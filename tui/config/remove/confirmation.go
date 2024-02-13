@@ -26,8 +26,8 @@ func viewConfirmation(m *model) string {
 			lipgloss.NewStyle().Width(m.remotes.Width()).Align(lipgloss.Center, lipgloss.Center).Render(
 				fmt.Sprintf(
 					"Are you sure that you want to delete the token '%s' for %s?",
-					m.oldConfig.Remotes[m.remotes.Index()].Details[m.details.Index()].TokenName,
-					m.oldConfig.Remotes[m.remotes.Index()].URL.String(),
+					m.originalConfig.Remotes[m.remotes.Index()].Details[m.details.Index()].TokenName,
+					m.originalConfig.Remotes[m.remotes.Index()].URL.String(),
 				),
 			),
 			"\n",

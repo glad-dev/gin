@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"errors"
@@ -13,15 +13,15 @@ import (
 var ErrUpdateSameValues = errors.New("called update config with existing values")
 
 // Update updates the token/url and checks the token's validity.
-func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, token string) error {
-	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {
-		log.Error("Wrapper index is invalid.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
+func Update(config *Config, configIndex int, detailsIndex int, url string, token string) error {
+	if configIndex < 0 || configIndex >= len(config.Remotes) {
+		log.Error("Config index is invalid.", "index", configIndex, "len(remotes)", len(config.Remotes))
 
-		return errors.New("update: invalid wrapper index")
+		return errors.New("update: invalid config index")
 	}
 
-	if detailsIndex < 0 || detailsIndex >= len(wrapper.Remotes[wrapperIndex].Details) {
-		log.Error("Details index is invalid.", "index", detailsIndex, "len(details)", len(wrapper.Remotes[wrapperIndex].Details))
+	if detailsIndex < 0 || detailsIndex >= len(config.Remotes[configIndex].Details) {
+		log.Error("Details index is invalid.", "index", detailsIndex, "len(details)", len(config.Remotes[configIndex].Details))
 
 		return errors.New("update: invalid details index")
 	}
@@ -32,7 +32,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 	}
 
 	// Check if there are any changes
-	old := wrapper.Remotes[wrapperIndex]
+	old := config.Remotes[configIndex]
 	if old.URL == *u {
 		for _, detail := range old.Details {
 			if detail.Token == token {
@@ -60,7 +60,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 		return err
 	}
 
-	wrapper.Remotes[wrapperIndex].Details[detailsIndex] = rd
+	config.Remotes[configIndex].Details[detailsIndex] = rd
 
-	return write(wrapper)
+	return write(config)
 }

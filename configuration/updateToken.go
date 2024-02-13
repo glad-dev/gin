@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"errors"
@@ -6,25 +6,25 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/log"
-	"github.com/glad-dev/gin/remote"
+	r "github.com/glad-dev/gin/remote"
 )
 
 // UpdateRemote loads the configuration file and updates the username and token name associated with each token.
 func UpdateRemote() error {
-	wrapper, err := Load()
+	config, err := Load()
 	if err != nil {
 		return err
 	}
 
 	invalid := make(map[string][]errorStruct)
-	var d remote.Details
-	for i, config := range wrapper.Remotes {
-		for k, detail := range config.Details {
+	var d r.Details
+	for i, remote := range config.Remotes {
+		for k, detail := range remote.Details {
 			// Check token's scope and update the username
 			d = detail
-			err = d.Init(&config.URL)
+			err = d.Init(&remote.URL)
 			if err != nil {
-				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
+				invalid[remote.URL.String()] = append(invalid[remote.URL.String()], errorStruct{
 					tokenName: d.TokenName,
 					err:       err,
 				})
@@ -32,13 +32,13 @@ func UpdateRemote() error {
 				continue
 			}
 
-			config.Details[k] = d
+			remote.Details[k] = d
 		}
 
-		wrapper.Remotes[i] = config
+		config.Remotes[i] = remote
 	}
 
-	err = write(wrapper)
+	err = write(config)
 	if err != nil {
 		return fmt.Errorf("failed to write config: %w", err)
 	}

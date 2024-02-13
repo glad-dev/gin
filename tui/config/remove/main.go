@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
@@ -17,26 +17,26 @@ import (
 // Config is the entry point of this TUI, which allows to remove remotes.
 func Config() {
 	// Load current config
-	wrapper, err := config.Load()
+	config, err := configuration.Load()
 	if err != nil {
-		if errors.Is(err, config.ErrConfigDoesNotExist) {
-			style.PrintErrAndExit(config.ErrConfigDoesNotExistMsg)
+		if errors.Is(err, configuration.ErrConfigDoesNotExist) {
+			style.PrintErrAndExit(configuration.ErrConfigDoesNotExistMsg)
 		}
 
 		style.PrintErrAndExit("Failed to load the configuration: " + err.Error())
 	}
 
-	items := make([]list.Item, len(wrapper.Remotes))
-	for i := range wrapper.Remotes {
+	items := make([]list.Item, len(config.Remotes))
+	for i := range config.Remotes {
 		items[i] = shared.ListItem{
-			Remote: &wrapper.Remotes[i],
+			Remote: &config.Remotes[i],
 		}
 	}
 
 	p := tea.NewProgram(model{
-		remotes:   shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to delete?"),
-		details:   shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to delete?"),
-		oldConfig: *wrapper,
+		remotes:        shared.NewList(items, shared.ItemDelegate{}, "Which remote do you want to delete?"),
+		details:        shared.NewList([]list.Item{}, shared.DetailsItemDelegate{}, "Which token do you want to delete?"),
+		originalConfig: *config,
 	})
 
 	m, err := p.Run()

@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 
@@ -13,9 +13,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// ListItem is a list.Item and contains a *config.Remote.
+// ListItem is a list.Item and contains a *configuration.Remote.
 type ListItem struct {
-	Remote *config.Remote
+	Remote *configuration.Remote
 }
 
 // FilterValue is required for ListItem to be a list.Item.

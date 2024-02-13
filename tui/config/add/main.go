@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
@@ -15,7 +15,7 @@ import (
 
 // Config is the entry point of this TUI, which allows to add new remotes.
 func Config() {
-	_, _ = config.Load() // To load the colors
+	_, _ = configuration.Load() // To load the colors
 
 	p := tea.NewProgram(model{
 		inputs:              shared.GetTextInputs(),

@@ -3,7 +3,7 @@ package remove
 import (
 	"fmt"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
 
@@ -33,7 +33,7 @@ type model struct {
 	remotes             list.Model
 	details             list.Model
 	text                string
-	oldConfig           config.Wrapper
+	originalConfig      configuration.Config
 	confirmPosition     int
 	currentlyDisplaying displaying
 	state               state
@@ -123,7 +123,7 @@ func submit(m *model) (string, bool) {
 
 	tokenName := selected.Remote.Details[m.details.Index()].TokenName
 
-	err := config.Remove(&m.oldConfig, m.remotes.Index(), m.details.Index())
+	err := configuration.Remove(&m.originalConfig, m.remotes.Index(), m.details.Index())
 	if err != nil {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}

@@ -1,7 +1,7 @@
 package edit
 
 import (
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
@@ -11,13 +11,13 @@ import (
 )
 
 type editModel struct {
-	oldConfig    *config.Wrapper
-	inputs       []textinput.Model
-	focusIndex   int
-	listIndex    int
-	detailsIndex int
-	width        int
-	height       int
+	originalConfig *configuration.Config
+	inputs         []textinput.Model
+	focusIndex     int
+	listIndex      int
+	detailsIndex   int
+	width          int
+	height         int
 }
 
 func (m *editModel) init(match *match.Match, listIndex int, detailsIndex int) {

@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"errors"
@@ -10,15 +10,15 @@ import (
 	"github.com/glad-dev/gin/repository"
 )
 
-// Wrapper contains the Colors configurations, a Version number and a list of Remotes.
-type Wrapper struct {
+// Config contains the Colors configurations, a Version number and a list of Remotes.
+type Config struct {
 	Colors  Colors
 	Remotes []Remote
 	Version uint8
 }
 
-// CheckValidity checks if the wrapper is valid. It checks the wrapper's version number, colors, and remotes.
-func (config *Wrapper) CheckValidity() error {
+// CheckValidity checks if the config is valid. It checks the config's version number, colors, and remotes.
+func (config *Config) CheckValidity() error {
 	if len(config.Remotes) == 0 {
 		log.Error("Config does not contain any remotes.")
 
@@ -53,9 +53,9 @@ func (config *Wrapper) CheckValidity() error {
 	return nil
 }
 
-// GetMatchingConfig searches the wrapper's Remotes and returns a remote.Match if a Remote has the same  URL as one of
+// GetMatchingConfig searches the config's Remotes and returns a remote.Match if a Remote has the same  URL as one of
 // the passed repository.Details.
-func (config *Wrapper) GetMatchingConfig(details []repository.Details) (*match.Match, string, error) {
+func (config *Config) GetMatchingConfig(details []repository.Details) (*match.Match, string, error) {
 	if len(details) == 0 {
 		log.Error("No details passed.")
 
@@ -63,9 +63,9 @@ func (config *Wrapper) GetMatchingConfig(details []repository.Details) (*match.M
 	}
 
 	for _, detail := range details {
-		for _, conf := range config.Remotes {
-			if conf.URL.Host == detail.URL.Host {
-				m, err := conf.ToMatch()
+		for _, remote := range config.Remotes {
+			if remote.URL.Host == detail.URL.Host {
+				m, err := remote.ToMatch()
 				if err != nil {
 					return nil, "", err
 				}

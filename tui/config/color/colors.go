@@ -1,7 +1,7 @@
 package color
 
 import (
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 
 	"github.com/glad-dev/gin/style"
 
@@ -103,7 +103,7 @@ func viewAdd(m *model) string {
 }
 
 func submit(m *model) tea.Cmd {
-	c := config.Colors{
+	c := configuration.Colors{
 		Blurred: m.inputs[0].Value(),
 		Border:  m.inputs[1].Value(),
 		Focused: m.inputs[2].Value(),
@@ -117,7 +117,7 @@ func submit(m *model) tea.Cmd {
 		return nil
 	}
 
-	err = config.UpdateColors(c, m.wrapper)
+	err = configuration.UpdateColors(c, m.config)
 	if err != nil {
 		m.text = style.FormatQuitText("Failed to write config: " + err.Error())
 		m.text = err.Error()

@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"errors"
@@ -15,19 +15,19 @@ type errorStruct struct {
 
 // VerifyTokens loads the configuration file and checks if every token is valid.
 func VerifyTokens() error {
-	wrapper, err := Load()
+	config, err := Load()
 	if err != nil {
 		return err
 	}
 
 	invalid := make(map[string][]errorStruct)
-	for _, config := range wrapper.Remotes {
-		for _, detail := range config.Details {
-			_, err = detail.CheckTokenScope(&config.URL)
+	for _, remote := range config.Remotes {
+		for _, detail := range remote.Details {
+			_, err = detail.CheckTokenScope(&remote.URL)
 			if err != nil {
-				log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
+				log.Error("Failed to check token scope.", "error", err, "URL", remote.URL.String())
 
-				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
+				invalid[remote.URL.String()] = append(invalid[remote.URL.String()], errorStruct{
 					tokenName: detail.TokenName,
 					err:       err,
 				})

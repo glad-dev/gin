@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/add"
@@ -30,10 +30,10 @@ func newCmdConfig() *cobra.Command {
 		Long:  "View a list of all existing remotes",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.List()
+			err := configuration.List()
 			if err != nil {
-				if errors.Is(err, config.ErrConfigDoesNotExist) {
-					style.PrintErrAndExit(config.ErrConfigDoesNotExistMsg)
+				if errors.Is(err, configuration.ErrConfigDoesNotExist) {
+					style.PrintErrAndExit(configuration.ErrConfigDoesNotExistMsg)
 				}
 
 				style.PrintErrAndExit("An error occurred while attempting to list the configuration: " + err.Error())
@@ -81,7 +81,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "Check the validity of all stored tokens",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.VerifyTokens()
+			err := configuration.VerifyTokens()
 			if err != nil {
 				style.PrintErrAndExit(err.Error())
 			}
@@ -96,7 +96,7 @@ func newCmdConfig() *cobra.Command {
 		Long:  "Update the username and token names if they changed",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := config.UpdateRemote()
+			err := configuration.UpdateRemote()
 			if err != nil {
 				style.PrintErrAndExit(err.Error())
 			}

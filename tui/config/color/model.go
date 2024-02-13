@@ -1,7 +1,7 @@
 package color
 
 import (
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -26,7 +26,7 @@ const (
 )
 
 type model struct {
-	wrapper             *config.Wrapper
+	config              *configuration.Config
 	text                string
 	inputs              []textinput.Model
 	width               int

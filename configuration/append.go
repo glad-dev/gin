@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 // If no configuration file exists, a new one will be created.
 func Append(urlStr string, token string, remoteType remotetype.Type) error {
 	// Load current config
-	wrapper, err := Load()
+	config, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
 		// Config exists, but there was some other error
 		log.Error("Failed to load config", "error", err)
@@ -29,7 +29,7 @@ func Append(urlStr string, token string, remoteType remotetype.Type) error {
 
 	// Check if a configuration with the same username and token already exists
 	configLocation := -1
-	for i, config := range wrapper.Remotes {
+	for i, config := range config.Remotes {
 		if config.URL == *u {
 			configLocation = i
 
@@ -56,15 +56,15 @@ func Append(urlStr string, token string, remoteType remotetype.Type) error {
 	// Add new config
 	if configLocation == -1 {
 		// Config with given URL does not yet exist
-		wrapper.Remotes = append(wrapper.Remotes, Remote{
+		config.Remotes = append(config.Remotes, Remote{
 			URL:     *u,
 			Details: []remote.Details{rd},
 		})
 	} else {
 		// Config with given URL exists
-		wrapper.Remotes[configLocation].Details = append(wrapper.Remotes[configLocation].Details, rd)
+		config.Remotes[configLocation].Details = append(config.Remotes[configLocation].Details, rd)
 	}
 
 	// write back
-	return write(wrapper)
+	return write(config)
 }

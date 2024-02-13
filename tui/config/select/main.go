@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/glad-dev/gin/config"
+	"github.com/glad-dev/gin/configuration"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/style"
 
@@ -15,7 +15,7 @@ import (
 var ErrUserQuit = errors.New("user quit selection program")
 
 // Select is the entry point of this TUI, which allows the user to choose a remote if more than one exists.
-func Select(selectedRemote *config.Remote, title string) (*remote.Details, error) {
+func Select(selectedRemote *configuration.Remote, title string) (*remote.Details, error) {
 	items := make([]list.Item, len(selectedRemote.Details))
 	for i := range selectedRemote.Details {
 		items[i] = itemWrapper{

@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/glad-dev/gin/config/location"
+	"github.com/glad-dev/gin/configuration/location"
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/log"
 
