@@ -9,12 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/glad-dev/gin/remote/match"
-
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
+	"github.com/glad-dev/gin/remote/match"
 
-	"github.com/google/go-github/v52/github"
+	"github.com/google/go-github/v59/github"
 	"golang.org/x/oauth2"
 )
 
