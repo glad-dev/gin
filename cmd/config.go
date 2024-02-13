@@ -29,7 +29,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "List all remotes",
 		Long:  "View a list of all existing remotes",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			err := configuration.List()
 			if err != nil {
 				if errors.Is(err, configuration.ErrConfigDoesNotExist) {
@@ -52,7 +52,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "Add a new remote",
 		Long:  addDesc,
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			add.Config()
 		},
 	}
@@ -62,7 +62,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "Remove a remote",
 		Long:  "Remove a remote and its API token from the local storage",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			remove.Config()
 		},
 	}
@@ -71,7 +71,7 @@ func newCmdConfig() *cobra.Command {
 		Use:   "edit",
 		Short: "Edit the configuration of an existing remote",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			edit.Config()
 		},
 	}
@@ -80,7 +80,7 @@ func newCmdConfig() *cobra.Command {
 		Use:   "verify",
 		Short: "Check the validity of all stored tokens",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			err := configuration.VerifyTokens()
 			if err != nil {
 				style.PrintErrAndExit(err.Error())
@@ -95,7 +95,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "Update the username and token names",
 		Long:  "Update the username and token names if they changed",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			err := configuration.UpdateRemote()
 			if err != nil {
 				style.PrintErrAndExit(err.Error())
@@ -110,7 +110,7 @@ func newCmdConfig() *cobra.Command {
 		Short: "Update the colors",
 		Long:  "Update the colors. Delete the input field to revert back to the default color.",
 		Args:  cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			color.Config()
 		},
 	}
