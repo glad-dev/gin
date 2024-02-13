@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	remotetype "github.com/glad-dev/gin/remote/type"
 )
@@ -15,14 +15,14 @@ func Append(urlStr string, token string, remoteType remotetype.Type) error {
 	wrapper, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
 		// Config exists, but there was some other error
-		logger.Log.Error("Failed to load config", "error", err)
+		log.Error("Failed to load config", "error", err)
 
 		return err
 	}
 
 	u, err := checkURLStr(urlStr)
 	if err != nil {
-		logger.Log.Error("URL is invalid.", "error", err, "url", urlStr)
+		log.Error("URL is invalid.", "error", err, "url", urlStr)
 
 		return err
 	}
@@ -48,7 +48,7 @@ func Append(urlStr string, token string, remoteType remotetype.Type) error {
 
 	err = rd.Init(u)
 	if err != nil {
-		logger.Log.Error("Failed to initialize token", "error", err)
+		log.Error("Failed to initialize token", "error", err)
 
 		return err
 	}

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/issues"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -27,7 +27,7 @@ func initList(m *model, msg *allIssuesUpdateMsg) (tea.Model, tea.Cmd) {
 			item.issue.Title = "[closed] " + item.issue.Title
 			all = append(all, item)
 		default:
-			logger.Log.Warn("Got item with unknown state", "state", item.issue.State)
+			log.Warn("Got item with unknown state", "state", item.issue.State)
 			all = append(all, item)
 		}
 	}

@@ -5,20 +5,20 @@ import (
 	"os"
 
 	"github.com/glad-dev/gin/config/location"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 )
 
 // Remove removes the token/url combination at the passed indices.
 func Remove(wrapper *Wrapper, wrapperIndex int, detailsIndex int) error {
 	// Check if index is valid
 	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {
-		logger.Log.Error("Invalid wrapper index.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
+		log.Error("Invalid wrapper index.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
 
 		return errors.New("invalid wrapper index")
 	}
 
 	if detailsIndex < 0 || detailsIndex >= len(wrapper.Remotes[wrapperIndex].Details) {
-		logger.Log.Error("Invalid details index.", "index", detailsIndex, "len(remotes.Details)", len(wrapper.Remotes[wrapperIndex].Details))
+		log.Error("Invalid details index.", "index", detailsIndex, "len(remotes.Details)", len(wrapper.Remotes[wrapperIndex].Details))
 
 		return errors.New("invalid details index")
 	}

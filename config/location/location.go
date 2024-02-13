@@ -1,7 +1,7 @@
 package location
 
 import (
-	"log" // We can't use out logger since that would lead to an import cycle
+	"log" // We can't use our log since that would lead to an import cycle
 	"os"
 	"os/user"
 	"path"

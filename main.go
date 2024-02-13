@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/glad-dev/gin/cmd"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 )
 
 func main() {
-	logger.Init()
+	log.Init()
 
 	err := cmd.Execute()
 	if err != nil {

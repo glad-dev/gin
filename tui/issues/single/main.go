@@ -3,7 +3,7 @@ package single
 import (
 	"net/url"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/repo"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/issues/shared"
@@ -16,7 +16,7 @@ import (
 func Show(details []repo.Details, u *url.URL, issueID string) {
 	conf, err := shared.SelectConfig(details, u)
 	if err != nil {
-		logger.Log.Error("Failed to select config", "error", err)
+		log.Error("Failed to select config", "error", err)
 
 		style.PrintErrAndExit("Failed to select config: " + err.Error())
 	}

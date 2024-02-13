@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/glad-dev/gin/constants"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote/match"
 	"github.com/glad-dev/gin/repo"
 )
@@ -20,14 +20,14 @@ type Wrapper struct {
 // CheckValidity checks if the wrapper is valid. It checks the wrapper's version number, colors, and remotes.
 func (config *Wrapper) CheckValidity() error {
 	if len(config.Remotes) == 0 {
-		logger.Log.Error("Config does not contain any remotes.")
+		log.Error("Config does not contain any remotes.")
 
 		return errors.New("config file does not contain remotes")
 	}
 
 	// Check version
 	if config.Version > constants.ConfigVersion {
-		logger.Log.Error("Config has newer version than the program.", "configVersion", config.Version, "expectedVersion", constants.ConfigVersion)
+		log.Error("Config has newer version than the program.", "configVersion", config.Version, "expectedVersion", constants.ConfigVersion)
 
 		return fmt.Errorf("config was written by a newer version of the tool")
 	}
@@ -36,7 +36,7 @@ func (config *Wrapper) CheckValidity() error {
 	for _, r := range config.Remotes {
 		err := r.checkSemantics()
 		if err != nil {
-			logger.Log.Error("Invalid remote.", "error", err, "remote", r)
+			log.Error("Invalid remote.", "error", err, "remote", r)
 
 			return err
 		}
@@ -45,7 +45,7 @@ func (config *Wrapper) CheckValidity() error {
 	// Check colors
 	err := config.Colors.CheckValidity()
 	if err != nil {
-		logger.Log.Error("")
+		log.Error("")
 
 		return err
 	}
@@ -57,7 +57,7 @@ func (config *Wrapper) CheckValidity() error {
 // the passed repo.Details.
 func (config *Wrapper) GetMatchingConfig(details []repo.Details) (*match.Match, string, error) {
 	if len(details) == 0 {
-		logger.Log.Error("No details passed.")
+		log.Error("No details passed.")
 
 		return nil, "", errors.New("no details passed")
 	}

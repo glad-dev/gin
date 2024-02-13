@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -39,7 +39,7 @@ func (d DetailsItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return n
 func (d DetailsItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	i, ok := item.(DetailItem)
 	if !ok {
-		logger.Log.Error("Got item that is not a DetailItem.", "item", item)
+		log.Error("Got item that is not a DetailItem.", "item", item)
 
 		return
 	}

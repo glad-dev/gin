@@ -5,7 +5,7 @@ import (
 
 	"github.com/glad-dev/gin/config"
 	"github.com/glad-dev/gin/issues/discussion"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/repo"
 )
 
@@ -13,7 +13,7 @@ import (
 func QuerySingle(conf *config.Wrapper, details []repo.Details, u *url.URL, issueID string) (*discussion.Details, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
-		logger.Log.Error("Failed to get matching config", "error", err)
+		log.Error("Failed to get matching config", "error", err)
 
 		return nil, err
 	}

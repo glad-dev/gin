@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/glad-dev/gin/constants"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -14,7 +14,7 @@ import (
 func CheckTokenScope(token string, apiURL string) (string, error) {
 	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(apiURL))
 	if err != nil {
-		logger.Log.Error("Creating gitlab client",
+		log.Error("Creating gitlab client",
 			"error", err,
 			"API-URL", apiURL,
 		)
@@ -24,7 +24,7 @@ func CheckTokenScope(token string, apiURL string) (string, error) {
 
 	tokenDetails, _, err := client.PersonalAccessTokens.GetSinglePersonalAccessToken()
 	if err != nil {
-		logger.Log.Error("Requesting personal access token",
+		log.Error("Requesting personal access token",
 			"error", err,
 			"API-URL", apiURL,
 		)

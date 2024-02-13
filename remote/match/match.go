@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	remotetype "github.com/glad-dev/gin/remote/type"
 
 	"github.com/shurcooL/graphql"
@@ -33,7 +33,7 @@ func (m *Match) GraphqlClient() (*graphql.Client, error) {
 
 	apiURL, err := m.Type.GraphqlAPIURL(&m.URL)
 	if err != nil {
-		logger.Log.Error("Failed to get API URL", "error", err, "match-url", m.URL.String())
+		log.Error("Failed to get API URL", "error", err, "match-url", m.URL.String())
 
 		return nil, fmt.Errorf("invalid API url: %w", err)
 	}

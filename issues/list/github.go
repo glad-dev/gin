@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
 
@@ -54,7 +54,7 @@ type followingQuery struct { // Needed since GitHub considers an empty "after" t
 func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
-		logger.Log.Error("Project path is invalid", "path", projectPath)
+		log.Error("Project path is invalid", "path", projectPath)
 
 		return nil, errors.New("invalid project path")
 	}
@@ -71,7 +71,7 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 		"name":  graphql.String(tmp[1]),
 	})
 	if err != nil {
-		logger.Log.Error("First GitHub query failed", "error", err)
+		log.Error("First GitHub query failed", "error", err)
 
 		return nil, fmt.Errorf("query failed: %w", err)
 	}
@@ -93,7 +93,7 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 			"after": cursor,
 		})
 		if err != nil {
-			logger.Log.Error("GitHub query failed", "error", err)
+			log.Error("GitHub query failed", "error", err)
 
 			return nil, fmt.Errorf("query failed: %w", err)
 		}
@@ -122,12 +122,12 @@ func flatten(issues issuesStruct) []Issue {
 
 		creationTime, err := time.Parse(timeLayout, string(issue.CreatedAt))
 		if err != nil {
-			logger.Log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
+			log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
 		}
 
 		updateTime, err := time.Parse(timeLayout, string(issue.UpdatedAt))
 		if err != nil {
-			logger.Log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
+			log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
 		}
 
 		lst = append(lst, Issue{

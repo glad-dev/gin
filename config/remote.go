@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
 )
@@ -20,7 +20,7 @@ type Remote struct {
 // or more than one Details.
 func (r *Remote) ToMatch() (*match.Match, error) {
 	if len(r.Details) == 0 {
-		logger.Log.Error("Remote contains no details.")
+		log.Error("Remote contains no details.")
 
 		return nil, errors.New("failed to convert Remote to Match since Remote.Details contains no elements")
 	}
@@ -35,7 +35,7 @@ func (r *Remote) ToMatch() (*match.Match, error) {
 		}, nil
 	}
 
-	logger.Log.Info("Got a remote with multiple details.")
+	log.Info("Got a remote with multiple details.")
 
 	return &match.Match{
 		URL: r.URL,
@@ -45,7 +45,7 @@ func (r *Remote) ToMatch() (*match.Match, error) {
 // ToMatchAtIndex casts the remote at index to a remote.Match.
 func (r *Remote) ToMatchAtIndex(index int) (*match.Match, error) {
 	if index < 0 || index >= len(r.Details) {
-		logger.Log.Error("Invalid index.", "index", index, "len(details)", len(r.Details))
+		log.Error("Invalid index.", "index", index, "len(details)", len(r.Details))
 
 		return nil, errors.New("ToMatchAtIndex: invalid index")
 	}

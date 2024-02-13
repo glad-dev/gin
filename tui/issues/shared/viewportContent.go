@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/issues/discussion"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/charmbracelet/glamour"
@@ -34,7 +34,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		markdownOptions...,
 	)
 	if err != nil {
-		logger.Log.Error("Failed to create markdown renderer", "error", err.Error())
+		log.Error("Failed to create markdown renderer", "error", err.Error())
 
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
@@ -46,7 +46,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		markdownOptions...,
 	)
 	if err != nil {
-		logger.Log.Error("Failed to create markdown renderer", "error", err.Error())
+		log.Error("Failed to create markdown renderer", "error", err.Error())
 
 		return style.FormatQuitText("Failed to create markdown renderer: " + err.Error())
 	}
@@ -54,7 +54,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 
 	desc, err := markdownOuter.Render(details.Description)
 	if err != nil {
-		logger.Log.Error("Failed to render description.", "error", err, "input", details.Description)
+		log.Error("Failed to render description.", "error", err, "input", details.Description)
 
 		return style.FormatQuitText("Failed to render markdown: " + err.Error())
 	}
@@ -81,7 +81,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 	for _, comment := range details.Discussion {
 		commentBody, err = markdownOuter.Render(comment.Body)
 		if err != nil {
-			logger.Log.Error("Failed to render comment.", "error", err, "input", details.Description)
+			log.Error("Failed to render comment.", "error", err, "input", details.Description)
 
 			return style.FormatQuitText("Failed to render markdown: " + err.Error())
 		}
@@ -101,7 +101,7 @@ func PrettyPrintIssue(details *discussion.Details, width int, height int) string
 		for i, innerComment := range comment.Comments {
 			commentBody, err = markdownInner.Render(innerComment.Body)
 			if err != nil {
-				logger.Log.Error("Failed to render inner comment.", "error", err, "input", details.Description)
+				log.Error("Failed to render inner comment.", "error", err, "input", details.Description)
 
 				return style.FormatQuitText("Failed to render markdown: " + err.Error())
 			}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/glad-dev/gin/config/location"
 	"github.com/glad-dev/gin/constants"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 
 	"github.com/BurntSushi/toml"
@@ -31,7 +31,7 @@ func Load() (*Wrapper, error) {
 	metaData, err := toml.DecodeFile(fileLocation, wrap)
 	if err != nil {
 		if os.IsNotExist(err) {
-			logger.Log.Info("Found no configuration file", "location", fileLocation)
+			log.Info("Found no configuration file", "location", fileLocation)
 
 			return &Wrapper{
 				Remotes: []Remote{},
@@ -39,14 +39,14 @@ func Load() (*Wrapper, error) {
 			}, ErrConfigDoesNotExist
 		}
 
-		logger.Log.Error("toml decode failed", "error", err)
+		log.Error("toml decode failed", "error", err)
 
 		return nil, fmt.Errorf("could not decode config: %w", err)
 	}
 
 	// Check if the config only contains the keys we expect
 	if len(metaData.Undecoded()) > 0 {
-		logger.Log.Error("Config contains unexpected keys.", "invalidKeys", metaData.Undecoded())
+		log.Error("Config contains unexpected keys.", "invalidKeys", metaData.Undecoded())
 
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
 	}

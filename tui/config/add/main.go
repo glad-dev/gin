@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/config"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/tui/config/shared"
 	"github.com/glad-dev/gin/tui/widgets"
@@ -36,7 +36,7 @@ func Config() {
 
 	switch r.state { //nolint:exhaustive
 	case exitFailure:
-		logger.Log.Error(strings.TrimSpace(r.text))
+		log.Error(strings.TrimSpace(r.text))
 		style.PrintErrAndExit(strings.TrimSpace(r.text))
 
 	case exitSuccess:

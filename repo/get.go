@@ -5,8 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/glad-dev/gin/logger"
-
+	"github.com/glad-dev/gin/log"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -20,31 +19,31 @@ type Details struct {
 func Get(path string) ([]Details, error) {
 	r, err := git.PlainOpen(path)
 	if err != nil {
-		logger.Log.Error("Failed to open repository.", "error", err, "path", path)
+		log.Error("Failed to open repository.", "error", err, "path", path)
 
 		return nil, err
 	}
 
 	remotes, err := r.Remotes()
 	if err != nil {
-		logger.Log.Error("Failed to get remotes.", "error", err, "path", path)
+		log.Error("Failed to get remotes.", "error", err, "path", path)
 
 		return nil, err
 	}
 
 	if len(remotes) == 0 {
-		logger.Log.Error("Repository does not contains any remotes.", "path", path)
+		log.Error("Repository does not contains any remotes.", "path", path)
 
 		return nil, errors.New("repository does not contain any remotes")
 	} else if len(remotes) > 1 {
-		logger.Log.Error("Repository contains multiple remotes.", "path", path)
+		log.Error("Repository contains multiple remotes.", "path", path)
 	}
 
 	repos := make([]Details, 0)
 	for _, remote := range remotes {
 		for _, origin := range remote.Config().URLs {
 			if !strings.HasPrefix(origin, "git@") {
-				logger.Log.Error("Origin does have 'git@' prefix.", "origin", origin)
+				log.Error("Origin does have 'git@' prefix.", "origin", origin)
 
 				return nil, errors.New("origin does have 'git@' prefix")
 			}
@@ -55,14 +54,14 @@ func Get(path string) ([]Details, error) {
 			}
 
 			if strings.Count(origin, ":") != 1 {
-				logger.Log.Error("Origin has invalid amount of ':'.", "origin", origin)
+				log.Error("Origin has invalid amount of ':'.", "origin", origin)
 
 				return nil, errors.New("origin contains an invalid amount of ':'")
 			}
 
 			u, err := url.Parse(origin[len("git@") : len(origin)-suffixLength])
 			if err != nil {
-				logger.Log.Error("Failed to parse the git URL.", "error", err, "url", origin[len("git@"):len(origin)-len(".git")])
+				log.Error("Failed to parse the git URL.", "error", err, "url", origin[len("git@"):len(origin)-len(".git")])
 
 				return nil, err
 			}

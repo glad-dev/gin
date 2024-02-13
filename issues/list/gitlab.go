@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
 
@@ -58,7 +58,7 @@ func QueryGitLab(match *match.Match, projectPath string) ([]Issue, error) {
 			"cursor": cursor,
 		})
 		if err != nil {
-			logger.Log.Error("Requesting issues", "error", err, "projectPath", projectPath)
+			log.Error("Requesting issues", "error", err, "projectPath", projectPath)
 
 			return nil, fmt.Errorf("requesting issues: %w", err)
 		}
@@ -74,12 +74,12 @@ func QueryGitLab(match *match.Match, projectPath string) ([]Issue, error) {
 
 			creationTime, err := time.Parse(timeLayout, string(issue.CreatedAt))
 			if err != nil {
-				logger.Log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
+				log.Warn("failed to parse creation time", "time", string(issue.CreatedAt), "error", err)
 			}
 
 			updateTime, err := time.Parse(timeLayout, string(issue.UpdatedAt))
 			if err != nil {
-				logger.Log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
+				log.Warn("failed to parse update time", "time", string(issue.UpdatedAt), "error", err)
 			}
 
 			issueList = append(issueList, Issue{

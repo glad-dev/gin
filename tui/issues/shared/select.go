@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/glad-dev/gin/config"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/repo"
 	selection "github.com/glad-dev/gin/tui/config/select"
@@ -38,7 +38,7 @@ func selectConfigForURL(u *url.URL) (*config.Wrapper, error) {
 		}
 	}
 
-	logger.Log.Info("Found no matching config", "URL", u.String())
+	log.Info("Found no matching config", "URL", u.String())
 
 	return &config.Wrapper{
 		Remotes: []config.Remote{},
@@ -65,7 +65,7 @@ func selectConfigForLocal(details []repo.Details) (*config.Wrapper, error) {
 		}
 	}
 
-	logger.Log.Info("Found no matching config", "details", details)
+	log.Info("Found no matching config", "details", details)
 
 	return &config.Wrapper{
 		Remotes: []config.Remote{},

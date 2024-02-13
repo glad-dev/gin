@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/glad-dev/gin/config"
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/style"
 	"github.com/glad-dev/gin/style/color"
 
@@ -37,7 +37,7 @@ func Config() {
 	}
 
 	if r, ok := m.(model); ok && r.state == exitFailure {
-		logger.Log.Error(strings.TrimSpace(r.text))
+		log.Error(strings.TrimSpace(r.text))
 		os.Exit(1)
 	}
 }

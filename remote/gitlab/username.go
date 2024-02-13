@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote/match"
 	remotetype "github.com/glad-dev/gin/remote/type"
 
-	"github.com/glad-dev/gin/logger"
 	"github.com/shurcooL/graphql"
 )
 
@@ -28,7 +28,7 @@ func getUsername(token string, u *url.URL) (string, error) {
 
 	client, err := m.GraphqlClient()
 	if err != nil {
-		logger.Log.Error("Creating gitlab client",
+		log.Error("Creating gitlab client",
 			"error", err,
 			"API-URL", u,
 		)
@@ -39,7 +39,7 @@ func getUsername(token string, u *url.URL) (string, error) {
 	q := &queryUsername{}
 	err = client.Query(context.Background(), q, nil)
 	if err != nil {
-		logger.Log.Error("Querying username",
+		log.Error("Querying username",
 			"error", err,
 		)
 

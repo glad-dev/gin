@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
+
 	"github.com/shurcooL/graphql"
 )
 
@@ -78,19 +79,19 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 	})
 
 	if err != nil {
-		logger.Log.Error("Requesting discussion", "error", err, "projectPath", projectPath, "issueID", issueID)
+		log.Error("Requesting discussion", "error", err, "projectPath", projectPath, "issueID", issueID)
 
 		return nil, fmt.Errorf("requesting discussion: %w", err)
 	}
 
 	creationTime, err := time.Parse(timeLayout, string(q.Project.Issue.CreatedAt))
 	if err != nil {
-		logger.Log.Warn("failed to parse creation time", "time", string(q.Project.Issue.CreatedAt), "error", err)
+		log.Warn("failed to parse creation time", "time", string(q.Project.Issue.CreatedAt), "error", err)
 	}
 
 	updateTime, err := time.Parse(timeLayout, string(q.Project.Issue.UpdatedAt))
 	if err != nil {
-		logger.Log.Warn("failed to parse update time", "time", string(q.Project.Issue.UpdatedAt), "error", err)
+		log.Warn("failed to parse update time", "time", string(q.Project.Issue.UpdatedAt), "error", err)
 	}
 
 	issueDetails := Details{
@@ -134,7 +135,7 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 	for _, node := range q.Project.Issue.Discussions.Nodes {
 		inner := node.Notes.Nodes
 		if len(inner) == 0 {
-			logger.Log.Info("Discussion without nodes", "response", q)
+			log.Info("Discussion without nodes", "response", q)
 
 			continue
 		}
@@ -145,12 +146,12 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 
 		creationTime, err = time.Parse(timeLayout, string(inner[0].CreatedAt))
 		if err != nil {
-			logger.Log.Warn("failed to parse creation time", "time", string(inner[0].CreatedAt), "error", err)
+			log.Warn("failed to parse creation time", "time", string(inner[0].CreatedAt), "error", err)
 		}
 
 		updateTime, err = time.Parse(timeLayout, string(inner[0].UpdatedAt))
 		if err != nil {
-			logger.Log.Warn("failed to parse update time", "time", string(inner[0].UpdatedAt), "error", err)
+			log.Warn("failed to parse update time", "time", string(inner[0].UpdatedAt), "error", err)
 		}
 
 		comment := Comment{
@@ -173,12 +174,12 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 		for _, subComment := range inner[1:] {
 			creationTime, err = time.Parse(timeLayout, string(subComment.CreatedAt))
 			if err != nil {
-				logger.Log.Warn("failed to parse creation time", "time", string(subComment.CreatedAt), "error", err)
+				log.Warn("failed to parse creation time", "time", string(subComment.CreatedAt), "error", err)
 			}
 
 			updateTime, err = time.Parse(timeLayout, string(subComment.UpdatedAt))
 			if err != nil {
-				logger.Log.Warn("failed to parse update time", "time", string(subComment.UpdatedAt), "error", err)
+				log.Warn("failed to parse update time", "time", string(subComment.UpdatedAt), "error", err)
 			}
 
 			comment.Comments = append(comment.Comments, Comment{

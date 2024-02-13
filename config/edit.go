@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	remotetype "github.com/glad-dev/gin/remote/type"
 )
@@ -15,13 +15,13 @@ var ErrUpdateSameValues = errors.New("called update config with existing values"
 // Update updates the token/url and checks the token's validity.
 func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, token string) error {
 	if wrapperIndex < 0 || wrapperIndex >= len(wrapper.Remotes) {
-		logger.Log.Error("Wrapper index is invalid.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
+		log.Error("Wrapper index is invalid.", "index", wrapperIndex, "len(remotes)", len(wrapper.Remotes))
 
 		return errors.New("update: invalid wrapper index")
 	}
 
 	if detailsIndex < 0 || detailsIndex >= len(wrapper.Remotes[wrapperIndex].Details) {
-		logger.Log.Error("Details index is invalid.", "index", detailsIndex, "len(details)", len(wrapper.Remotes[wrapperIndex].Details))
+		log.Error("Details index is invalid.", "index", detailsIndex, "len(details)", len(wrapper.Remotes[wrapperIndex].Details))
 
 		return errors.New("update: invalid details index")
 	}
@@ -36,7 +36,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 	if old.URL == *u {
 		for _, detail := range old.Details {
 			if detail.Token == token {
-				logger.Log.Warn("Attempted to update the remote '%s' with the same token", u.String())
+				log.Warn("Attempted to update the remote '%s' with the same token", u.String())
 
 				return ErrUpdateSameValues
 			}
@@ -55,7 +55,7 @@ func Update(wrapper *Wrapper, wrapperIndex int, detailsIndex int, url string, to
 
 	err = rd.Init(u)
 	if err != nil {
-		logger.Log.Error("Failed to initialize token", "error", err)
+		log.Error("Failed to initialize token", "error", err)
 
 		return err
 	}

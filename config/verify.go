@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 )
 
 type errorStruct struct {
@@ -25,7 +25,7 @@ func VerifyTokens() error {
 		for _, detail := range config.Details {
 			_, err = detail.CheckTokenScope(&config.URL)
 			if err != nil {
-				logger.Log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
+				log.Error("Failed to check token scope.", "error", err, "URL", config.URL.String())
 
 				invalid[config.URL.String()] = append(invalid[config.URL.String()], errorStruct{
 					tokenName: detail.TokenName,
@@ -51,7 +51,7 @@ func VerifyTokens() error {
 		}
 	}
 
-	logger.Log.Error("Not all tokens could be verified.", "error", out)
+	log.Error("Not all tokens could be verified.", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }

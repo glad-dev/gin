@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 )
 
@@ -60,7 +60,7 @@ func UpdateRemote() error {
 		}
 	}
 
-	logger.Log.Error("Not all remotes could be updated.", "error", out)
+	log.Error("Not all remotes could be updated.", "error", out)
 
 	return errors.New(strings.TrimSuffix(out, "\n"))
 }

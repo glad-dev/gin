@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/glad-dev/gin/logger"
+	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
 
@@ -22,14 +22,14 @@ import (
 func QueryGitHub(match *match.Match, projectPath string, issueID string) (*Details, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
-		logger.Log.Error("Project path is invalid", "path", projectPath)
+		log.Error("Project path is invalid", "path", projectPath)
 
 		return nil, errors.New("invalid project path")
 	}
 
 	issueNumber, err := strconv.Atoi(issueID)
 	if err != nil {
-		logger.Log.Error("Failed to convert issueID to int.", "error", err, "issueID", issueID)
+		log.Error("Failed to convert issueID to int.", "error", err, "issueID", issueID)
 
 		return nil, fmt.Errorf("failed to convert issueID to int: %w", err)
 	}

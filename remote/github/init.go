@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/glad-dev/gin/logger"
-
+	"github.com/glad-dev/gin/log"
 	"github.com/google/go-github/v59/github"
 	"golang.org/x/oauth2"
 )
@@ -14,7 +13,7 @@ import (
 func Init(token string) (string, string, error) {
 	username, err := getUsername(token)
 	if err != nil {
-		logger.Log.Error("Failed to get username", "error", err)
+		log.Error("Failed to get username", "error", err)
 
 		return "", "", fmt.Errorf("GitHubDetails.Init: Failed to get Username: %w", err)
 	}
