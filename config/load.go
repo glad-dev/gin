@@ -61,7 +61,7 @@ func Load() (*Wrapper, error) {
 		return nil, err
 	}
 
-	style.Init()
+	style.UpdateColors()
 
 	return wrap, nil
 }

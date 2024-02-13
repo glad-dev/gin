@@ -8,7 +8,6 @@ import (
 
 func main() {
 	logger.Init()
-	style.Init()
 
 	err := cmd.Execute()
 	if err != nil {
