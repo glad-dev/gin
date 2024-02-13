@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newCmdList() *cobra.Command { // nolint:unused
+func newCmdListRepos() *cobra.Command { // nolint:unused
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List all repos that you have access to",

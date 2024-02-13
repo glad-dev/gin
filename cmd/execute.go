@@ -16,7 +16,7 @@ func Execute() error {
 	cmdAllIssues := newCmdAllIssues()
 	cmdSingleIssue := newCmdSingleIssue()
 	cmdConfig := newCmdConfig()
-	// cmdList := newCmdList()
+	// cmdList := newCmdListRepos()
 
 	rootCmd.AddCommand(cmdAllIssues, cmdSingleIssue, cmdConfig)
 
