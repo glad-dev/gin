@@ -1,19 +1,17 @@
 package discussion
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"fmt"
-	"github.com/shurcooL/graphql"
-	"reflect"
 	"time"
 
 	"github.com/glad-dev/gin/logger"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
+	"github.com/shurcooL/graphql"
 )
 
-type queryGitlab struct {
+type query struct {
 	Project struct {
 		Issue struct {
 			Title       graphql.String
@@ -40,12 +38,7 @@ type queryGitlab struct {
 				Nodes []struct {
 					Notes struct {
 						Nodes []struct {
-							Body      graphql.String
-							CreatedAt graphql.String
-							UpdatedAt graphql.String
-							System    graphql.Boolean
-							Resolved  graphql.Boolean
-							Author    struct {
+							Author struct {
 								Name     graphql.String
 								Username graphql.String
 							}
@@ -53,6 +46,11 @@ type queryGitlab struct {
 								Name     graphql.String
 								Username graphql.String
 							}
+							Body      graphql.String
+							CreatedAt graphql.String
+							UpdatedAt graphql.String
+							System    graphql.Boolean
+							Resolved  graphql.Boolean
 						}
 					}
 				}
@@ -61,130 +59,50 @@ type queryGitlab struct {
 	} `graphql:"project(fullPath: $projectPath)"`
 }
 
-type querySingleGitLabResponse struct {
-	Data struct {
-		Project struct {
-			Issue struct {
-				Title       string      `json:"title"`
-				Description string      `json:"description"`
-				CreatedAt   time.Time   `json:"createdAt"`
-				UpdatedAt   time.Time   `json:"updatedAt"`
-				Author      remote.User `json:"author"`
-				Assignees   struct {
-					Nodes []remote.User `json:"nodes"`
-				} `json:"assignees"`
-				Labels struct {
-					Nodes []Label `json:"nodes"`
-				} `json:"labels"`
-				Discussions struct {
-					Nodes []struct {
-						Notes struct {
-							Nodes []struct {
-								Body         string      `json:"body"`
-								CreatedAt    time.Time   `json:"createdAt"`
-								UpdatedAt    time.Time   `json:"updatedAt"`
-								LastEditedBy remote.User `json:"lastEditedBy"`
-								remote.User  `json:"author"`
-								System       bool `json:"system"`
-								Resolved     bool `json:"resolved"`
-							} `json:"nodes"`
-						} `json:"notes"`
-					} `json:"nodes"`
-				} `json:"discussions"`
-			} `json:"issue"`
-		} `json:"project"`
-	} `json:"data"`
-}
-
-const querySingleGitLab = `
-	query($projectPath: ID!, $issueID: String!) {
-		project(fullPath: $projectPath) {
-			issue(iid: $issueID) {
-				title
-				description
-				createdAt
-				updatedAt
-				author {
-					name
-					username
-				}
-				assignees {
-					nodes {
-						name
-						username
-					}
-				}
-				labels {
-					nodes {
-						title
-						color	
-					}
-				}
-				discussions {
-					nodes {
-						notes {
-							nodes {
-								system
-								author {
-									name
-									username
-								}
-								body
-								createdAt
-								updatedAt
-								resolved
-								lastEditedBy {
-								name
-								username
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-`
+const timeLayout = "2006-01-02T15:04:05Z"
 
 // QueryGitLab returns the discussion associated with the passed issueID. If the requested issue does not exist, an
 // ErrIssueDoesNotExist is returned.
 func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Details, error) {
-	variables := map[string]string{
+	client, err := match.GraphqlClient()
+	if err != nil {
+		// No need to log, since match.GraphqlClient() already logs the error
+		return nil, err
+	}
+
+	q := &query{}
+
+	err = client.Query(context.Background(), q, map[string]any{
 		"projectPath": projectPath,
-		"issueID":     issueID,
-	}
+		"issueID":     graphql.String(issueID),
+	})
 
-	response, err := graphQLRequest(&query{
-		Query:     querySingleGitLab,
-		Variables: variables,
-	}, match)
 	if err != nil {
-		return nil, fmt.Errorf("query single - request failed: %w", err)
+		logger.Log.Error("Requesting discussion", "error", err, "projectPath", projectPath, "issueID", issueID)
+
+		return nil, fmt.Errorf("requesting discussion: %w", err)
 	}
 
-	if issueDoesNotExist(response) {
-		logger.Log.Error("Requested discussion does not exist.", "issueID", issueID, "response", string(response))
-
-		return nil, ErrIssueDoesNotExist
-	}
-
-	querySingle := querySingleGitLabResponse{}
-
-	dec := json.NewDecoder(bytes.NewBuffer(response))
-	dec.DisallowUnknownFields()
-	err = dec.Decode(&querySingle)
+	creationTime, err := time.Parse(timeLayout, string(q.Project.Issue.CreatedAt))
 	if err != nil {
-		logger.Log.Error("Failed to decode discussion.", "error", err, "response", string(response))
+		logger.Log.Warn("failed to parse creation time", "time", string(q.Project.Issue.CreatedAt), "error", err)
+	}
 
-		return nil, fmt.Errorf("unmarshal of issues failed: %w", err)
+	updateTime, err := time.Parse(timeLayout, string(q.Project.Issue.UpdatedAt))
+	if err != nil {
+		logger.Log.Warn("failed to parse update time", "time", string(q.Project.Issue.UpdatedAt), "error", err)
 	}
 
 	issueDetails := Details{
-		Title:       querySingle.Data.Project.Issue.Title,
-		Description: querySingle.Data.Project.Issue.Description,
-		CreatedAt:   querySingle.Data.Project.Issue.CreatedAt,
-		UpdatedAt:   querySingle.Data.Project.Issue.UpdatedAt,
-		Author:      querySingle.Data.Project.Issue.Author,
-		BaseURL:     match.URL,
+		Title:       string(q.Project.Issue.Title),
+		Description: string(q.Project.Issue.Description),
+		CreatedAt:   creationTime,
+		UpdatedAt:   updateTime,
+		Author: remote.User{
+			Name:     string(q.Project.Issue.Author.Name),
+			Username: string(q.Project.Issue.Author.Username),
+		},
+		BaseURL: match.URL,
 
 		Assignees:  nil,
 		Labels:     nil,
@@ -194,29 +112,29 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 	// Flatten response
 	// Assignees
 	assignees := make([]remote.User, 0)
-	for _, assignee := range querySingle.Data.Project.Issue.Assignees.Nodes {
+	for _, assignee := range q.Project.Issue.Assignees.Nodes {
 		assignees = append(assignees, remote.User{
-			Name:     assignee.Name,
-			Username: assignee.Username,
+			Name:     string(assignee.Name),
+			Username: string(assignee.Username),
 		})
 	}
 	issueDetails.Assignees = assignees
 
 	// Labels
 	labels := make([]Label, 0)
-	for _, label := range querySingle.Data.Project.Issue.Labels.Nodes {
+	for _, label := range q.Project.Issue.Labels.Nodes {
 		labels = append(labels, Label{
-			Title: label.Title,
-			Color: label.Color,
+			Title: string(label.Title),
+			Color: string(label.Color),
 		})
 	}
 	issueDetails.Labels = labels
 
 	// Discussion
-	for _, node := range querySingle.Data.Project.Issue.Discussions.Nodes {
+	for _, node := range q.Project.Issue.Discussions.Nodes {
 		inner := node.Notes.Nodes
 		if len(inner) == 0 {
-			logger.Log.Info("Discussion without nodes", "response", string(response))
+			logger.Log.Info("Discussion without nodes", "response", q)
 
 			continue
 		}
@@ -225,29 +143,58 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 			continue
 		}
 
+		creationTime, err = time.Parse(timeLayout, string(inner[0].CreatedAt))
+		if err != nil {
+			logger.Log.Warn("failed to parse creation time", "time", string(inner[0].CreatedAt), "error", err)
+		}
+
+		updateTime, err = time.Parse(timeLayout, string(inner[0].UpdatedAt))
+		if err != nil {
+			logger.Log.Warn("failed to parse update time", "time", string(inner[0].UpdatedAt), "error", err)
+		}
+
 		comment := Comment{
 			Author: remote.User{
-				Name:     inner[0].Name,
-				Username: inner[0].Username,
+				Name:     string(inner[0].Author.Name),
+				Username: string(inner[0].Author.Username),
 			},
-			Body:         inner[0].Body,
-			CreatedAt:    inner[0].CreatedAt,
-			UpdatedAt:    inner[0].UpdatedAt,
-			Resolved:     inner[0].Resolved,
-			LastEditedBy: inner[0].LastEditedBy,
-			Comments:     make([]Comment, 0),
+			Body:      string(inner[0].Body),
+			CreatedAt: creationTime,
+			UpdatedAt: updateTime,
+			Resolved:  bool(inner[0].Resolved),
+			LastEditedBy: remote.User{
+				Name:     string(inner[0].LastEditedBy.Name),
+				Username: string(inner[0].LastEditedBy.Username),
+			},
+			Comments: make([]Comment, 0),
 		}
 
 		// Get sub comments
 		for _, subComment := range inner[1:] {
+			creationTime, err = time.Parse(timeLayout, string(subComment.CreatedAt))
+			if err != nil {
+				logger.Log.Warn("failed to parse creation time", "time", string(subComment.CreatedAt), "error", err)
+			}
+
+			updateTime, err = time.Parse(timeLayout, string(subComment.UpdatedAt))
+			if err != nil {
+				logger.Log.Warn("failed to parse update time", "time", string(subComment.UpdatedAt), "error", err)
+			}
+
 			comment.Comments = append(comment.Comments, Comment{
-				Author:       subComment.User,
-				Body:         subComment.Body,
-				CreatedAt:    subComment.CreatedAt,
-				UpdatedAt:    subComment.UpdatedAt,
-				Resolved:     subComment.Resolved,
-				LastEditedBy: subComment.LastEditedBy,
-				Comments:     nil,
+				Author: remote.User{
+					Name:     string(subComment.Author.Name),
+					Username: string(subComment.Author.Username),
+				},
+				Body:      string(subComment.Body),
+				CreatedAt: creationTime,
+				UpdatedAt: updateTime,
+				Resolved:  bool(subComment.Resolved),
+				LastEditedBy: remote.User{
+					Name:     string(subComment.Author.Name),
+					Username: string(subComment.Author.Username),
+				},
+				Comments: nil,
 			})
 		}
 
@@ -257,23 +204,4 @@ func QueryGitLab(match *match.Match, projectPath string, issueID string) (*Detai
 	issueDetails.UpdateUsername(match.Username)
 
 	return &issueDetails, nil
-}
-
-func issueDoesNotExist(response []byte) bool {
-	emptyResponse := struct {
-		Data struct {
-			Project struct {
-				Issue interface{} `json:"issue"`
-			} `json:"project"`
-		} `json:"data"`
-	}{}
-
-	dec := json.NewDecoder(bytes.NewBuffer(response))
-	dec.DisallowUnknownFields()
-	err := dec.Decode(&emptyResponse)
-	if err != nil {
-		return false
-	}
-
-	return !reflect.ValueOf(emptyResponse.Data.Project.Issue).IsValid()
 }
