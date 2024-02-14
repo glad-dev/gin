@@ -87,6 +87,7 @@ func updateEdit(m *model, msg tea.Msg) tea.Cmd {
 func (m *editModel) view() string {
 	return shared.RenderInputFields(
 		m.inputs,
+		"",
 		m.focusIndex,
 		m.width,
 		m.height,

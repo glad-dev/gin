@@ -61,6 +61,7 @@ func updateAdd(m *model, msg tea.Msg) tea.Cmd {
 func viewAdd(m *model) string {
 	return shared.RenderInputFields(
 		m.inputs,
+		m.remoteType.TokenRequirements(),
 		m.focusIndex,
 		m.width,
 		m.height,

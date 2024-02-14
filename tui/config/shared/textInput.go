@@ -55,10 +55,14 @@ func GetTextInputs() []textinput.Model {
 }
 
 // RenderInputFields renders the input fields created by GetTextInputs.
-func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, height int) string {
+func RenderInputFields(inputs []textinput.Model, apiDetails string, focusIndex int, width int, height int) string {
 	button := &blurredButton
 	if focusIndex == len(inputs) {
 		button = &focusedButton
+	}
+
+	if len(apiDetails) > 0 {
+		apiDetails = fmt.Sprintf(" (requires following permissions: %s)", apiDetails)
 	}
 
 	return lipgloss.Place(
@@ -73,7 +77,7 @@ func RenderInputFields(inputs []textinput.Model, focusIndex int, width int, heig
 			"Base URL",
 			style.InputField.Render(inputs[0].View()),
 			"\n",
-			"API Key",
+			"API Key"+apiDetails,
 			style.InputField.Render(inputs[1].View()),
 			"\n",
 			*button,
