@@ -3,6 +3,9 @@ package rt
 import (
 	"errors"
 	"net/url"
+	"strings"
+
+	"github.com/glad-dev/gin/constants"
 )
 
 type Type uint8
@@ -48,6 +51,18 @@ func (t Type) String() string {
 		return "GitHub"
 	case Gitlab:
 		return "GitLab"
+	}
+
+	return "Unknown type"
+}
+
+func (t Type) TokenRequirements() string {
+	switch t {
+	case Github:
+		return strings.Join(constants.RequiredGitHubScopes, ", ")
+
+	case Gitlab:
+		return strings.Join(constants.RequiredGitLabScopes, ", ")
 	}
 
 	return "Unknown type"
