@@ -40,11 +40,11 @@ func VerifyTokens() error {
 		return nil
 	}
 
-	out := "The following configs have issues:\n"
+	out := "The following remotes/tokens could not be verified:\n"
 	for urlStr, errorStructs := range invalid {
 		for _, errStruct := range errorStructs {
 			out += fmt.Sprintf(
-				"- Remote '%s' contains token '%s' with error: %s\n",
+				"- Remote '%s' contains invalid token named '%s': %s\n",
 				urlStr,
 				errStruct.tokenName,
 				errStruct.err.Error(),
