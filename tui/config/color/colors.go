@@ -2,12 +2,10 @@ package color
 
 import (
 	"github.com/glad-dev/gin/configuration"
-
 	"github.com/glad-dev/gin/style"
 
-	"github.com/charmbracelet/lipgloss"
-
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func updateColor(m *model, msg tea.Msg) tea.Cmd {

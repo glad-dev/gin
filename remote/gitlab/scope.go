@@ -7,6 +7,7 @@ import (
 
 	"github.com/glad-dev/gin/constants"
 	"github.com/glad-dev/gin/log"
+
 	"github.com/xanzy/go-gitlab"
 )
 

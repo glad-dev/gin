@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/glad-dev/gin/log"
+
 	"github.com/google/go-github/v59/github"
 	"golang.org/x/oauth2"
 )
