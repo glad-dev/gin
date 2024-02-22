@@ -8,18 +8,11 @@ import (
 	"github.com/glad-dev/gin/constants"
 )
 
-type Type struct {
-	name string
-}
+type Type uint8
 
-var (
-	Github = Type{
-		name: "GitHub",
-	}
-
-	Gitlab = Type{
-		name: "GitLab",
-	}
+const (
+	Github Type = iota
+	Gitlab
 )
 
 func (t Type) GraphqlAPIURL(u *url.URL) (string, error) { //nolint:revive
@@ -53,7 +46,14 @@ func (t Type) RestAPIURL(u *url.URL) (string, error) {
 }
 
 func (t Type) String() string {
-	return t.name
+	switch t {
+	case Github:
+		return "GitHub"
+	case Gitlab:
+		return "GitLab"
+	}
+
+	return "Unknown type"
 }
 
 func (t Type) TokenRequirements() string {
