@@ -15,7 +15,14 @@ func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
 		oldURL := m.edit.originalConfig.Remotes[m.edit.listIndex].URL.String()
 
-		err := configuration.Update(m.edit.originalConfig, m.edit.listIndex, m.edit.detailsIndex, m.edit.inputs[0].Value(), m.edit.inputs[1].Value())
+		err := configuration.Update(
+			m.edit.originalConfig,
+			m.edit.listIndex,
+			m.edit.detailsIndex,
+			m.edit.inputs[0].Value(),
+			m.edit.inputs[1].Value(),
+			true,
+		)
 		if err != nil {
 			if errors.Is(err, configuration.ErrUpdateSameValues) {
 				return updateMsg{

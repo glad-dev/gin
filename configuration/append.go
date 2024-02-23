@@ -10,7 +10,7 @@ import (
 
 // Append adds the token to the corresponding host in the  configuration file.
 // If no configuration file exists, a new one will be created.
-func Append(urlStr string, token string, remoteType rt.Type) error {
+func Append(urlStr string, token string, remoteType rt.Type, init bool) error {
 	// Load current config
 	config, err := Load()
 	if err != nil && !errors.Is(ErrConfigDoesNotExist, err) {
@@ -45,11 +45,13 @@ func Append(urlStr string, token string, remoteType rt.Type) error {
 		Token: token,
 	}
 
-	err = rd.Init(u, remoteType)
-	if err != nil {
-		log.Error("Failed to initialize token", "error", err)
+	if init {
+		err = rd.Init(u, remoteType)
+		if err != nil {
+			log.Error("Failed to initialize token", "error", err)
 
-		return err
+			return err
+		}
 	}
 
 	// Add new config
