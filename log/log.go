@@ -13,8 +13,8 @@ import (
 
 var logger *slog.Logger
 
-// Init creates the log directory and file and initializes Log to use said file.
-func Init() {
+// init creates the log directory and file and initializes Log to use said file.
+func init() {
 	err := location.CreateDir()
 	if err != nil {
 		l.Fatalf("Failed to create config directory: %s", err)
