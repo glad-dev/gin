@@ -61,7 +61,7 @@ func (r *Remote) ToMatchAtIndex(index int) (*match.Match, error) {
 
 func (r *Remote) checkSemantics() error {
 	// Check URL
-	_, err := checkURLStr(r.URL.String())
+	_, err := parseURLStr(r.URL.String())
 	if err != nil {
 		return err
 	}

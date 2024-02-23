@@ -7,7 +7,7 @@ import (
 	"github.com/glad-dev/gin/log"
 )
 
-func checkURLStr(urlStr string) (*url.URL, error) {
+func parseURLStr(urlStr string) (*url.URL, error) {
 	u, err := url.ParseRequestURI(urlStr)
 	if err != nil {
 		log.Error("URL is invalid.", "url", urlStr)

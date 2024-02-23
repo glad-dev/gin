@@ -26,7 +26,7 @@ func Update(config *Config, configIndex int, detailsIndex int, url string, token
 		return errors.New("update: invalid details index")
 	}
 
-	u, err := checkURLStr(url)
+	u, err := parseURLStr(url)
 	if err != nil {
 		return err
 	}

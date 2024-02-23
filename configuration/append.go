@@ -20,7 +20,7 @@ func Append(urlStr string, token string, remoteType rt.Type) error {
 		return err
 	}
 
-	u, err := checkURLStr(urlStr)
+	u, err := parseURLStr(urlStr)
 	if err != nil {
 		log.Error("URL is invalid.", "error", err, "url", urlStr)
 
