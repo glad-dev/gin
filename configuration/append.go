@@ -42,11 +42,10 @@ func Append(urlStr string, token string, remoteType rt.Type) error {
 	}
 
 	rd := remote.Details{
-		Type:  remoteType,
 		Token: token,
 	}
 
-	err = rd.Init(u)
+	err = rd.Init(u, remoteType)
 	if err != nil {
 		log.Error("Failed to initialize token", "error", err)
 

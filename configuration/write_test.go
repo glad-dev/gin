@@ -39,18 +39,17 @@ func TestWriteRead(t *testing.T) {
 					Scheme: "https",
 					Host:   "github.com",
 				},
+				Type: rt.Github,
 				Details: []remote.Details{
 					{
 						Token:     "Github token 1",
 						TokenName: "Github token name 1",
 						Username:  "Github username 1",
-						Type:      rt.Github,
 					},
 					{
 						Token:     "Github token 2",
 						TokenName: "Github token name 2",
 						Username:  "Github username 2",
-						Type:      rt.Github,
 					},
 				},
 			},
@@ -59,12 +58,12 @@ func TestWriteRead(t *testing.T) {
 					Scheme: "https",
 					Host:   "gitlab.com",
 				},
+				Type: rt.Gitlab,
 				Details: []remote.Details{
 					{
 						Token:     "Gitlab token",
 						TokenName: "Gitlab token name",
 						Username:  "Gitlab user name",
-						Type:      rt.Gitlab,
 					},
 				},
 			},

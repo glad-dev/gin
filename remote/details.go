@@ -13,12 +13,11 @@ type Details struct {
 	Token     string
 	TokenName string
 	Username  string
-	Type      rt.Type
 }
 
 // Init checks the token's scope and sets the username and token name associated with the token.
-func (d *Details) Init(u *url.URL) error {
-	switch d.Type {
+func (d *Details) Init(u *url.URL, remoteType rt.Type) error {
+	switch remoteType {
 	case rt.Github:
 		username, tokenName, err := github.Init(d.Token)
 		if err != nil {
@@ -31,7 +30,7 @@ func (d *Details) Init(u *url.URL) error {
 		return nil
 
 	case rt.Gitlab:
-		username, tokenName, err := gitlab.Init(d.Token, d.Type, u)
+		username, tokenName, err := gitlab.Init(d.Token, remoteType, u)
 		if err != nil {
 			return err
 		}
@@ -45,13 +44,13 @@ func (d *Details) Init(u *url.URL) error {
 	return errors.New("invalid type passed to Details.Init")
 }
 
-func (d *Details) CheckTokenScope(u *url.URL) (string, error) {
-	apiURL, err := d.Type.GraphqlAPIURL(u)
+func (d *Details) CheckTokenScope(u *url.URL, remoteType rt.Type) (string, error) {
+	apiURL, err := remoteType.GraphqlAPIURL(u)
 	if err != nil {
 		return "", err
 	}
 
-	switch d.Type {
+	switch remoteType {
 	case rt.Github:
 		return "", nil // Not implemented
 

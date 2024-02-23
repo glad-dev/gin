@@ -8,11 +8,13 @@ import (
 	"github.com/glad-dev/gin/log"
 	"github.com/glad-dev/gin/remote"
 	"github.com/glad-dev/gin/remote/match"
+	rt "github.com/glad-dev/gin/remote/type"
 )
 
 // Remote contains the remote's URL and a list of Details, containing the token, username and token name.
 type Remote struct {
 	URL     url.URL
+	Type    rt.Type
 	Details []remote.Details
 }
 
@@ -31,7 +33,7 @@ func (r *Remote) ToMatch() (*match.Match, error) {
 			Token:     r.Details[0].Token,
 			Username:  r.Details[0].Username,
 			TokenName: r.Details[0].TokenName,
-			Type:      r.Details[0].Type,
+			Type:      r.Type,
 		}, nil
 	}
 
@@ -55,7 +57,7 @@ func (r *Remote) ToMatchAtIndex(index int) (*match.Match, error) {
 		Token:     r.Details[index].Token,
 		Username:  r.Details[index].Username,
 		TokenName: r.Details[index].TokenName,
-		Type:      r.Details[index].Type,
+		Type:      r.Type,
 	}, nil
 }
 

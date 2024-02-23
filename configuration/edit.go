@@ -47,19 +47,21 @@ func Update(config *Config, configIndex int, detailsIndex int, url string, token
 		Token: token,
 	}
 
+	var remoteType rt.Type
 	if u.Host == "github.com" {
-		rd.Type = rt.Github
+		remoteType = rt.Github
 	} else {
-		rd.Type = rt.Gitlab
+		remoteType = rt.Gitlab
 	}
 
-	err = rd.Init(u)
+	err = rd.Init(u, remoteType)
 	if err != nil {
 		log.Error("Failed to initialize token", "error", err)
 
 		return err
 	}
 
+	config.Remotes[configIndex].Type = remoteType
 	config.Remotes[configIndex].Details[detailsIndex] = rd
 
 	return write(config)
