@@ -58,6 +58,7 @@ func Append(urlStr string, token string, remoteType rt.Type) error {
 		config.Remotes = append(config.Remotes, Remote{
 			URL:     *u,
 			Details: []remote.Details{rd},
+			Type:    remoteType,
 		})
 	} else {
 		// Config with given URL exists
