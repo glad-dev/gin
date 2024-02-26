@@ -13,7 +13,7 @@ import (
 var ErrUpdateSameValues = errors.New("called update config with existing values")
 
 // Update updates the token/url and checks the token's validity.
-func Update(config *Config, configIndex int, detailsIndex int, url string, token string, init bool) error {
+func Update(config *Config, configIndex int, detailsIndex int, url string, token string) error {
 	if configIndex < 0 || configIndex >= len(config.Remotes) {
 		log.Error("Config index is invalid.", "index", configIndex, "len(remotes)", len(config.Remotes))
 
@@ -54,13 +54,11 @@ func Update(config *Config, configIndex int, detailsIndex int, url string, token
 		remoteType = rt.Gitlab
 	}
 
-	if init {
-		err = rd.Init(u, remoteType)
-		if err != nil {
-			log.Error("Failed to initialize token", "error", err)
+	err = rd.Init(u, remoteType)
+	if err != nil {
+		log.Error("Failed to initialize token", "error", err)
 
-			return err
-		}
+		return err
 	}
 
 	config.Remotes[configIndex].Type = remoteType

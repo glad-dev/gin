@@ -12,7 +12,7 @@ import (
 
 func updateLoading(m *model) tea.Cmd {
 	return func() tea.Msg {
-		err := configuration.Append(m.inputs[0].Value(), m.inputs[1].Value(), m.remoteType, true)
+		err := configuration.Append(m.inputs[0].Value(), m.inputs[1].Value(), m.remoteType)
 		if err != nil {
 			return updateMsg{
 				str:     fmt.Sprintf("Could not add config: %s", err),
