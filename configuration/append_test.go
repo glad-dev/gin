@@ -53,33 +53,73 @@ func TestAppend(t *testing.T) {
 		t.Fatalf("Failed to remove existing config: %s", err)
 	}
 
-	details := struct {
+	details := [][]struct {
 		urlStr     string
 		token      string
 		remoteType rt.Type
 	}{
-		urlStr:     "https://github.com",
-		token:      "Legitimate token",
-		remoteType: rt.Github,
+		{
+			{
+				urlStr:     "https://github.com",
+				token:      "Legitimate token 1",
+				remoteType: rt.Github,
+			},
+			{
+				urlStr:     "https://github.com",
+				token:      "Legitimate token 2",
+				remoteType: rt.Github,
+			},
+		},
+		{
+			{
+				urlStr:     "https://gitlab.com",
+				token:      "Legitimate token gitlab 1",
+				remoteType: rt.Gitlab,
+			},
+			{
+				urlStr:     "https://gitlab.com",
+				token:      "Legitimate token gitlab 2",
+				remoteType: rt.Gitlab,
+			},
+		},
+		{
+			{
+				urlStr:     "https://other-gitlab.com",
+				token:      "Legitimate token gitlab 1",
+				remoteType: rt.Gitlab,
+			},
+			{
+				urlStr:     "https://other-gitlab.com",
+				token:      "Legitimate token gitlab 2",
+				remoteType: rt.Gitlab,
+			},
+		},
 	}
 
-	err = Append(details.urlStr, details.token, details.remoteType)
-	if err != nil {
-		t.Fatalf("Failed to append: %s", err)
-	}
+	for i, group := range details {
+		tokens := make([]string, 0, 2)
 
-	// Check if append successful
-	config, err := Load()
-	if err != nil {
-		t.Fatalf("Failed to load config: %s", err)
-	}
+		for _, d := range group {
+			tokens = append(tokens, d.token)
+			err = Append(d.urlStr, d.token, d.remoteType)
+			if err != nil {
+				t.Fatalf("Failed to append: %s", err)
+			}
 
-	if len(config.Remotes) != 1 {
-		t.Fatalf("Config has invalid amount of remotes. Expected 1, got %d", len(config.Remotes))
-	}
+			// Check if append successful
+			config, err := Load()
+			if err != nil {
+				t.Fatalf("Failed to load config: %s", err)
+			}
 
-	err = checkRemote(config.Remotes[0], "github.com", rt.Github, []string{details.token})
-	if err != nil {
-		t.Fatalf("Verifying loaded remote: %s", err)
+			if len(config.Remotes) != (i + 1) {
+				t.Fatalf("Config has invalid amount of remotes. Expected %d, got %d", i+1, len(config.Remotes))
+			}
+
+			err = checkRemote(config.Remotes[i], d.urlStr[len("https://"):], d.remoteType, tokens)
+			if err != nil {
+				t.Fatalf("Verifying loaded remote: %s", err)
+			}
+		}
 	}
 }
