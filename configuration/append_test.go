@@ -14,7 +14,7 @@ import (
 
 func checkRemote(remote Remote, urlHost string, remoteType rt.Type, tokens []string) error {
 	if remote.Type != remoteType {
-		return fmt.Errorf("remote type mismatch. Expected %s, got %s", remote.Type.String(), remote.Type.String())
+		return fmt.Errorf("remote type mismatch. Expected %s, got %s for tokens: %+v", remoteType.String(), remote.Type.String(), tokens)
 	}
 
 	if len(remote.Details) != len(tokens) {
@@ -63,7 +63,7 @@ func TestAppend(t *testing.T) {
 		remoteType: rt.Github,
 	}
 
-	err = Append(details.urlStr, details.token, details.remoteType, false)
+	err = Append(details.urlStr, details.token, details.remoteType)
 	if err != nil {
 		t.Fatalf("Failed to append: %s", err)
 	}
