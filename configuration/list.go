@@ -22,10 +22,10 @@ func List() error {
 
 	fmt.Println()
 	fmt.Println(style.Title.Render(fmt.Sprintf("The configuration file at '%s' contains the following remotes:", configLocation)))
-	for i, config := range config.Remotes {
-		fmt.Println(style.PrintOnlyList.Render(fmt.Sprintf("%d) %s", i+1, config.URL.String())))
+	for i, conf := range config.Remotes {
+		fmt.Println(style.PrintOnlyList.Render(fmt.Sprintf("%d) %s", i+1, conf.URL.String())))
 
-		for k, detail := range config.Details {
+		for k, detail := range conf.Details {
 			fmt.Println(style.ListDetails.Render(fmt.Sprintf(
 				"%d.%d) Username: '%s' - Token name: '%s'", // TODO: Improve output
 				i+1, k+1,
