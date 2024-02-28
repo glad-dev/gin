@@ -15,43 +15,27 @@ Type "go build -o gin"
 Enter
 Type "clear"
 Enter
-Show
 
 # Open a repo
 Type "./gin issues --url 'https://github.com/charmbracelet/bubbletea'"
-Sleep 500ms
 Enter
 ## Wait for issues to load
-Sleep 5s
+Sleep 1s
+Show
+Sleep 1.5s
 
 # Select an open issue
-Down@1s 2
+PageDown@1s 1
+Down@250ms 5
 Enter
 ## Wait for issue discussion to load
-Sleep 2s
+Sleep 1.5s
 ## Scroll down
-Down@250ms 8
-Sleep 1s
+PageDown@1.75s 2
+Sleep 1.5s
 ## Go back
 Type "q"
-
-# Select a closed issue
-Right@1s
-Sleep 1s
-Down@250ms 4
-Enter
-## Wait for issue discussion to load
-Sleep 2s
-Down@250ms 10
-Sleep 1s
-## Go back
-Type "q"
-
-## Show all issues
-Right@1s
-Sleep 1s
-Down@250ms 10
-Sleep 2s
+Sleep 1.5s
 
 # Delete the binary
 Hide

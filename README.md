@@ -1,21 +1,18 @@
 # Git Issue Navigator (gin)
 
-View the issues foa given repository on your command line.
+View the issues for a given repository on your command line.
 
 ![Gif showing gin's functionality](examples/issues.gif)
 
-## Known issues
+## Creating tokens
 
-- All issues:
-	- List items that are too wide, break the view
-	- Filtering does not show text since the UI would break otherwise
-	- Querying can take a lot of time if many issues exist
-- Single issue:
-	- List items that are too wide, look weird => Solution: Change placement, avoid lipgloss.Place
+### GitLab
 
-## v2
+Preferences > Access Tokens > New Token with scopes "read_api", "read_user", "read_repository"
 
-- [ ] Add support for PR
+### GitHub
+
+Settings > Developer settings > Personal access token > Generate new token (classic) with scopes public_repo and read_user.
 
 # Acknowledgements
 
