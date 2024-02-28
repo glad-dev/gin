@@ -31,7 +31,6 @@ linters:
     - bidichk
     - bodyclose
     - decorder
-    # - depguard
     - dupl
     - dupword
     - durationcheck
@@ -39,7 +38,6 @@ linters:
     - errorlint
     - exhaustive
     - exportloopref
-    - gochecknoinits
     - gocritic
     - godot
     - gofmt
