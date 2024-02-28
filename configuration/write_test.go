@@ -1,9 +1,7 @@
 package configuration
 
 import (
-	"log"
 	"net/url"
-	"os"
 	"reflect"
 	"testing"
 
@@ -11,20 +9,6 @@ import (
 	"github.com/glad-dev/gin/remote"
 	rt "github.com/glad-dev/gin/remote/type"
 )
-
-func TestMain(m *testing.M) {
-	dir, err := os.MkdirTemp("", "")
-	if err != nil {
-		log.Fatalf("Failed to create temp directory: %s", err)
-	}
-
-	err = os.Setenv("XDG_CONFIG_HOME", dir)
-	if err != nil {
-		log.Fatalf("Failed to set env: %s", err)
-	}
-
-	os.Exit(m.Run())
-}
 
 func TestWriteRead(t *testing.T) {
 	conf := &Config{
