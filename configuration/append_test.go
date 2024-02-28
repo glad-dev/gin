@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/glad-dev/gin/configuration/location"
@@ -13,6 +14,12 @@ import (
 )
 
 func checkRemote(remote Remote, urlHost string, remoteType rt.Type, tokens []string) error {
+	if strings.HasPrefix(urlHost, "https://") {
+		urlHost = urlHost[len("https://"):]
+	} else if strings.HasPrefix(urlHost, "http://") {
+		urlHost = urlHost[len("http://"):]
+	}
+
 	if remote.Type != remoteType {
 		return fmt.Errorf("remote type mismatch. Expected %s, got %s for tokens: %+v", remoteType.String(), remote.Type.String(), tokens)
 	}
@@ -60,36 +67,24 @@ func TestAppend(t *testing.T) {
 	}{
 		{
 			{
-				urlStr:     "https://github.com",
-				token:      "Legitimate token 1",
-				remoteType: rt.Github,
-			},
-			{
-				urlStr:     "https://github.com",
-				token:      "Legitimate token 2",
-				remoteType: rt.Github,
-			},
-		},
-		{
-			{
-				urlStr:     "https://gitlab.com",
+				urlStr:     "http://127.0.0.1" + gitlabMockPort,
 				token:      "Legitimate token gitlab 1",
 				remoteType: rt.Gitlab,
 			},
 			{
-				urlStr:     "https://gitlab.com",
+				urlStr:     "http://127.0.0.1" + gitlabMockPort,
 				token:      "Legitimate token gitlab 2",
 				remoteType: rt.Gitlab,
 			},
 		},
 		{
 			{
-				urlStr:     "https://other-gitlab.com",
+				urlStr:     "http://localhost" + gitlabMockPort,
 				token:      "Legitimate token gitlab 1",
 				remoteType: rt.Gitlab,
 			},
 			{
-				urlStr:     "https://other-gitlab.com",
+				urlStr:     "http://localhost" + gitlabMockPort,
 				token:      "Legitimate token gitlab 2",
 				remoteType: rt.Gitlab,
 			},
@@ -116,7 +111,7 @@ func TestAppend(t *testing.T) {
 				t.Fatalf("Config has invalid amount of remotes. Expected %d, got %d", i+1, len(config.Remotes))
 			}
 
-			err = checkRemote(config.Remotes[i], d.urlStr[len("https://"):], d.remoteType, tokens)
+			err = checkRemote(config.Remotes[i], d.urlStr, d.remoteType, tokens)
 			if err != nil {
 				t.Fatalf("Verifying loaded remote: %s", err)
 			}
