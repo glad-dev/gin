@@ -14,6 +14,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("Failed to create temp directory: %s", err)
 	}
+	defer os.RemoveAll(dir)
 
 	err = os.Setenv("XDG_CONFIG_HOME", dir)
 	if err != nil {
