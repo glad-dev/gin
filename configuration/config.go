@@ -74,7 +74,6 @@ func (config *Config) GetMatchingConfig(details []repository.Details) (*match.Ma
 				return m, detail.ProjectPath, nil
 			}
 		}
-
 	}
 
 	// No match => Mock up a config

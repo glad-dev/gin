@@ -14,8 +14,8 @@ import (
 // Remote contains the remote's URL and a list of Details, containing the token, username and token name.
 type Remote struct {
 	URL     url.URL
-	Type    rt.Type
 	Details []remote.Details
+	Type    rt.Type
 }
 
 // ToMatch casts the remote to a remote.Match if the remote contains one Details. An error is returned if there are none
