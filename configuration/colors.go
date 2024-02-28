@@ -18,10 +18,16 @@ type Colors struct {
 	Focused string
 }
 
-func UpdateColors(c Colors, wrap *Config) error {
-	wrap.Colors = c
+// UpdateColors sets the colors in the configuration to the provided values and writes the updated configuration back.
+func UpdateColors(c Colors, config *Config) error {
+	err := c.CheckValidity()
+	if err != nil {
+		return err
+	}
 
-	return write(wrap)
+	config.Colors = c
+
+	return write(config)
 }
 
 func (c *Colors) setColors() error {
