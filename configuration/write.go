@@ -21,7 +21,7 @@ func write(config *Config) error {
 
 	config.Version = constants.ConfigVersion
 
-	err := config.CheckValidity()
+	err := config.checkValidity()
 	if err != nil {
 		return fmt.Errorf("passed config is invalid: %w", err)
 	}

@@ -18,8 +18,8 @@ type Config struct {
 	Version uint8
 }
 
-// CheckValidity checks if the config is valid. It checks the config's version number, colors, and remotes.
-func (config *Config) CheckValidity() error {
+// checkValidity checks if the config is valid. It checks the config's version number, colors, and remotes.
+func (config *Config) checkValidity() error {
 	if len(config.Remotes) == 0 {
 		log.Error("Config does not contain any remotes.")
 

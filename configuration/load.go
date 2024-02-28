@@ -51,7 +51,7 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("config contains unexpected keys: %+v", metaData.Undecoded())
 	}
 
-	err = wrap.CheckValidity()
+	err = wrap.checkValidity()
 	if err != nil {
 		return nil, fmt.Errorf("config is invalid: %w", err)
 	}
