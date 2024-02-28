@@ -1,20 +1,34 @@
 # Git Issue Navigator (gin)
 
-View the issues for a given repository on your command line.
+View the issues of a GitHub or GitLab repository directly from your command line.
 
 ![Gif showing gin's functionality](examples/issues.gif)
 
-## Creating tokens
+## Installation
+```go
+go install github.com/glad-dev/gin@latest
+```
 
-### GitLab
+## Usage
 
-Preferences > Access Tokens > New Token with scopes "read_api", "read_user", "read_repository"
+### Configuring authentication tokens
 
-### GitHub
+Authenticate with the GiHub/GitLab APIs by importing tokens with ``gin config add``.
 
-Settings > Developer settings > Personal access token > Generate new token (classic) with scopes public_repo and read_user.
+#### Creating a GitLab token
 
-# Acknowledgements
+Create a token with scopes ``read_api``, ``read_user`` and ``read_repository`` in ``Preferences > Access Tokens``. 
+
+#### Creating a GitHub token
+
+Create a **classic** token with scopes ``repo`` and ``read_user`` in ``Settings > Developer settings > Personal access token``.
+
+### Viewing issues
+
+- To view the issues of a remote repository, use ``gin issues --url https://github.com/path/to/your/repo``.
+- To view the issues of the repository you're currently in, use ``gin issues``
+
+## Acknowledgements
 
 This project would not have been possible without [charmbracelet](https://github.com/charmbracelet) and their
 [bubbletea](https://github.com/charmbracelet/bubbletea) and [glow](https://github.com/charmbracelet/glow) libraries.
