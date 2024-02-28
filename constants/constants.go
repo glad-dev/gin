@@ -11,5 +11,5 @@ var (
 	// RequiredGitLabScopes is a list with the scopes required for a GitLab repository.
 	RequiredGitLabScopes = []string{"read_api", "read_user", "read_repository"}
 	// RequiredGitHubScopes is a list with the scopes required for a GitHub repository.
-	RequiredGitHubScopes = []string{"public_repo", "read:user"}
+	RequiredGitHubScopes = []string{"repo", "read:user"}
 )
