@@ -2,7 +2,7 @@ package constants
 
 const (
 	// Version is the tool's version.
-	Version = "1.0.0"
+	Version = "0.1.0"
 	// ConfigVersion is the version of the configuration file.
 	ConfigVersion uint8 = 1
 )
