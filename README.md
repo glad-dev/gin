@@ -4,8 +4,13 @@ View the issues of a GitHub or GitLab repository directly from your command line
 
 ![Gif showing gin's functionality](examples/issues.gif)
 
+## Features
+- Browse all issues (open/closed) from both local and remote repositories
+- View the discussion for each issue
+- Discussions have fully rendered markdown as well as correctly colored tags
+
 ## Installation
-```go
+```shell
 go install github.com/glad-dev/gin@latest
 ```
 
@@ -14,6 +19,7 @@ go install github.com/glad-dev/gin@latest
 ### Configuring authentication tokens
 
 Authenticate with the GiHub/GitLab APIs by importing tokens with ``gin config add``.
+If ``$XDG_CONFIG_HOME`` is set, the tokens are stored at ``$XDG_CONFIG_HOME/gin/``, otherwise ``~/.config/gin`` is used.
 
 #### Creating a GitLab token
 
