@@ -42,7 +42,7 @@ type query struct {
 }
 
 // QueryGitLab returns all issues, open and closed, of a given repository.
-func QueryGitLab(match *match.Match, projectPath string) ([]Issue, error) {
+func QueryGitLab(match *match.Match, projectPath string, channel chan int) ([]Issue, error) {
 	client, err := match.GraphqlClient()
 	if err != nil {
 		// No need to log, since match.GraphqlClient() already logs the error
@@ -95,6 +95,8 @@ func QueryGitLab(match *match.Match, projectPath string) ([]Issue, error) {
 				Assignees: assignees,
 			})
 		}
+
+		sendCountUpdate(channel, len(issueList))
 
 		cursor = q.Project.Issues.PageInfo.EndCursor
 		if !q.Project.Issues.PageInfo.HasNextPage {

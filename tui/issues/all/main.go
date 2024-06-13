@@ -50,6 +50,8 @@ func Show(details []repository.Details, u *url.URL) {
 			viewedIssues:        make(map[string]discussion.Details),
 			currentlyDisplaying: displayingInitialLoading,
 			state:               stateRunning,
+			channel:             make(chan int, 4),
+			alreadyLoaded:       0,
 		},
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),

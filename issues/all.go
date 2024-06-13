@@ -12,7 +12,7 @@ import (
 
 // QueryList returns a list of issues associated with a repository. Uses the GraphQL API since it is faster than the
 // REST API.
-func QueryList(conf *configuration.Config, details []repository.Details, u *url.URL) ([]list.Issue, error) {
+func QueryList(conf *configuration.Config, details []repository.Details, u *url.URL, channel chan int) ([]list.Issue, error) {
 	match, projectPath, err := getMatchingConfig(conf, details, u)
 	if err != nil {
 		log.Error("Failed to get matching config", "error", err)
@@ -21,8 +21,8 @@ func QueryList(conf *configuration.Config, details []repository.Details, u *url.
 	}
 
 	if match.Type == rt.Github {
-		return list.QueryGitHub(match, projectPath)
+		return list.QueryGitHub(match, projectPath, channel)
 	}
 
-	return list.QueryGitLab(match, projectPath)
+	return list.QueryGitLab(match, projectPath, channel)
 }

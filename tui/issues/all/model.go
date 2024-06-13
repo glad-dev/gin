@@ -36,9 +36,11 @@ type model struct {
 	shared              *shared.Shared
 	conf                *configuration.Config
 	viewedIssues        map[string]discussion.Details
+	channel             chan int
 	tabs                tabs
 	error               string
 	viewport            viewport.Model
+	alreadyLoaded       int
 	state               state
 	currentlyDisplaying displaying
 }
@@ -59,10 +61,15 @@ type singleIssueUpdateMsg struct {
 	issueID  string
 }
 
+type alreadyLoadedItemsMsg struct {
+	newValue int
+}
+
 // Init is required for model to be a tea.Model.
 func (m model) Init() tea.Cmd {
 	return tea.Batch(
 		getIssues(&m),
+		updateLoadedCount(&m),
 		m.shared.Spinner.Tick,
 	)
 }
@@ -78,6 +85,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		shared.ViewportSetSize(&m.viewport, &msg, m.shared.IssueID)
+
+		return m, nil
+
+	case alreadyLoadedItemsMsg:
+		if msg.newValue > m.alreadyLoaded {
+			m.alreadyLoaded = msg.newValue
+		}
 
 		return m, nil
 
@@ -120,7 +134,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch m.currentlyDisplaying {
 	case displayingInitialLoading:
-		return m, cmds[0]
+		cmds[1] = updateLoadedCount(&m)
+
+		return m, tea.Batch(cmds...)
 
 	case displayingList:
 		cmds[1] = updateList(&m, msg)
@@ -161,7 +177,7 @@ func (m model) View() string {
 			lipgloss.Center,
 			lipgloss.Center,
 
-			fmt.Sprintf("Loading %s", m.shared.Spinner.View()),
+			fmt.Sprintf("%s Loading issues (%d so far)", m.shared.Spinner.View(), m.alreadyLoaded),
 		)
 
 	case displayingList:
@@ -177,7 +193,7 @@ func (m model) View() string {
 
 func getIssues(m *model) func() tea.Msg {
 	return func() tea.Msg {
-		allIssues, err := issues.QueryList(m.conf, m.shared.Details, m.shared.URL)
+		allIssues, err := issues.QueryList(m.conf, m.shared.Details, m.shared.URL, m.channel)
 		if err != nil {
 			return allIssuesUpdateMsg{
 				items:    nil,
@@ -195,5 +211,18 @@ func getIssues(m *model) func() tea.Msg {
 		return allIssuesUpdateMsg{
 			items: issueList,
 		}
+	}
+}
+
+func updateLoadedCount(m *model) func() tea.Msg {
+	return func() tea.Msg {
+		select {
+		case loaded := <-m.channel:
+			return alreadyLoadedItemsMsg{newValue: loaded}
+		default:
+			// Channel is empty
+		}
+
+		return nil
 	}
 }

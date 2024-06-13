@@ -51,7 +51,7 @@ type followingQuery struct { // Needed since GitHub considers an empty "after" t
 }
 
 // QueryGitHub returns all issues, open and closed, of a given repository.
-func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
+func QueryGitHub(match *match.Match, projectPath string, channel chan int) ([]Issue, error) {
 	tmp := strings.Split(projectPath, "/")
 	if len(tmp) != 2 {
 		log.Error("Project path is invalid", "path", projectPath)
@@ -76,6 +76,7 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 		return nil, fmt.Errorf("query failed: %w", err)
 	}
 
+	// Manually load the first page
 	lst := flatten(fq.Repository.Issues)
 	if !fq.Repository.Issues.PageInfo.HasNextPage {
 		return lst, nil
@@ -84,9 +85,12 @@ func QueryGitHub(match *match.Match, projectPath string) ([]Issue, error) {
 	issueList := make([]Issue, 0)
 	issueList = append(issueList, lst...)
 
+	// Load the following pages
 	cursor := fq.Repository.Issues.PageInfo.EndCursor
 	q := &followingQuery{}
 	for {
+		sendCountUpdate(channel, len(issueList))
+
 		err = client.Query(context.Background(), q, map[string]any{
 			"owner": graphql.String(tmp[0]), // owner is at tmp[0], repository name is at tmp[1]
 			"name":  graphql.String(tmp[1]),
