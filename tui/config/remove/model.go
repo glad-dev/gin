@@ -128,5 +128,5 @@ func submit(m *model) (string, bool) {
 		return style.FormatQuitText(fmt.Sprintf("Failed to remove remote: %s", err)), true
 	}
 
-	return style.FormatQuitText(fmt.Sprintf("Sucessfully deleted the token '%s'\nRemember to delete the API key", tokenName)), false
+	return style.FormatQuitText(fmt.Sprintf("Successfully deleted the token '%s'\nRemember to delete the API key", tokenName)), false
 }

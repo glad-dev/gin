@@ -31,7 +31,7 @@ func updateLoading(m *model) tea.Cmd {
 		}
 
 		return updateMsg{
-			str:     style.FormatQuitText(fmt.Sprintf("Sucessfully updated the remote %s", oldURL)),
+			str:     style.FormatQuitText(fmt.Sprintf("Successfully updated the remote %s", oldURL)),
 			success: true,
 		}
 	}
